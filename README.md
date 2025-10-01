@@ -21,7 +21,7 @@ Those who find an item can post it, while those who are looking for something ca
 ## 🛠 Tech Stack
 
 - **Frontend**: Javascript, HTML5 and CSS3
-- **Backend**: Java and XML
+- **Backend**: Java, JSP, Java Servlets and XML
 - **Database**: MySQL
 
 
