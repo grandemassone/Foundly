@@ -1,3 +1,7 @@
+
+<img width="500" height="500" alt="Foundly logo" src="https://github.com/user-attachments/assets/a905d2e5-1f18-4bd2-a1be-d4be39e025d1" />
+
+
 # 💚 Foundly 💚
 
 **Foundly** is a web application that helps people **report, search for, and reclaim lost items** in a simple and secure way.  
