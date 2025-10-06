@@ -1,7 +1,10 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/0236924e-c2f0-4380-a8ea-a399ac8fab06"
-       alt="foundly-logo"
-       style="filter: greyscale(); width: 15%; border-radius: 50%;"/>
+  <img
+    src="https://github.com/user-attachments/assets/6e9a0026-0671-45b5-bb89-6ae375693952"
+    alt="logo_foundly"
+    width="200"
+    height="200"
+  />
 </div>
 
 **Foundly** is a web application that helps people **report, search for, and reclaim lost items** in a simple and secure way.  
