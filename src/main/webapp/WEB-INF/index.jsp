@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Founldy</title>
+    <title>Foundly</title>
 </head>
 <body>
 <h1><%= "Hello World!" %>
