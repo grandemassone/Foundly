@@ -1,5 +1,5 @@
 
-<img width="1024" height="1024" alt="Logo Foundly" src="https://github.com/user-attachments/assets/0236924e-c2f0-4380-a8ea-a399ac8fab06" />
+<img width="512" height="512" alt="Logo Foundly" src="https://github.com/user-attachments/assets/0236924e-c2f0-4380-a8ea-a399ac8fab06" />
 
 **Foundly** is a web application that helps people **report, search for, and reclaim lost items** in a simple and secure way.  
 Those who find an item can post it, while those who are looking for something can locate it and claim ownership.  
