@@ -15,7 +15,7 @@ public class connectionTest {
                 + "&serverTimezone=Europe/Rome"
                 + "&enabledTLSProtocols=TLSv1.2,TLSv1.3";
         String user = "avnadmin";
-        String pass = System.getenv("DB_PASSKEY");;
+        String pass = System.getenv("DB_PASSKEY");
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
