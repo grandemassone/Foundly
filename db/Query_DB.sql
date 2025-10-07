@@ -147,11 +147,13 @@ VALUES
 ('luca.verdi', 'Luca', 'Verdi', 'luca.verdi@email.com', 'pass123', 'Roma', 'RM', '3332221111', 80, 'Lara Croft', 'user', 'img/profili/luca.jpg'),
 ('admin', 'Admin', 'System', 'admin@foundly.com', 'admin123', 'Torino', 'TO', '3200000000', 0, NULL, 'admin', 'img/profili/admin.jpg'),
 ('giulia.bianchi', 'Giulia', 'Bianchi', 'giulia.bianchi@email.com', 'pass123', 'Bologna', 'BO', '3471122334', 45, NULL, 'user', 'img/profili/giulia.jpg');
+
 INSERT INTO drop_point (nome_attivita, indirizzo, citta, provincia, telefono, email_contatto, orari_apertura, orari_chiusura, descrizione, latitudine, longitudine, immagine)
 VALUES
 ('Pet Shop Amici a 4 Zampe', 'Via Roma 42', 'Milano', 'MI', '0287654321', 'info@amicia4zampe.it', '09:00', '19:00', 'Punto di raccolta per oggetti e animali smarriti.', 45.464211, 9.191383, 'img/drop/petshop.jpg'),
 ('Libreria Il Segnalibro', 'Corso Garibaldi 15', 'Roma', 'RM', '066712345', 'contatti@ilsegnalibro.it', '10:00', '18:00', 'Accetta piccoli oggetti e documenti smarriti.', 41.902782, 12.496366, 'img/drop/libreria.jpg'),
 ('Bar Centrale', 'Piazza Maggiore 1', 'Bologna', 'BO', '051987654', 'barcentrale@gmail.com', '07:30', '22:00', 'Luogo di scambio sicuro per Foundly.', 44.493671, 11.343035, 'img/drop/bar.jpg');
+
 INSERT INTO oggetto_smarrito (
   id_utente, id_drop_point, titolo, descrizione, categoria, marca, caratteristiche,
   domanda_verifica1, domanda_verifica2, domanda_verifica3,
@@ -167,6 +169,7 @@ VALUES
  'Elettronica', 'Samsung', 'Schermo leggermente graffiato, cover blu.', 
  'Di che colore è la cover?', 'Qual è la marca?', 'Ha una pellicola sullo schermo?', 
  '2025-09-30', 'Villa Borghese', 'Roma', 'RM', 'disponibile', 'img/oggetti/telefono.jpg');
+
 INSERT INTO animale_smarrito (
   id_utente, id_drop_point, nome, specie, razza, colore, caratteristiche,
   domanda_verifica1, domanda_verifica2, domanda_verifica3,
@@ -180,6 +183,7 @@ VALUES
 (4, 3, 'N/A', 'gatto', 'europeo', 'grigio', 'Molto docile, aveva un collarino blu.',
  'Di che colore è il collarino?', 'È maschio o femmina?', 'Ha segni particolari?',
  '2025-10-05', 'Via Indipendenza', 'Bologna', 'BO', 'disponibile', 'img/animali/gatto.jpg');
+
 INSERT INTO reclamo (
   id_utente_richiedente, id_oggetto, id_animale,
   risposta1, risposta2, risposta3, messaggio
