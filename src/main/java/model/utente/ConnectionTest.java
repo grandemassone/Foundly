@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-public class connectionTest {
+public class ConnectionTest {
     public static void main(String[] args) {
         String url = "jdbc:mysql://foundly-db-salvolepore7.j.aivencloud.com:21893/defaultdb"
                 + "?useSSL=true"
