@@ -22,15 +22,15 @@ public class ConnectionTest {
 
             try (Connection c = DriverManager.getConnection(url, user, pass)) {
                 System.out.println("✅ Connessione riuscita!");
-                System.out.println("📋 Nomi degli utenti registrati:");
+                System.out.println("📋 Nome, cognome e badge degli utenti registrati:");
                 System.out.println("--------------------------------");
 
-                String query = "SELECT nome, cognome FROM user";
+                String query = "SELECT nome, cognome, badge FROM user";
                 try (PreparedStatement ps = c.prepareStatement(query);
                      ResultSet rs = ps.executeQuery()) {
 
                     while (rs.next()) {
-                        System.out.println("👤 " + rs.getString("nome") + " " + rs.getString("cognome"));
+                        System.out.println("👤 " + rs.getString("nome") + " " + rs.getString("cognome") + ": " + rs.getString("badge"));
                     }
                 }
             }

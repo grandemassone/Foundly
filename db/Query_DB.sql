@@ -144,8 +144,8 @@ CREATE TABLE reclamo (
 INSERT INTO user (username, nome, cognome, email, passkey, citta, provincia, numero_telefono, punti, badge, ruolo, immagine_profilo)
 VALUES
 ('maria.rossi', 'Maria', 'Rossi', 'maria.rossi@email.com', 'pass123', 'Milano', 'MI', '3456789012', 120, 'Indiana Jones', 'user', 'img/profili/maria.jpg'),
-('luca.verdi', 'Luca', 'Verdi', 'luca.verdi@email.com', 'pass123', 'Roma', 'RM', '3332221111', 80, 'Lara Croft', 'user', 'img/profili/luca.jpg'),
-('admin', 'Admin', 'System', 'admin@foundly.com', 'admin123', 'Torino', 'TO', '3200000000', 0, NULL, 'admin', 'img/profili/admin.jpg'),
+('luca.verdi', 'Luca', 'Verdi', 'luca.verdi@email.com', 'pass123', 'Roma', 'RM', '3457912467', 80, 'Lara Croft', 'user', 'img/profili/luca.jpg'),
+('admin', 'Admin', 'System', 'admin@foundly.com', 'admin123', 'Torino', 'TO', '3245689215', 0, NULL, 'admin', 'img/profili/admin.jpg'),
 ('giulia.bianchi', 'Giulia', 'Bianchi', 'giulia.bianchi@email.com', 'pass123', 'Bologna', 'BO', '3471122334', 45, NULL, 'user', 'img/profili/giulia.jpg');
 
 INSERT INTO drop_point (nome_attivita, indirizzo, citta, provincia, telefono, email_contatto, orari_apertura, orari_chiusura, descrizione, latitudine, longitudine, immagine)
