@@ -1,12 +1,13 @@
 -- ============================================
--- Foundly - Schema completo "from scratch"
--- (coerente con: claim -> codice -> chiusura
---  via Drop-Point o doppia conferma diretta)
+-- Foundly - Schema completo (aggiornato)
+-- - Drop-Point con stato + responsabile
+-- - Codice di Consegna univoco
+-- - Flusso: claim -> codice -> chiusura (DP o diretto)
 -- ============================================
 
 USE defaultdb;
 
--- Drop in ordine (prima i trigger, poi le tabelle)
+-- Drop in ordine (prima trigger, poi tabelle)
 DROP TRIGGER IF EXISTS trg_user_badge_update;
 DROP TRIGGER IF EXISTS trg_user_badge_initial;
 DROP TRIGGER IF EXISTS trg_reclamo_close_and_score;
@@ -33,7 +34,7 @@ CREATE TABLE `user` (
   numero_telefono  VARCHAR(15)  NOT NULL,
   punti            INT NOT NULL DEFAULT 0,
   badge            ENUM('Sherlock Holmes','Lara Croft','Indiana Jones','Dora') DEFAULT NULL,
-  ruolo            ENUM('user','admin') DEFAULT 'user',
+  ruolo            ENUM('user','admin','drop_point') DEFAULT 'user',
   immagine_profilo VARCHAR(255)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -45,6 +46,8 @@ CREATE TABLE drop_point (
   provincia           VARCHAR(100) NOT NULL,
   telefono            VARCHAR(20),
   email_contatto      VARCHAR(100),
+
+  -- orari semplici per MVP
   orari_apertura      ENUM(
     '00:00','00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30',
     '05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30',
@@ -59,11 +62,21 @@ CREATE TABLE drop_point (
     '15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30',
     '20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'
   ),
+
   descrizione         TEXT,
   latitudine          DECIMAL(10,7),
   longitudine         DECIMAL(10,7),
   data_registrazione  DATETIME DEFAULT CURRENT_TIMESTAMP,
-  immagine            VARCHAR(255) NOT NULL
+  immagine            VARCHAR(255) NOT NULL,
+
+  -- (a) Stato di approvazione/operatività
+  stato               ENUM('in_attesa','approvato','sospeso') NOT NULL DEFAULT 'in_attesa',
+
+  -- (a) Responsabile (facoltativo) con ruolo 'drop_point'
+  id_utente_responsabile INT NULL,
+
+  CONSTRAINT fk_dp_responsabile
+    FOREIGN KEY (id_utente_responsabile) REFERENCES `user`(id_utente) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =========================
@@ -71,8 +84,8 @@ CREATE TABLE drop_point (
 -- =========================
 CREATE TABLE oggetto_smarrito (
   id_oggetto          INT AUTO_INCREMENT PRIMARY KEY,
-  id_utente           INT NOT NULL,
-  id_drop_point       INT NULL,
+  id_utente           INT NOT NULL,             -- finder
+  id_drop_point       INT NULL,                 -- DP suggerito (opzionale)
 
   titolo              VARCHAR(100) NOT NULL,
   descrizione         TEXT NOT NULL,
@@ -100,8 +113,8 @@ CREATE TABLE oggetto_smarrito (
 
 CREATE TABLE animale_smarrito (
   id_animale          INT AUTO_INCREMENT PRIMARY KEY,
-  id_utente           INT NOT NULL,
-  id_drop_point       INT NULL,
+  id_utente           INT NOT NULL,             -- finder
+  id_drop_point       INT NULL,                 -- DP suggerito (opzionale)
 
   nome                VARCHAR(50),
   specie              VARCHAR(50) NOT NULL,
@@ -128,7 +141,7 @@ CREATE TABLE animale_smarrito (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =======================
--- 3) Claim (owner)
+-- 3) Reclamo (owner)
 -- =======================
 CREATE TABLE reclamo (
   id_reclamo            INT AUTO_INCREMENT PRIMARY KEY,
@@ -147,7 +160,7 @@ CREATE TABLE reclamo (
   stato                 ENUM('inviato','accettato','rifiutato') NOT NULL DEFAULT 'inviato',
   motivazione_rifiuto   TEXT,
 
-  -- Codice di consegna (solo dopo accettazione)
+  -- (b) Codice di consegna: unico a livello tabella
   codice_consegna       CHAR(6) NULL,
   codice_scadenza       DATETIME NULL,
   codice_stato          ENUM('valido','usato','scaduto') NULL,
@@ -168,25 +181,25 @@ CREATE TABLE reclamo (
   CONSTRAINT fk_re_dp_dep FOREIGN KEY (dp_deposito_id)        REFERENCES drop_point(id_drop_point)      ON DELETE SET NULL,
   CONSTRAINT fk_re_dp_rit FOREIGN KEY (dp_ritiro_id)          REFERENCES drop_point(id_drop_point)      ON DELETE SET NULL,
 
-  -- XOR: o oggetto, o animale (MySQL 8.0.16+)
+  -- esattamente uno tra oggetto e animale (MySQL 8.0.16+)
   CONSTRAINT chk_re_target_xor CHECK (
     (id_oggetto IS NOT NULL AND id_animale IS NULL) OR
     (id_oggetto IS NULL     AND id_animale IS NOT NULL)
   )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Indici utili (una sola volta)
-CREATE INDEX idx_reclamo_stato   ON reclamo (stato);
-CREATE INDEX idx_reclamo_codice  ON reclamo (codice_consegna, codice_stato);
-CREATE INDEX idx_reclamo_oggetto ON reclamo (id_oggetto);
-CREATE INDEX idx_reclamo_animale ON reclamo (id_animale);
+-- Indici (incluso codice univoco)
+CREATE UNIQUE INDEX ux_reclamo_codice   ON reclamo (codice_consegna);
+CREATE INDEX idx_reclamo_stato          ON reclamo (stato);
+CREATE INDEX idx_reclamo_oggetto        ON reclamo (id_oggetto);
+CREATE INDEX idx_reclamo_animale        ON reclamo (id_animale);
 
 -- ======================
 -- 4) Trigger
 -- ======================
 DELIMITER $$
 
--- Badge in base ai punti (all'insert)
+-- Badge in base ai punti (insert)
 CREATE TRIGGER trg_user_badge_initial
 BEFORE INSERT ON `user`
 FOR EACH ROW
@@ -204,7 +217,7 @@ BEGIN
   END IF;
 END$$
 
--- Genera codice quando il claim viene accettato
+-- Genera il codice quando il claim viene ACCETTATO
 CREATE TRIGGER trg_reclamo_generate_code
 BEFORE UPDATE ON reclamo
 FOR EACH ROW
@@ -240,7 +253,7 @@ BEGIN
        SET codice_stato = 'usato'
      WHERE id_reclamo = NEW.id_reclamo;
 
-    -- chiudi la segnalazione e ricava il finder
+    -- chiudi la segnalazione collegata e ricava il finder
     IF NEW.id_oggetto IS NOT NULL THEN
       UPDATE oggetto_smarrito
          SET stato = 'chiusa'
@@ -257,14 +270,14 @@ BEGIN
        WHERE id_animale = NEW.id_animale;
     END IF;
 
-    -- 1 punto al finder (scoreboard)
+    -- assegna 1 punto al finder (scoreboard)
     IF v_finder_id IS NOT NULL THEN
       UPDATE `user` SET punti = punti + 1 WHERE id_utente = v_finder_id;
     END IF;
   END IF;
 END$$
 
--- Badge anche quando i punti cambiano
+-- Badge aggiornato quando cambiano i punti
 CREATE TRIGGER trg_user_badge_update
 AFTER UPDATE ON `user`
 FOR EACH ROW
