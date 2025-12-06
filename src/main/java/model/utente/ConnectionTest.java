@@ -1,44 +1,68 @@
 package model.utente;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import model.bean.Utente;
+import model.bean.enums.Ruolo;
+import model.dao.UtenteDAO;
+import model.utils.PasswordUtils; // Importa la nuova classe utility
 
 public class ConnectionTest {
     public static void main(String[] args) {
-        String url = "jdbc:mysql://foundly-db-salvolepore7.j.aivencloud.com:21893/defaultdb"
-                + "?useSSL=true"
-                + "&requireSSL=true"
-                + "&verifyServerCertificate=false"
-                + "&allowPublicKeyRetrieval=true"
-                + "&serverTimezone=Europe/Rome"
-                + "&enabledTLSProtocols=TLSv1.2,TLSv1.3";
-        String user = "avnadmin";
-        String pass = System.getenv("DB_PASSKEY");
+        System.out.println("🚀 Inizio Test Sicurezza Password...");
+
+        UtenteDAO utenteDAO = new UtenteDAO();
+        long timeSeed = System.currentTimeMillis();
+
+        // 1. Definiamo una password in chiaro
+        String passwordInChiaro = "Segreto123!";
+
+        System.out.println("🔑 Password utente: " + passwordInChiaro);
+
+        // 2. Creiamo l'hash
+        String passwordHashata = PasswordUtils.hashPassword(passwordInChiaro);
+        System.out.println("🔒 Hash generato (da salvare nel DB): " + passwordHashata);
+
+        // 3. Creiamo l'utente con l'hash
+        Utente nuovoUtente = new Utente();
+        nuovoUtente.setNome("Luigi");
+        nuovoUtente.setCognome("Verdi");
+        nuovoUtente.setUsername("luigi_" + timeSeed);
+        nuovoUtente.setEmail("luigi." + timeSeed + "@secure.com");
+
+        // IMPORTANTE: Settiamo l'hash, NON la password in chiaro!
+        nuovoUtente.setPasswordHash(passwordHashata);
+
+        nuovoUtente.setTelefono("3339998888");
+        nuovoUtente.setImmagineProfilo("img/avatar.png");
+        nuovoUtente.setRuolo(Ruolo.UTENTE_BASE);
+        nuovoUtente.setBadge("OCCHIO_DI_FALCO");
 
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            // 4. Salviamo nel DB
+            if (utenteDAO.doSave(nuovoUtente)) {
+                System.out.println("✅ Utente salvato con password criptata.");
+            }
 
-            try (Connection c = DriverManager.getConnection(url, user, pass)) {
-                System.out.println("✅ Connessione riuscita!");
-                System.out.println("📋 Nome, cognome e badge degli utenti registrati:");
-                System.out.println("--------------------------------");
+            // 5. Simuliamo il LOGIN
+            System.out.println("\n--- Simulazione Login ---");
+            String emailLogin = nuovoUtente.getEmail();
+            String passwordInseritaLogin = "Segreto123!"; // Quella giusta
+            String passwordErrata = "Sbagliata!";
 
-                String query = "SELECT nome, cognome, badge FROM user";
-                try (PreparedStatement ps = c.prepareStatement(query);
-                     ResultSet rs = ps.executeQuery()) {
+            // Recuperiamo l'utente dal DB
+            Utente utenteDb = utenteDAO.doRetrieveByEmail(emailLogin);
 
-                    while (rs.next()) {
-                        System.out.println("👤 " + rs.getString("nome") + " " + rs.getString("cognome") + ": " + rs.getString("badge"));
-                    }
-                }
+            if (utenteDb != null) {
+                // Test Password Corretta
+                boolean accessoConsentito = PasswordUtils.checkPassword(passwordInseritaLogin, utenteDb.getPasswordHash());
+                System.out.println("Tentativo con password corretta: " + (accessoConsentito ? "✅ ACCESSO RIUSCITO" : "❌ ERRORE"));
+
+                // Test Password Errata
+                boolean accessoNegato = PasswordUtils.checkPassword(passwordErrata, utenteDb.getPasswordHash());
+                System.out.println("Tentativo con password errata:   " + (!accessoNegato ? "✅ ACCESSO NEGATO (Corretto)" : "❌ ERRORE DI SICUREZZA"));
             }
 
         } catch (Exception e) {
-            System.err.println("❌ Errore di connessione o query:");
             e.printStackTrace();
         }
     }
 }
-

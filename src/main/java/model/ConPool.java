@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConPool {
-
     private static final String URL = "jdbc:mysql://foundly-db-salvolepore7.j.aivencloud.com:21893/defaultdb"
             + "?useSSL=true"
             + "&requireSSL=true"
@@ -21,7 +20,7 @@ public class ConPool {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("❌ Driver MySQL non trovato!", e);
+            throw new RuntimeException("Driver MySQL non trovato!", e);
         }
     }
 

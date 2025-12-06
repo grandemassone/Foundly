@@ -1,0 +1,2451 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.mvn/
+  wrapper/
+    maven-wrapper.jar
+    maven-wrapper.properties
+db/
+  insert.sql
+  schemaDB.sql
+doc/
+  SOW_Foundly_2025-2026.pdf
+src/
+  main/
+    java/
+      controller/
+        LoginServlet.java
+        RegistrazioneDropPointServlet.java
+        RegistrazioneUtenteServlet.java
+      model/
+        bean/
+          enums/
+            CategoriaOggetto.java
+            ModalitaConsegna.java
+            Ruolo.java
+            StatoReclamo.java
+            StatoSegnalazione.java
+            TipoSegnalazione.java
+          DropPoint.java
+          Reclamo.java
+          Segnalazione.java
+          SegnalazioneAnimale.java
+          SegnalazioneOggetto.java
+          Utente.java
+        dao/
+          DropPointDAO.java
+          UtenteDAO.java
+        service/
+          DropPointService.java
+          UtenteService.java
+        utente/
+          ConnectionTest.java
+        utils/
+          PasswordUtils.java
+        ConPool.java
+    webapp/
+      css/
+        index.css
+      javascript/
+        index.js
+      WEB-INF/
+        jsp/
+          login.jsp
+          registrazione_droppoint.jsp
+          registrazione_utente.jsp
+        web.xml
+      index.jsp
+.gitignore
+mvnw
+mvnw.cmd
+pom.xml
+README.md
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="db/schemaDB.sql">
+DROP DATABASE IF EXISTS defaultdb;
+CREATE DATABASE defaultdb;
+USE defaultdb;
+
+-- 1. UTENTE
+CREATE TABLE utente
+(
+    id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username           VARCHAR(50)  NOT NULL UNIQUE,
+    email              VARCHAR(100) NOT NULL UNIQUE,
+    password_hash      VARCHAR(255) NOT NULL,
+    nome               VARCHAR(50)  NOT NULL,
+    cognome            VARCHAR(50)  NOT NULL,
+    telefono           VARCHAR(20),
+    immagine_profilo   VARCHAR(255),
+    punteggio          INT                                                      DEFAULT 0,
+    ruolo              ENUM ('UTENTE_BASE', 'ADMIN')                            DEFAULT 'UTENTE_BASE',
+    badge              ENUM ('OCCHIO_DI_FALCO', 'DETECTIVE', 'SHERLOCK_HOLMES') DEFAULT 'OCCHIO_DI_FALCO'
+);
+
+-- 2. DROP-POINT
+CREATE TABLE drop_point
+(
+    id                BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome_attivita     VARCHAR(100) NOT NULL,
+    email             VARCHAR(100) NOT NULL UNIQUE,
+    password_hash     VARCHAR(255) NOT NULL,
+    indirizzo         VARCHAR(100) NOT NULL,
+    citta             VARCHAR(50)  NOT NULL,
+    provincia         VARCHAR(50)  NOT NULL,
+    telefono          VARCHAR(20),
+    orari_apertura    VARCHAR(255),
+    descrizione       TEXT,
+    immagine          VARCHAR(255),
+    latitudine        DOUBLE,
+    longitudine       DOUBLE,
+    ritiri_effettuati INT                                          DEFAULT 0,
+    stato             ENUM ('IN_ATTESA', 'APPROVATO', 'RIFIUTATO') DEFAULT 'IN_ATTESA'
+);
+
+-- 3. SEGNALAZIONE (Tabella Padre - Abstract)
+CREATE TABLE segnalazione
+(
+    id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_utente          BIGINT                      NOT NULL,
+    titolo             VARCHAR(100)                NOT NULL,
+    descrizione        TEXT                        NOT NULL,
+    data_ritrovamento  DATETIME                    NOT NULL,
+    luogo_ritrovamento VARCHAR(100)                NOT NULL,
+    citta              VARCHAR(50)                 NOT NULL,
+    provincia          VARCHAR(50)                 NOT NULL,
+    latitudine         DOUBLE,
+    longitudine        DOUBLE,
+    immagine           VARCHAR(255),
+    domanda_verifica1  VARCHAR(255)                NOT NULL,
+    domanda_verifica2  VARCHAR(255)                NOT NULL,
+    data_pubblicazione DATETIME                                 DEFAULT CURRENT_TIMESTAMP,
+    stato              ENUM ('APERTA', 'IN_CONSEGNA', 'CHIUSA') DEFAULT 'APERTA',
+    tipo_segnalazione  ENUM ('OGGETTO', 'ANIMALE') NOT NULL,
+    FOREIGN KEY (id_utente) REFERENCES utente (id) ON DELETE CASCADE
+);
+
+-- 4. SEGNALAZIONE OGGETTO (Estensione)
+CREATE TABLE segnalazione_oggetto
+(
+    id_segnalazione   BIGINT PRIMARY KEY,
+    categoria         ENUM ('DOCUMENTI', 'ELETTRONICA', 'PORTAFOGLI', 'CHIAVI', 'GIOIELLI', 'ABBIGLIAMENTO', 'ALTRO') NOT NULL,
+    modalita_consegna ENUM ('DIRETTA', 'DROP_POINT')                                                                  NOT NULL,
+    id_drop_point     BIGINT,
+    FOREIGN KEY (id_segnalazione) REFERENCES segnalazione (id) ON DELETE CASCADE,
+    FOREIGN KEY (id_drop_point) REFERENCES drop_point (id) ON DELETE SET NULL
+);
+
+-- 5. SEGNALAZIONE ANIMALE (Estensione)
+CREATE TABLE segnalazione_animale
+(
+    id_segnalazione BIGINT PRIMARY KEY,
+    specie          VARCHAR(50) NOT NULL,
+    razza           VARCHAR(50),
+    FOREIGN KEY (id_segnalazione) REFERENCES segnalazione (id) ON DELETE CASCADE
+);
+
+-- 6. RECLAMO (Secure Claim)
+CREATE TABLE reclamo
+(
+    id                    BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_segnalazione       BIGINT       NOT NULL,
+    id_utente_richiedente BIGINT       NOT NULL,
+    risposta_verifica1    VARCHAR(255) NOT NULL,
+    risposta_verifica2    VARCHAR(255) NOT NULL,
+    data_richiesta        DATETIME                                     DEFAULT CURRENT_TIMESTAMP,
+    stato                 ENUM ('IN_ATTESA', 'ACCETTATO', 'RIFIUTATO') DEFAULT 'IN_ATTESA',
+
+    codice_consegna       VARCHAR(6) UNIQUE,
+    data_deposito         DATETIME,
+    data_ritiro           DATETIME,
+    conferma_finder       BOOLEAN                                      DEFAULT FALSE,
+    conferma_owner        BOOLEAN                                      DEFAULT FALSE,
+
+    FOREIGN KEY (id_segnalazione) REFERENCES segnalazione (id) ON DELETE CASCADE,
+    FOREIGN KEY (id_utente_richiedente) REFERENCES utente (id) ON DELETE CASCADE
+);
+</file>
+
+<file path="src/main/java/controller/LoginServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.DropPoint;
+import model.bean.Utente;
+import model.service.DropPointService;
+import model.service.UtenteService;
+
+import java.io.IOException;
+
+@WebServlet(name = "LoginServlet", value = "/login")
+public class LoginServlet extends HttpServlet {
+
+    private final UtenteService utenteService = new UtenteService();
+    private final DropPointService dropPointService = new DropPointService();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+
+        // 1. Proviamo il login come UTENTE
+        Utente utente = utenteService.login(email, password);
+
+        if (utente != null) {
+            HttpSession session = request.getSession();
+            session.setAttribute("utente", utente); // Chiave "utente"
+            session.setAttribute("ruoloLoggato", "CITTADINO");
+            session.setMaxInactiveInterval(30 * 60);
+            response.sendRedirect("index.jsp");
+            return;
+        }
+
+        // 2. Se fallisce, proviamo come DROP-POINT
+        DropPoint dropPoint = dropPointService.login(email, password);
+
+        if (dropPoint != null) {
+            HttpSession session = request.getSession();
+            session.setAttribute("dropPoint", dropPoint); // Chiave "dropPoint" (diversa da utente!)
+            session.setAttribute("ruoloLoggato", "DROPPOINT");
+            session.setMaxInactiveInterval(30 * 60);
+
+            // Opzionale: Se vuoi bloccare l'accesso a chi è ancora "IN_ATTESA"
+            /*
+            if ("IN_ATTESA".equals(dropPoint.getStato())) {
+                 request.setAttribute("errore", "Il tuo account è ancora in attesa di approvazione.");
+                 request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
+                 return;
+            }
+            */
+
+            response.sendRedirect("index.jsp");
+            return;
+        }
+
+        // 3. Se arriviamo qui, entrambi i login sono falliti
+        request.setAttribute("errore", "Email o Password non validi.");
+        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
+    }
+}
+</file>
+
+<file path="src/main/java/controller/RegistrazioneDropPointServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import model.service.DropPointService;
+import java.io.IOException;
+
+@WebServlet(name = "RegistrazioneDropPointServlet", value = "/registrazione-droppoint")
+public class RegistrazioneDropPointServlet extends HttpServlet {
+
+    private final DropPointService dpService = new DropPointService();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Mostra il form per i Drop-Point
+        request.getRequestDispatcher("/WEB-INF/jsp/registrazione_droppoint.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String nomeAttivita = request.getParameter("nomeAttivita");
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String indirizzo = request.getParameter("indirizzo");
+        String citta = request.getParameter("citta");
+        String provincia = request.getParameter("provincia");
+        String telefono = request.getParameter("telefono");
+        String orari = request.getParameter("orari");
+
+        if (email == null || password == null || nomeAttivita == null) {
+            request.setAttribute("errore", "Campi obbligatori mancanti.");
+            request.getRequestDispatcher("/WEB-INF/jsp/registrazione_droppoint.jsp").forward(request, response);
+            return;
+        }
+
+        boolean successo = dpService.registraDropPoint(nomeAttivita, email, password, indirizzo, citta, provincia, telefono, orari);
+
+        if (successo) {
+            // Manda alla login con un messaggio specifico
+            response.sendRedirect("login?registrazione=attesa_approvazione");
+        } else {
+            request.setAttribute("errore", "Email già registrata per un altro Drop-Point.");
+            request.getRequestDispatcher("/WEB-INF/jsp/registrazione_droppoint.jsp").forward(request, response);
+        }
+    }
+}
+</file>
+
+<file path="src/main/java/controller/RegistrazioneUtenteServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import model.service.UtenteService;
+import java.io.IOException;
+
+@WebServlet(name = "RegistrazioneUtenteServlet", value = "/registrazione-utente")
+public class RegistrazioneUtenteServlet extends HttpServlet {
+
+    private final UtenteService utenteService = new UtenteService();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Mostra il form per gli utenti
+        request.getRequestDispatcher("/WEB-INF/jsp/registrazione_utente.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String nome = request.getParameter("nome");
+        String cognome = request.getParameter("cognome");
+        String username = request.getParameter("username");
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String telefono = request.getParameter("telefono");
+
+        // Validazione minima
+        if (email == null || password == null || username == null) {
+            request.setAttribute("errore", "Campi obbligatori mancanti.");
+            request.getRequestDispatcher("/WEB-INF/jsp/registrazione_utente.jsp").forward(request, response);
+            return;
+        }
+
+        boolean successo = utenteService.registraUtente(nome, cognome, username, email, password, telefono);
+
+        if (successo) {
+            response.sendRedirect("login?registrazione=ok");
+        } else {
+            request.setAttribute("errore", "Email o Username già esistenti.");
+            request.getRequestDispatcher("/WEB-INF/jsp/registrazione_utente.jsp").forward(request, response);
+        }
+    }
+}
+</file>
+
+<file path="src/main/java/model/bean/enums/CategoriaOggetto.java">
+package model.bean.enums;
+
+public enum CategoriaOggetto {
+    DOCUMENTI, ELETTRONICA, PORTAFOGLI, CHIAVI, GIOIELLI, ABBIGLIAMENTO, ALTRO
+}
+</file>
+
+<file path="src/main/java/model/bean/enums/ModalitaConsegna.java">
+package model.bean.enums;
+
+public enum ModalitaConsegna { DIRETTA, DROP_POINT }
+</file>
+
+<file path="src/main/java/model/bean/enums/Ruolo.java">
+package model.bean.enums;
+
+public enum Ruolo { UTENTE_BASE, ADMIN }
+</file>
+
+<file path="src/main/java/model/bean/enums/StatoReclamo.java">
+package model.bean.enums;
+
+public enum StatoReclamo { IN_ATTESA, ACCETTATO, RIFIUTATO }
+</file>
+
+<file path="src/main/java/model/bean/enums/StatoSegnalazione.java">
+package model.bean.enums;
+
+public enum StatoSegnalazione { APERTA, IN_CONSEGNA, CHIUSA }
+</file>
+
+<file path="src/main/java/model/bean/enums/TipoSegnalazione.java">
+package model.bean.enums;
+
+public enum TipoSegnalazione { OGGETTO, ANIMALE }
+</file>
+
+<file path="src/main/java/model/bean/DropPoint.java">
+package model.bean;
+
+import java.sql.Timestamp;
+
+public class DropPoint {
+    private long id;
+    private String nomeAttivita;
+    private String email;
+    private String passwordHash;
+    private String indirizzo;
+    private String citta;
+    private String provincia;
+    private String telefono;
+    private String orariApertura;
+    private String descrizione;
+    private String immagine;
+    private Double latitudine;
+    private Double longitudine;
+    private int ritiriEffettuati;
+    private String stato; // IN_ATTESA, APPROVATO, RIFIUTATO
+
+    public DropPoint() {}
+
+    // Getters e Setters
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
+
+    public String getNomeAttivita() { return nomeAttivita; }
+    public void setNomeAttivita(String nomeAttivita) { this.nomeAttivita = nomeAttivita; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+
+    public String getIndirizzo() { return indirizzo; }
+    public void setIndirizzo(String indirizzo) { this.indirizzo = indirizzo; }
+
+    public String getCitta() { return citta; }
+    public void setCitta(String citta) { this.citta = citta; }
+
+    public String getProvincia() { return provincia; }
+    public void setProvincia(String provincia) { this.provincia = provincia; }
+
+    public String getTelefono() { return telefono; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
+
+    public String getOrariApertura() { return orariApertura; }
+    public void setOrariApertura(String orariApertura) { this.orariApertura = orariApertura; }
+
+    public String getDescrizione() { return descrizione; }
+    public void setDescrizione(String descrizione) { this.descrizione = descrizione; }
+
+    public String getImmagine() { return immagine; }
+    public void setImmagine(String immagine) { this.immagine = immagine; }
+
+    public Double getLatitudine() { return latitudine; }
+    public void setLatitudine(Double latitudine) { this.latitudine = latitudine; }
+
+    public Double getLongitudine() { return longitudine; }
+    public void setLongitudine(Double longitudine) { this.longitudine = longitudine; }
+
+    public int getRitiriEffettuati() { return ritiriEffettuati; }
+    public void setRitiriEffettuati(int ritiriEffettuati) { this.ritiriEffettuati = ritiriEffettuati; }
+
+    public String getStato() { return stato; }
+    public void setStato(String stato) { this.stato = stato; }
+}
+</file>
+
+<file path="src/main/java/model/bean/Reclamo.java">
+package model.bean;
+
+import model.bean.enums.StatoReclamo;
+import java.sql.Timestamp;
+
+public class Reclamo {
+    private long id;
+    private long idSegnalazione;
+    private long idUtenteRichiedente;
+    private String rispostaVerifica1;
+    private String rispostaVerifica2;
+    private Timestamp dataRichiesta;
+    private StatoReclamo stato;
+
+    // Gestione Consegna
+    private String codiceConsegna;
+    private Timestamp dataDeposito;
+    private Timestamp dataRitiro;
+    private boolean confermaFinder;
+    private boolean confermaOwner;
+
+    public Reclamo() {}
+
+    // Getters e Setters
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
+
+    public long getIdSegnalazione() { return idSegnalazione; }
+    public void setIdSegnalazione(long idSegnalazione) { this.idSegnalazione = idSegnalazione; }
+
+    public long getIdUtenteRichiedente() { return idUtenteRichiedente; }
+    public void setIdUtenteRichiedente(long idUtenteRichiedente) { this.idUtenteRichiedente = idUtenteRichiedente; }
+
+    public String getRispostaVerifica1() { return rispostaVerifica1; }
+    public void setRispostaVerifica1(String rispostaVerifica1) { this.rispostaVerifica1 = rispostaVerifica1; }
+
+    public String getRispostaVerifica2() { return rispostaVerifica2; }
+    public void setRispostaVerifica2(String rispostaVerifica2) { this.rispostaVerifica2 = rispostaVerifica2; }
+
+    public Timestamp getDataRichiesta() { return dataRichiesta; }
+    public void setDataRichiesta(Timestamp dataRichiesta) { this.dataRichiesta = dataRichiesta; }
+
+    public StatoReclamo getStato() { return stato; }
+    public void setStato(StatoReclamo stato) { this.stato = stato; }
+
+    public String getCodiceConsegna() { return codiceConsegna; }
+    public void setCodiceConsegna(String codiceConsegna) { this.codiceConsegna = codiceConsegna; }
+
+    public Timestamp getDataDeposito() { return dataDeposito; }
+    public void setDataDeposito(Timestamp dataDeposito) { this.dataDeposito = dataDeposito; }
+
+    public Timestamp getDataRitiro() { return dataRitiro; }
+    public void setDataRitiro(Timestamp dataRitiro) { this.dataRitiro = dataRitiro; }
+
+    public boolean isConfermaFinder() { return confermaFinder; }
+    public void setConfermaFinder(boolean confermaFinder) { this.confermaFinder = confermaFinder; }
+
+    public boolean isConfermaOwner() { return confermaOwner; }
+    public void setConfermaOwner(boolean confermaOwner) { this.confermaOwner = confermaOwner; }
+}
+</file>
+
+<file path="src/main/java/model/bean/Segnalazione.java">
+package model.bean;
+
+import model.bean.enums.StatoSegnalazione;
+import model.bean.enums.TipoSegnalazione;
+import java.sql.Timestamp;
+
+public abstract class Segnalazione {
+    private long id;
+    private long idUtente;
+    private String titolo;
+    private String descrizione;
+    private Timestamp dataRitrovamento;
+    private String luogoRitrovamento;
+    private String citta;
+    private String provincia;
+    private Double latitudine;
+    private Double longitudine;
+    private String immagine;
+    private String domandaVerifica1;
+    private String domandaVerifica2;
+    private Timestamp dataPubblicazione;
+    private StatoSegnalazione stato;
+    private TipoSegnalazione tipoSegnalazione;
+
+    public Segnalazione() {}
+
+    // Getters e Setters
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
+
+    public long getIdUtente() { return idUtente; }
+    public void setIdUtente(long idUtente) { this.idUtente = idUtente; }
+
+    public String getTitolo() { return titolo; }
+    public void setTitolo(String titolo) { this.titolo = titolo; }
+
+    public String getDescrizione() { return descrizione; }
+    public void setDescrizione(String descrizione) { this.descrizione = descrizione; }
+
+    public Timestamp getDataRitrovamento() { return dataRitrovamento; }
+    public void setDataRitrovamento(Timestamp dataRitrovamento) { this.dataRitrovamento = dataRitrovamento; }
+
+    public String getLuogoRitrovamento() { return luogoRitrovamento; }
+    public void setLuogoRitrovamento(String luogoRitrovamento) { this.luogoRitrovamento = luogoRitrovamento; }
+
+    public String getCitta() { return citta; }
+    public void setCitta(String citta) { this.citta = citta; }
+
+    public String getProvincia() { return provincia; }
+    public void setProvincia(String provincia) { this.provincia = provincia; }
+
+    public Double getLatitudine() { return latitudine; }
+    public void setLatitudine(Double latitudine) { this.latitudine = latitudine; }
+
+    public Double getLongitudine() { return longitudine; }
+    public void setLongitudine(Double longitudine) { this.longitudine = longitudine; }
+
+    public String getImmagine() { return immagine; }
+    public void setImmagine(String immagine) { this.immagine = immagine; }
+
+    public String getDomandaVerifica1() { return domandaVerifica1; }
+    public void setDomandaVerifica1(String domandaVerifica1) { this.domandaVerifica1 = domandaVerifica1; }
+
+    public String getDomandaVerifica2() { return domandaVerifica2; }
+    public void setDomandaVerifica2(String domandaVerifica2) { this.domandaVerifica2 = domandaVerifica2; }
+
+    public Timestamp getDataPubblicazione() { return dataPubblicazione; }
+    public void setDataPubblicazione(Timestamp dataPubblicazione) { this.dataPubblicazione = dataPubblicazione; }
+
+    public StatoSegnalazione getStato() { return stato; }
+    public void setStato(StatoSegnalazione stato) { this.stato = stato; }
+
+    public TipoSegnalazione getTipoSegnalazione() { return tipoSegnalazione; }
+    public void setTipoSegnalazione(TipoSegnalazione tipoSegnalazione) { this.tipoSegnalazione = tipoSegnalazione; }
+}
+</file>
+
+<file path="src/main/java/model/bean/SegnalazioneAnimale.java">
+package model.bean;
+
+import model.bean.enums.TipoSegnalazione;
+
+public class SegnalazioneAnimale extends Segnalazione {
+    private String specie;
+    private String razza;
+
+    public SegnalazioneAnimale() {
+        super();
+        this.setTipoSegnalazione(TipoSegnalazione.ANIMALE);
+    }
+
+    public String getSpecie() { return specie; }
+    public void setSpecie(String specie) { this.specie = specie; }
+
+    public String getRazza() { return razza; }
+    public void setRazza(String razza) { this.razza = razza; }
+}
+</file>
+
+<file path="src/main/java/model/bean/SegnalazioneOggetto.java">
+package model.bean;
+
+import model.bean.enums.CategoriaOggetto;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.TipoSegnalazione;
+
+public class SegnalazioneOggetto extends Segnalazione {
+    private CategoriaOggetto categoria;
+    private ModalitaConsegna modalitaConsegna;
+    private Long idDropPoint;
+
+    public SegnalazioneOggetto() {
+        super();
+        this.setTipoSegnalazione(TipoSegnalazione.OGGETTO);
+    }
+
+    public CategoriaOggetto getCategoria() { return categoria; }
+    public void setCategoria(CategoriaOggetto categoria) { this.categoria = categoria; }
+
+    public ModalitaConsegna getModalitaConsegna() { return modalitaConsegna; }
+    public void setModalitaConsegna(ModalitaConsegna modalitaConsegna) { this.modalitaConsegna = modalitaConsegna; }
+
+    public Long getIdDropPoint() { return idDropPoint; }
+    public void setIdDropPoint(Long idDropPoint) { this.idDropPoint = idDropPoint; }
+}
+</file>
+
+<file path="src/main/java/model/bean/Utente.java">
+package model.bean;
+
+import model.bean.enums.Ruolo;
+
+public class Utente {
+    private long id;
+    private String username;
+    private String email;
+    private String passwordHash;
+    private String nome;
+    private String cognome;
+    private String telefono;
+    private String immagineProfilo;
+    private int punteggio;
+    private Ruolo ruolo;
+    private String badge;
+
+    public Utente() {}
+
+    // Getters e Setters
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+
+    public String getCognome() { return cognome; }
+    public void setCognome(String cognome) { this.cognome = cognome; }
+
+    public String getTelefono() { return telefono; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
+
+    public String getImmagineProfilo() { return immagineProfilo; }
+    public void setImmagineProfilo(String immagineProfilo) { this.immagineProfilo = immagineProfilo; }
+
+    public int getPunteggio() { return punteggio; }
+    public void setPunteggio(int punteggio) { this.punteggio = punteggio; }
+
+    public Ruolo getRuolo() { return ruolo; }
+    public void setRuolo(Ruolo ruolo) { this.ruolo = ruolo; }
+
+    public String getBadge() { return badge; }
+    public void setBadge(String badge) { this.badge = badge; }
+}
+</file>
+
+<file path="src/main/java/model/dao/DropPointDAO.java">
+package model.dao;
+
+import model.ConPool;
+import model.bean.DropPoint;
+import java.sql.*;
+
+public class DropPointDAO {
+
+    public boolean doSave(DropPoint dp) {
+        String query = "INSERT INTO drop_point (nome_attivita, email, password_hash, indirizzo, citta, provincia, telefono, orari_apertura, descrizione, stato) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, dp.getNomeAttivita());
+            ps.setString(2, dp.getEmail());
+            ps.setString(3, dp.getPasswordHash());
+            ps.setString(4, dp.getIndirizzo());
+            ps.setString(5, dp.getCitta());
+            ps.setString(6, dp.getProvincia());
+            ps.setString(7, dp.getTelefono());
+            ps.setString(8, dp.getOrariApertura());
+            ps.setString(9, dp.getDescrizione());
+            ps.setString(10, dp.getStato()); // Solitamente "IN_ATTESA"
+
+            int result = ps.executeUpdate();
+            if (result > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) dp.setId(generatedKeys.getLong(1));
+                }
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public DropPoint doRetrieveByEmail(String email) {
+        String query = "SELECT * FROM drop_point WHERE email = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    DropPoint dp = new DropPoint();
+                    dp.setId(rs.getLong("id"));
+                    dp.setNomeAttivita(rs.getString("nome_attivita"));
+                    dp.setEmail(rs.getString("email"));
+                    dp.setPasswordHash(rs.getString("password_hash"));
+                    dp.setIndirizzo(rs.getString("indirizzo"));
+                    dp.setCitta(rs.getString("citta"));
+                    dp.setStato(rs.getString("stato"));
+                    return dp;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
+</file>
+
+<file path="src/main/java/model/dao/UtenteDAO.java">
+package model.dao;
+
+import model.ConPool;
+import model.bean.Utente;
+import model.bean.enums.Ruolo;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class UtenteDAO {
+
+    public boolean doSave(Utente utente) {
+        // Rimossi 'citta' e 'provincia' dalla query
+        String query = "INSERT INTO utente (username, email, password_hash, nome, cognome, " +
+                "telefono, immagine_profilo, punteggio, ruolo, badge) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, utente.getUsername());
+            ps.setString(2, utente.getEmail());
+            ps.setString(3, utente.getPasswordHash());
+            ps.setString(4, utente.getNome());
+            ps.setString(5, utente.getCognome());
+            ps.setString(6, utente.getTelefono());
+            ps.setString(7, utente.getImmagineProfilo());
+            ps.setInt(8, utente.getPunteggio());
+            ps.setString(9, utente.getRuolo().toString());
+            ps.setString(10, utente.getBadge());
+
+            int result = ps.executeUpdate();
+
+            if (result > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        utente.setId(generatedKeys.getLong(1));
+                    }
+                }
+                return true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Utente doRetrieveByEmail(String email) {
+        String query = "SELECT * FROM utente WHERE email = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToUtente(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<Utente> doRetrieveAll() {
+        List<Utente> utenti = new ArrayList<>();
+        String query = "SELECT * FROM utente";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                utenti.add(mapRowToUtente(rs));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return utenti;
+    }
+
+    private Utente mapRowToUtente(ResultSet rs) throws SQLException {
+        Utente u = new Utente();
+        u.setId(rs.getLong("id"));
+        u.setUsername(rs.getString("username"));
+        u.setEmail(rs.getString("email"));
+        u.setPasswordHash(rs.getString("password_hash"));
+        u.setNome(rs.getString("nome"));
+        u.setCognome(rs.getString("cognome"));
+        u.setTelefono(rs.getString("telefono"));
+        u.setImmagineProfilo(rs.getString("immagine_profilo"));
+        u.setPunteggio(rs.getInt("punteggio"));
+
+        String ruoloStr = rs.getString("ruolo");
+        if (ruoloStr != null) {
+            u.setRuolo(Ruolo.valueOf(ruoloStr));
+        }
+
+        u.setBadge(rs.getString("badge"));
+        return u;
+    }
+
+    public Utente doRetrieveByUsername(String username) {
+        String query = "SELECT * FROM utente WHERE username = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToUtente(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
+</file>
+
+<file path="src/main/java/model/service/DropPointService.java">
+package model.service;
+
+import model.bean.DropPoint;
+import model.dao.DropPointDAO;
+import model.utils.PasswordUtils;
+
+public class DropPointService {
+    private final DropPointDAO dropPointDAO = new DropPointDAO();
+
+    public boolean registraDropPoint(String nomeAttivita, String email, String password, String indirizzo, String citta, String provincia, String telefono, String orari) {
+        if (dropPointDAO.doRetrieveByEmail(email) != null) return false;
+
+        DropPoint dp = new DropPoint();
+        dp.setNomeAttivita(nomeAttivita);
+        dp.setEmail(email);
+        dp.setPasswordHash(PasswordUtils.hashPassword(password));
+        dp.setIndirizzo(indirizzo);
+        dp.setCitta(citta);
+        dp.setProvincia(provincia);
+        dp.setTelefono(telefono);
+        dp.setOrariApertura(orari);
+        dp.setStato("IN_ATTESA"); // Di default deve essere approvato dall'admin
+
+        return dropPointDAO.doSave(dp);
+    }
+
+    public DropPoint login(String email, String password) {
+        // 1. Recupera il DropPoint dal DB
+        DropPoint dp = dropPointDAO.doRetrieveByEmail(email);
+
+        if (dp == null) {
+            return null; // Email non trovata
+        }
+
+        // 2. Verifica la password (hash)
+        if (PasswordUtils.checkPassword(password, dp.getPasswordHash())) {
+            return dp; // Login successo
+        }
+
+        return null; // Password errata
+    }
+}
+</file>
+
+<file path="src/main/java/model/service/UtenteService.java">
+package model.service;
+
+import model.bean.Utente;
+import model.bean.enums.Ruolo;
+import model.dao.UtenteDAO;
+import model.utils.PasswordUtils;
+
+import java.sql.Timestamp;
+import java.time.Instant;
+
+public class UtenteService {
+
+    private final UtenteDAO utenteDAO = new UtenteDAO();
+    public boolean registraUtente(String nome, String cognome, String username, String email, String password, String telefono) {
+        System.out.println("🔍 DEBUG: Inizio registrazione per " + email);
+
+        // 1. Controllo Email
+        if (utenteDAO.doRetrieveByEmail(email) != null) {
+            System.out.println("❌ DEBUG: Email già presente.");
+            return false;
+        }
+
+        // 2. Controllo Username (NUOVO!)
+        if (utenteDAO.doRetrieveByUsername(username) != null) {
+            System.out.println("❌ DEBUG: Username già presente.");
+            return false;
+        }
+
+        System.out.println("✅ DEBUG: Email e Username liberi. Procedo...");
+
+        Utente nuovoUtente = new Utente();
+        nuovoUtente.setNome(nome);
+        nuovoUtente.setCognome(cognome);
+        nuovoUtente.setUsername(username);
+        nuovoUtente.setEmail(email);
+        nuovoUtente.setTelefono(telefono);
+
+        String passwordHash = PasswordUtils.hashPassword(password);
+        nuovoUtente.setPasswordHash(passwordHash);
+
+        nuovoUtente.setRuolo(Ruolo.UTENTE_BASE);
+        nuovoUtente.setPunteggio(0);
+        nuovoUtente.setBadge("OCCHIO_DI_FALCO");
+        nuovoUtente.setImmagineProfilo("img/default-avatar.png");
+
+        boolean salvato = utenteDAO.doSave(nuovoUtente);
+        System.out.println("💾 DEBUG: Risultato salvataggio DAO: " + salvato);
+
+        return salvato;
+    }
+
+    public Utente login(String email, String password) {
+        // 1. Recupera l'utente dal DB
+        Utente utente = utenteDAO.doRetrieveByEmail(email);
+
+        if (utente == null) {
+            return null; // Utente non trovato
+        }
+
+        // 2. Verifica la password (hash vs password in chiaro)
+        if (PasswordUtils.checkPassword(password, utente.getPasswordHash())) {
+            return utente; // Login successo
+        }
+
+        return null; // Password errata
+    }
+}
+</file>
+
+<file path="src/main/java/model/utils/PasswordUtils.java">
+package model.utils;
+
+import org.mindrot.jbcrypt.BCrypt;
+
+public class PasswordUtils {
+    public static String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt(12));
+    }
+    public static boolean checkPassword(String plainPassword, String hashedPassword) {
+        if (hashedPassword == null || !hashedPassword.startsWith("$2a$")) {
+            throw new IllegalArgumentException("Hash non valido");
+        }
+        return BCrypt.checkpw(plainPassword, hashedPassword);
+    }
+}
+</file>
+
+<file path="src/main/webapp/WEB-INF/jsp/login.jsp">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foundly - Login</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
+</head>
+<body>
+
+<div class="main-container">
+
+    <div class="info-section">
+        <div class="brand-header">
+            <div class="logo-placeholder">
+                <span class="material-icons logo-icon">travel_explore</span> Foundly
+            </div>
+        </div>
+
+        <div class="hero-text">
+            <h1>Hai perso qualcosa?</h1>
+            <p>
+                Foundly ti aiuta a ritrovare oggetti e animali smarriti grazie alla nostra community.
+                Segnala uno smarrimento, cerca tra i ritrovamenti e restituisci in sicurezza tramite i nostri Drop-Point.
+            </p>
+            <div class="feature-pills">
+                <span class="pill"><span class="material-icons">security</span> Secure Claim</span>
+                <span class="pill"><span class="material-icons">store</span> Drop-Points</span>
+                <span class="pill"><span class="material-icons">emoji_events</span> Scoreboard</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-section">
+        <div class="auth-card">
+            <h2>Accedi</h2>
+            <p class="subtitle">Benvenuto su Foundly</p>
+
+            <form action="${pageContext.request.contextPath}/login" method="post">
+
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="nome@esempio.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Inserisci la tua password" required>
+                </div>
+
+                <div class="form-actions">
+                    <a href="${pageContext.request.contextPath}/recupero-password" class="forgot-password">Password dimenticata?</a>
+                </div>
+
+                <button type="submit" class="btn-primary">Accedi</button>
+            </form>
+
+            <div class="divider">
+                <span>oppure</span>
+            </div>
+
+            <div class="registration-area">
+                <p>Non hai un account?</p>
+                <div class="reg-buttons">
+                    <a href="${pageContext.request.contextPath}/registrazione-utente" class="btn-outline">
+                        Registrati come Utente
+                    </a>
+                    <a href="${pageContext.request.contextPath}/registrazione-droppoint" class="btn-outline">
+                        Registrati come Drop Point
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+</file>
+
+<file path="src/main/webapp/WEB-INF/jsp/registrazione_droppoint.jsp">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foundly - Registrazione Drop-Point</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
+
+    <style>
+        /* Piccola aggiunta specifica per evidenziare che siamo nella sezione Business */
+        .info-section {
+            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); /* Stesso arancione */
+        }
+        /* Colore distintivo per il badge Drop-Point attivo */
+        .pill.active {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #FF9800;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+
+    <div class="info-section">
+        <div class="brand-header">
+            <div class="logo-placeholder">
+                <span class="material-icons logo-icon">travel_explore</span> Foundly
+            </div>
+        </div>
+
+        <div class="hero-text">
+            <h1>Diventa un Partner</h1>
+            <p>
+                Trasforma la tua attività in un punto di riferimento per la community.
+                Diventando un <strong>Drop-Point</strong>, offrirai un luogo sicuro per la restituzione di oggetti smarriti, aumentando la visibilità del tuo negozio.
+            </p>
+            <div class="feature-pills">
+                <span class="pill"><span class="material-icons">security</span> Secure Claim</span>
+                <span class="pill active"><span class="material-icons">store</span> Drop-Points</span>
+                <span class="pill"><span class="material-icons">emoji_events</span> Scoreboard</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-section">
+        <div class="auth-card">
+            <h2>Registra Attività</h2>
+            <p class="subtitle">Unisciti alla rete Foundly</p>
+
+            <% String errore = (String) request.getAttribute("errore"); %>
+            <% if (errore != null) { %>
+            <div style="background-color: #ffebee; color: #c62828; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; text-align: center;">
+                <span class="material-icons" style="font-size: 16px; vertical-align: middle;">error</span> <%= errore %>
+            </div>
+            <% } %>
+
+            <form action="${pageContext.request.contextPath}/registrazione-droppoint" method="post">
+
+                <div class="input-group">
+                    <label for="nomeAttivita">Nome Attività Commerciale</label>
+                    <input type="text" id="nomeAttivita" name="nomeAttivita" placeholder="Es. Bar Centrale" required>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="email">Email Aziendale</label>
+                        <input type="email" id="email" name="email" placeholder="info@barcentrale.it" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="telefono">Telefono</label>
+                        <input type="tel" id="telefono" name="telefono" placeholder="081 1234567" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="indirizzo">Indirizzo</label>
+                    <input type="text" id="indirizzo" name="indirizzo" placeholder="Via Roma, 10" required>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group" style="flex: 3;">
+                        <label for="citta">Città</label>
+                        <input type="text" id="citta" name="citta" placeholder="Milano" required>
+                    </div>
+                    <div class="input-group" style="flex: 1;">
+                        <label for="provincia">Prov.</label>
+                        <input type="text" id="provincia" name="provincia" maxlength="2" placeholder="MI" style="text-transform: uppercase;" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="orari">Orari di Apertura</label>
+                    <input type="text" id="orari" name="orari" placeholder="Es. Lun-Sab 07:00 - 20:00" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Crea una password sicura" required>
+                </div>
+
+                <button type="submit" class="btn-primary mt-2">Invia Richiesta</button>
+
+                <div class="back-link">
+                    La tua attività è già registrata? <a href="${pageContext.request.contextPath}/login">Accedi qui</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+</file>
+
+<file path="src/main/webapp/WEB-INF/jsp/registrazione_utente.jsp">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foundly - Registrazione Utente</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
+
+    <style>
+        /* Gradiente specifico per la colonna info */
+        .info-section {
+            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+        }
+
+        /* Stile per il badge attivo nella lista feature */
+        .pill.active {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #FF9800;
+        }
+
+        /* --- NUOVO STILE PER IL FOOTER DEL FORM --- */
+        .form-footer {
+            margin-top: 30px;           /* Distanza dal pulsante di registrazione */
+            padding-top: 20px;          /* Spazio interno sopra il testo */
+            border-top: 1px solid #eee; /* Linea divisoria sottile ed elegante */
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;                   /* Spazio tra testo e link */
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .link-login {
+            color: #FB8C00;             /* Arancione Foundly */
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .link-login:hover {
+            background-color: #FFF3E0;  /* Sfondo leggero all'hover */
+            color: #E65100;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+
+    <div class="info-section">
+        <div class="brand-header">
+            <div class="logo-placeholder">
+                <span class="material-icons logo-icon">travel_explore</span> Foundly
+            </div>
+        </div>
+
+        <div class="hero-text">
+            <h1>Entra nella Community</h1>
+            <p>
+                Registrati come utente per segnalare oggetti ritrovati o reclamare ciò che hai perso.
+                Aiutaci a costruire una rete di cittadini onesti e collaborativi.
+            </p>
+            <div class="feature-pills">
+                <span class="pill active"><span class="material-icons">security</span> Secure Claim</span>
+                <span class="pill"><span class="material-icons">store</span> Drop-Points</span>
+                <span class="pill"><span class="material-icons">emoji_events</span> Scoreboard</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-section">
+        <div class="auth-card">
+            <h2>Crea Account</h2>
+            <p class="subtitle">Inserisci i tuoi dati personali</p>
+
+            <%-- Gestione Errori --%>
+            <% String errore = (String) request.getAttribute("errore"); %>
+            <% if (errore != null) { %>
+            <div style="background-color: #ffebee; color: #c62828; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; text-align: center;">
+                <span class="material-icons" style="font-size: 16px; vertical-align: middle;">error</span> <%= errore %>
+            </div>
+            <% } %>
+
+            <form action="${pageContext.request.contextPath}/registrazione-utente" method="post">
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="nome">Nome</label>
+                        <input type="text" id="nome" name="nome" placeholder="Es. Mario" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="cognome">Cognome</label>
+                        <input type="text" id="cognome" name="cognome" placeholder="Es. Rossi" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Scegli un username" required>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group" style="flex: 2;">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="mario.rossi@email.com" required>
+                    </div>
+                    <div class="input-group" style="flex: 1;">
+                        <label for="telefono">Telefono</label>
+                        <input type="tel" id="telefono" name="telefono" placeholder="342..." required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Minimo 8 caratteri" required>
+                </div>
+
+                <button type="submit" class="btn-primary mt-2">Registrati</button>
+
+                <div class="form-footer">
+                    <span>Hai già un account?</span>
+                    <a href="${pageContext.request.contextPath}/login" class="link-login">Accedi qui</a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+</file>
+
+<file path=".mvn/wrapper/maven-wrapper.properties">
+distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.6/apache-maven-3.9.6-bin.zip
+wrapperUrl=https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.3.0/maven-wrapper-3.3.0.jar
+</file>
+
+<file path="src/main/java/model/ConPool.java">
+package model;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class ConPool {
+    private static final String URL = "jdbc:mysql://foundly-db-salvolepore7.j.aivencloud.com:21893/defaultdb"
+            + "?useSSL=true"
+            + "&requireSSL=true"
+            + "&verifyServerCertificate=false"
+            + "&allowPublicKeyRetrieval=true"
+            + "&serverTimezone=Europe/Rome"
+            + "&enabledTLSProtocols=TLSv1.2,TLSv1.3";
+
+    private static final String USER = "avnadmin";
+    private static final String PASSWORD = System.getenv("DB_PASSKEY");
+
+    static {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Driver MySQL non trovato!", e);
+        }
+    }
+
+    /**
+     * Restituisce una connessione attiva al database.
+     */
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+}
+</file>
+
+<file path="src/main/webapp/css/index.css">
+:root {
+    /* Palette Colori Arancione (Stile Google/Material) */
+    --primary-color: #FB8C00;       /* Arancione principale */
+    --primary-hover: #F57C00;       /* Arancione più scuro per hover */
+    --primary-light: #FFE0B2;       /* Arancione chiarissimo */
+    --text-dark: #202124;           /* Nero morbido (stile Google) */
+    --text-grey: #5f6368;           /* Grigio testo */
+    --bg-color: #f0f2f5;            /* Grigio chiarissimo sfondo */
+    --white: #ffffff;
+    --border-radius: 8px;           /* Bordi arrotondati standard */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px; /* Aggiunto padding per evitare che tocchi i bordi su schermi piccoli */
+}
+
+/* --- CONTENITORE PRINCIPALE --- */
+.main-container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px; /* Aumentato leggermente per dare respiro */
+
+    /* MODIFICA CHIAVE: Invece di height fissa, usiamo min-height */
+    min-height: 80vh;
+    height: auto;      /* Permette al box di crescere se il form è lungo */
+
+    background-color: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    overflow: hidden; /* Mantiene i bordi arrotondati */
+}
+
+/* --- PARTE SINISTRA (Info) --- */
+.info-section {
+    flex: 1; /* Occupa il 50% dello spazio */
+    /* Il background viene sovrascritto inline nelle JSP specifiche, ma questo è il default */
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.brand-header {
+    margin-bottom: 40px;
+}
+
+.logo-placeholder {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #E65100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hero-text h1 {
+    font-size: 3rem;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    color: var(--text-dark);
+}
+
+.hero-text p {
+    font-size: 1.1rem;
+    color: var(--text-grey);
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.feature-pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.pill {
+    background-color: rgba(255,255,255,0.6);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #E65100;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* --- PARTE DESTRA (Form) --- */
+.auth-section {
+    flex: 1.2; /* Diamo un po' più di spazio al form (era 1) */
+    padding: 40px; /* Ridotto leggermente il padding per dare spazio al contenuto */
+    display: flex;
+    align-items: center; /* Centra verticalmente */
+    justify-content: center;
+    background-color: var(--white);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 480px; /* Allargato il form per evitare che i campi input-row siano stretti */
+}
+
+.auth-card h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: var(--text-grey);
+    margin-bottom: 30px;
+}
+
+/* --- STILE INPUT --- */
+.input-group {
+    margin-bottom: 20px;
+}
+
+/* Gestione righe affiancate (Nome/Cognome, Città/Prov) */
+.input-row {
+    display: flex;
+    gap: 15px; /* Spazio tra i due input */
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-grey);
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #dadce0;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #fafafa;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-color);
+    background-color: var(--white);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(251, 140, 0, 0.2);
+}
+
+/* --- BOTTONI --- */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    box-shadow: 0 4px 12px rgba(251, 140, 0, 0.3);
+}
+
+.mt-2 {
+    margin-top: 20px;
+}
+
+/* Utility Links */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.forgot-password {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.back-link {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-grey);
+}
+
+.back-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* --- RESPONSIVE MOBILE --- */
+/* Se lo schermo è più piccolo di 900px, impiliamo le colonne */
+@media (max-width: 960px) {
+    .main-container {
+        flex-direction: column; /* Colonna verticale invece che riga */
+        height: auto;
+        min-height: auto;
+    }
+
+    .info-section {
+        padding: 40px 30px;
+        min-height: 300px; /* Altezza minima per la parte colorata */
+    }
+
+    .auth-section {
+        padding: 40px 20px;
+    }
+
+    .hero-text h1 {
+        font-size: 2.2rem;
+    }
+}
+</file>
+
+<file path="src/main/webapp/WEB-INF/web.xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+</web-app>
+</file>
+
+<file path=".gitignore">
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### IntelliJ IDEA ###
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
+*.iml
+*.ipr
+repomix-output.xml
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+</file>
+
+<file path="mvnw">
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#    https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+# Maven Start Up Batch script
+#
+# Required ENV vars:
+# ------------------
+#   JAVA_HOME - location of a JDK home dir
+#
+# Optional ENV vars
+# -----------------
+#   M2_HOME - location of maven2's installed home dir
+#   MAVEN_OPTS - parameters passed to the Java VM when running Maven
+#     e.g. to debug Maven itself, use
+#       set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+#   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
+# ----------------------------------------------------------------------------
+
+if [ -z "$MAVEN_SKIP_RC" ] ; then
+
+  if [ -f /usr/local/etc/mavenrc ] ; then
+    . /usr/local/etc/mavenrc
+  fi
+
+  if [ -f /etc/mavenrc ] ; then
+    . /etc/mavenrc
+  fi
+
+  if [ -f "$HOME/.mavenrc" ] ; then
+    . "$HOME/.mavenrc"
+  fi
+
+fi
+
+# OS specific support.  $var _must_ be set to either true or false.
+cygwin=false;
+darwin=false;
+mingw=false
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+  MINGW*) mingw=true;;
+  Darwin*) darwin=true
+    # Use /usr/libexec/java_home if available, otherwise fall back to /Library/Java/Home
+    # See https://developer.apple.com/library/mac/qa/qa1170/_index.html
+    if [ -z "$JAVA_HOME" ]; then
+      if [ -x "/usr/libexec/java_home" ]; then
+        export JAVA_HOME="`/usr/libexec/java_home`"
+      else
+        export JAVA_HOME="/Library/Java/Home"
+      fi
+    fi
+    ;;
+esac
+
+if [ -z "$JAVA_HOME" ] ; then
+  if [ -r /etc/gentoo-release ] ; then
+    JAVA_HOME=`java-config --jre-home`
+  fi
+fi
+
+if [ -z "$M2_HOME" ] ; then
+  ## resolve links - $0 may be a link to maven's home
+  PRG="$0"
+
+  # need this for relative symlinks
+  while [ -h "$PRG" ] ; do
+    ls=`ls -ld "$PRG"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
+      PRG="$link"
+    else
+      PRG="`dirname "$PRG"`/$link"
+    fi
+  done
+
+  saveddir=`pwd`
+
+  M2_HOME=`dirname "$PRG"`/..
+
+  # make it fully qualified
+  M2_HOME=`cd "$M2_HOME" && pwd`
+
+  cd "$saveddir"
+  # echo Using m2 at $M2_HOME
+fi
+
+# For Cygwin, ensure paths are in UNIX format before anything is touched
+if $cygwin ; then
+  [ -n "$M2_HOME" ] &&
+    M2_HOME=`cygpath --unix "$M2_HOME"`
+  [ -n "$JAVA_HOME" ] &&
+    JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
+  [ -n "$CLASSPATH" ] &&
+    CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
+fi
+
+# For Mingw, ensure paths are in UNIX format before anything is touched
+if $mingw ; then
+  [ -n "$M2_HOME" ] &&
+    M2_HOME="`(cd "$M2_HOME"; pwd)`"
+  [ -n "$JAVA_HOME" ] &&
+    JAVA_HOME="`(cd "$JAVA_HOME"; pwd)`"
+fi
+
+if [ -z "$JAVA_HOME" ]; then
+  javaExecutable="`which javac`"
+  if [ -n "$javaExecutable" ] && ! [ "`expr \"$javaExecutable\" : '\([^ ]*\)'`" = "no" ]; then
+    # readlink(1) is not available as standard on Solaris 10.
+    readLink=`which readlink`
+    if [ ! `expr "$readLink" : '\([^ ]*\)'` = "no" ]; then
+      if $darwin ; then
+        javaHome="`dirname \"$javaExecutable\"`"
+        javaExecutable="`cd \"$javaHome\" && pwd -P`/javac"
+      else
+        javaExecutable="`readlink -f \"$javaExecutable\"`"
+      fi
+      javaHome="`dirname \"$javaExecutable\"`"
+      javaHome=`expr "$javaHome" : '\(.*\)/bin'`
+      JAVA_HOME="$javaHome"
+      export JAVA_HOME
+    fi
+  fi
+fi
+
+if [ -z "$JAVACMD" ] ; then
+  if [ -n "$JAVA_HOME"  ] ; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+      # IBM's JDK on AIX uses strange locations for the executables
+      JAVACMD="$JAVA_HOME/jre/sh/java"
+    else
+      JAVACMD="$JAVA_HOME/bin/java"
+    fi
+  else
+    JAVACMD="`\\unset -f command; \\command -v java`"
+  fi
+fi
+
+if [ ! -x "$JAVACMD" ] ; then
+  echo "Error: JAVA_HOME is not defined correctly." >&2
+  echo "  We cannot execute $JAVACMD" >&2
+  exit 1
+fi
+
+if [ -z "$JAVA_HOME" ] ; then
+  echo "Warning: JAVA_HOME environment variable is not set."
+fi
+
+CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
+
+# traverses directory structure from process work directory to filesystem root
+# first directory with .mvn subdirectory is considered project base directory
+find_maven_basedir() {
+
+  if [ -z "$1" ]
+  then
+    echo "Path not specified to find_maven_basedir"
+    return 1
+  fi
+
+  basedir="$1"
+  wdir="$1"
+  while [ "$wdir" != '/' ] ; do
+    if [ -d "$wdir"/.mvn ] ; then
+      basedir=$wdir
+      break
+    fi
+    # workaround for JBEAP-8937 (on Solaris 10/Sparc)
+    if [ -d "${wdir}" ]; then
+      wdir=`cd "$wdir/.."; pwd`
+    fi
+    # end of workaround
+  done
+  echo "${basedir}"
+}
+
+# concatenates all lines of a file
+concat_lines() {
+  if [ -f "$1" ]; then
+    echo "$(tr -s '\n' ' ' < "$1")"
+  fi
+}
+
+BASE_DIR=`find_maven_basedir "$(pwd)"`
+if [ -z "$BASE_DIR" ]; then
+  exit 1;
+fi
+
+##########################################################################################
+# Extension to allow automatically downloading the maven-wrapper.jar from Maven-central
+# This allows using the maven wrapper in projects that prohibit checking in binary data.
+##########################################################################################
+if [ -r "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" ]; then
+    if [ "$MVNW_VERBOSE" = true ]; then
+      echo "Found .mvn/wrapper/maven-wrapper.jar"
+    fi
+else
+    if [ "$MVNW_VERBOSE" = true ]; then
+      echo "Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
+    fi
+    if [ -n "$MVNW_REPOURL" ]; then
+      jarUrl="$MVNW_REPOURL/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar"
+    else
+      jarUrl="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar"
+    fi
+    while IFS="=" read key value; do
+      case "$key" in (wrapperUrl) jarUrl="$value"; break ;;
+      esac
+    done < "$BASE_DIR/.mvn/wrapper/maven-wrapper.properties"
+    if [ "$MVNW_VERBOSE" = true ]; then
+      echo "Downloading from: $jarUrl"
+    fi
+    wrapperJarPath="$BASE_DIR/.mvn/wrapper/maven-wrapper.jar"
+    if $cygwin; then
+      wrapperJarPath=`cygpath --path --windows "$wrapperJarPath"`
+    fi
+
+    if command -v wget > /dev/null; then
+        if [ "$MVNW_VERBOSE" = true ]; then
+          echo "Found wget ... using wget"
+        fi
+        if [ -z "$MVNW_USERNAME" ] || [ -z "$MVNW_PASSWORD" ]; then
+            wget "$jarUrl" -O "$wrapperJarPath" || rm -f "$wrapperJarPath"
+        else
+            wget --http-user=$MVNW_USERNAME --http-password=$MVNW_PASSWORD "$jarUrl" -O "$wrapperJarPath" || rm -f "$wrapperJarPath"
+        fi
+    elif command -v curl > /dev/null; then
+        if [ "$MVNW_VERBOSE" = true ]; then
+          echo "Found curl ... using curl"
+        fi
+        if [ -z "$MVNW_USERNAME" ] || [ -z "$MVNW_PASSWORD" ]; then
+            curl -o "$wrapperJarPath" "$jarUrl" -f
+        else
+            curl --user $MVNW_USERNAME:$MVNW_PASSWORD -o "$wrapperJarPath" "$jarUrl" -f
+        fi
+
+    else
+        if [ "$MVNW_VERBOSE" = true ]; then
+          echo "Falling back to using Java to download"
+        fi
+        javaClass="$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.java"
+        # For Cygwin, switch paths to Windows format before running javac
+        if $cygwin; then
+          javaClass=`cygpath --path --windows "$javaClass"`
+        fi
+        if [ -e "$javaClass" ]; then
+            if [ ! -e "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
+                if [ "$MVNW_VERBOSE" = true ]; then
+                  echo " - Compiling MavenWrapperDownloader.java ..."
+                fi
+                # Compiling the Java class
+                ("$JAVA_HOME/bin/javac" "$javaClass")
+            fi
+            if [ -e "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
+                # Running the downloader
+                if [ "$MVNW_VERBOSE" = true ]; then
+                  echo " - Running MavenWrapperDownloader.java ..."
+                fi
+                ("$JAVA_HOME/bin/java" -cp .mvn/wrapper MavenWrapperDownloader "$MAVEN_PROJECTBASEDIR")
+            fi
+        fi
+    fi
+fi
+##########################################################################################
+# End of extension
+##########################################################################################
+
+export MAVEN_PROJECTBASEDIR=${MAVEN_BASEDIR:-"$BASE_DIR"}
+if [ "$MVNW_VERBOSE" = true ]; then
+  echo $MAVEN_PROJECTBASEDIR
+fi
+MAVEN_OPTS="$(concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config") $MAVEN_OPTS"
+
+# For Cygwin, switch paths to Windows format before running java
+if $cygwin; then
+  [ -n "$M2_HOME" ] &&
+    M2_HOME=`cygpath --path --windows "$M2_HOME"`
+  [ -n "$JAVA_HOME" ] &&
+    JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
+  [ -n "$CLASSPATH" ] &&
+    CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
+  [ -n "$MAVEN_PROJECTBASEDIR" ] &&
+    MAVEN_PROJECTBASEDIR=`cygpath --path --windows "$MAVEN_PROJECTBASEDIR"`
+fi
+
+# Provide a "standardized" way to retrieve the CLI args that will
+# work with both Windows and non-Windows executions.
+MAVEN_CMD_LINE_ARGS="$MAVEN_CONFIG $@"
+export MAVEN_CMD_LINE_ARGS
+
+WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
+
+exec "$JAVACMD" \
+  $MAVEN_OPTS \
+  $MAVEN_DEBUG_OPTS \
+  -classpath "$MAVEN_PROJECTBASEDIR/.mvn/wrapper/maven-wrapper.jar" \
+  "-Dmaven.home=${M2_HOME}" \
+  "-Dmaven.multiModuleProjectDirectory=${MAVEN_PROJECTBASEDIR}" \
+  ${WRAPPER_LAUNCHER} $MAVEN_CONFIG "$@"
+</file>
+
+<file path="mvnw.cmd">
+@REM ----------------------------------------------------------------------------
+@REM Licensed to the Apache Software Foundation (ASF) under one
+@REM or more contributor license agreements.  See the NOTICE file
+@REM distributed with this work for additional information
+@REM regarding copyright ownership.  The ASF licenses this file
+@REM to you under the Apache License, Version 2.0 (the
+@REM "License"); you may not use this file except in compliance
+@REM with the License.  You may obtain a copy of the License at
+@REM
+@REM    https://www.apache.org/licenses/LICENSE-2.0
+@REM
+@REM Unless required by applicable law or agreed to in writing,
+@REM software distributed under the License is distributed on an
+@REM "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+@REM KIND, either express or implied.  See the License for the
+@REM specific language governing permissions and limitations
+@REM under the License.
+@REM ----------------------------------------------------------------------------
+
+@REM ----------------------------------------------------------------------------
+@REM Maven Start Up Batch script
+@REM
+@REM Required ENV vars:
+@REM JAVA_HOME - location of a JDK home dir
+@REM
+@REM Optional ENV vars
+@REM M2_HOME - location of maven2's installed home dir
+@REM MAVEN_BATCH_ECHO - set to 'on' to enable the echoing of the batch commands
+@REM MAVEN_BATCH_PAUSE - set to 'on' to wait for a keystroke before ending
+@REM MAVEN_OPTS - parameters passed to the Java VM when running Maven
+@REM     e.g. to debug Maven itself, use
+@REM set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+@REM MAVEN_SKIP_RC - flag to disable loading of mavenrc files
+@REM ----------------------------------------------------------------------------
+
+@REM Begin all REM lines with '@' in case MAVEN_BATCH_ECHO is 'on'
+@echo off
+@REM set title of command window
+title %0
+@REM enable echoing by setting MAVEN_BATCH_ECHO to 'on'
+@if "%MAVEN_BATCH_ECHO%" == "on"  echo %MAVEN_BATCH_ECHO%
+
+@REM set %HOME% to equivalent of $HOME
+if "%HOME%" == "" (set "HOME=%HOMEDRIVE%%HOMEPATH%")
+
+@REM Execute a user defined script before this one
+if not "%MAVEN_SKIP_RC%" == "" goto skipRcPre
+@REM check for pre script, once with legacy .bat ending and once with .cmd ending
+if exist "%USERPROFILE%\mavenrc_pre.bat" call "%USERPROFILE%\mavenrc_pre.bat" %*
+if exist "%USERPROFILE%\mavenrc_pre.cmd" call "%USERPROFILE%\mavenrc_pre.cmd" %*
+:skipRcPre
+
+@setlocal
+
+set ERROR_CODE=0
+
+@REM To isolate internal variables from possible post scripts, we use another setlocal
+@setlocal
+
+@REM ==== START VALIDATION ====
+if not "%JAVA_HOME%" == "" goto OkJHome
+
+echo.
+echo Error: JAVA_HOME not found in your environment. >&2
+echo Please set the JAVA_HOME variable in your environment to match the >&2
+echo location of your Java installation. >&2
+echo.
+goto error
+
+:OkJHome
+if exist "%JAVA_HOME%\bin\java.exe" goto init
+
+echo.
+echo Error: JAVA_HOME is set to an invalid directory. >&2
+echo JAVA_HOME = "%JAVA_HOME%" >&2
+echo Please set the JAVA_HOME variable in your environment to match the >&2
+echo location of your Java installation. >&2
+echo.
+goto error
+
+@REM ==== END VALIDATION ====
+
+:init
+
+@REM Find the project base dir, i.e. the directory that contains the folder ".mvn".
+@REM Fallback to current working directory if not found.
+
+set MAVEN_PROJECTBASEDIR=%MAVEN_BASEDIR%
+IF NOT "%MAVEN_PROJECTBASEDIR%"=="" goto endDetectBaseDir
+
+set EXEC_DIR=%CD%
+set WDIR=%EXEC_DIR%
+:findBaseDir
+IF EXIST "%WDIR%"\.mvn goto baseDirFound
+cd ..
+IF "%WDIR%"=="%CD%" goto baseDirNotFound
+set WDIR=%CD%
+goto findBaseDir
+
+:baseDirFound
+set MAVEN_PROJECTBASEDIR=%WDIR%
+cd "%EXEC_DIR%"
+goto endDetectBaseDir
+
+:baseDirNotFound
+set MAVEN_PROJECTBASEDIR=%EXEC_DIR%
+cd "%EXEC_DIR%"
+
+:endDetectBaseDir
+
+IF NOT EXIST "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadAdditionalConfig
+
+@setlocal EnableExtensions EnableDelayedExpansion
+for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do set JVM_CONFIG_MAVEN_PROPS=!JVM_CONFIG_MAVEN_PROPS! %%a
+@endlocal & set JVM_CONFIG_MAVEN_PROPS=%JVM_CONFIG_MAVEN_PROPS%
+
+:endReadAdditionalConfig
+
+SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
+set WRAPPER_JAR="%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.jar"
+set WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
+
+set DOWNLOAD_URL="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar"
+
+FOR /F "usebackq tokens=1,2 delims==" %%A IN ("%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.properties") DO (
+    IF "%%A"=="wrapperUrl" SET DOWNLOAD_URL=%%B
+)
+
+@REM Extension to allow automatically downloading the maven-wrapper.jar from Maven-central
+@REM This allows using the maven wrapper in projects that prohibit checking in binary data.
+if exist %WRAPPER_JAR% (
+    if "%MVNW_VERBOSE%" == "true" (
+        echo Found %WRAPPER_JAR%
+    )
+) else (
+    if not "%MVNW_REPOURL%" == "" (
+        SET DOWNLOAD_URL="%MVNW_REPOURL%/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar"
+    )
+    if "%MVNW_VERBOSE%" == "true" (
+        echo Couldn't find %WRAPPER_JAR%, downloading it ...
+        echo Downloading from: %DOWNLOAD_URL%
+    )
+
+    powershell -Command "&{"^
+		"$webclient = new-object System.Net.WebClient;"^
+		"if (-not ([string]::IsNullOrEmpty('%MVNW_USERNAME%') -and [string]::IsNullOrEmpty('%MVNW_PASSWORD%'))) {"^
+		"$webclient.Credentials = new-object System.Net.NetworkCredential('%MVNW_USERNAME%', '%MVNW_PASSWORD%');"^
+		"}"^
+		"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $webclient.DownloadFile('%DOWNLOAD_URL%', '%WRAPPER_JAR%')"^
+		"}"
+    if "%MVNW_VERBOSE%" == "true" (
+        echo Finished downloading %WRAPPER_JAR%
+    )
+)
+@REM End of extension
+
+@REM Provide a "standardized" way to retrieve the CLI args that will
+@REM work with both Windows and non-Windows executions.
+set MAVEN_CMD_LINE_ARGS=%*
+
+%MAVEN_JAVA_EXE% ^
+  %JVM_CONFIG_MAVEN_PROPS% ^
+  %MAVEN_OPTS% ^
+  %MAVEN_DEBUG_OPTS% ^
+  -classpath %WRAPPER_JAR% ^
+  "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
+  %WRAPPER_LAUNCHER% %MAVEN_CONFIG% %*
+if ERRORLEVEL 1 goto error
+goto end
+
+:error
+set ERROR_CODE=1
+
+:end
+@endlocal & set ERROR_CODE=%ERROR_CODE%
+
+if not "%MAVEN_SKIP_RC%"=="" goto skipRcPost
+@REM check for post script, once with legacy .bat ending and once with .cmd ending
+if exist "%USERPROFILE%\mavenrc_post.bat" call "%USERPROFILE%\mavenrc_post.bat"
+if exist "%USERPROFILE%\mavenrc_post.cmd" call "%USERPROFILE%\mavenrc_post.cmd"
+:skipRcPost
+
+@REM pause the script if MAVEN_BATCH_PAUSE is set to 'on'
+if "%MAVEN_BATCH_PAUSE%"=="on" pause
+
+if "%MAVEN_TERMINATE_CMD%"=="on" exit %ERROR_CODE%
+
+cmd /C exit /B %ERROR_CODE%
+</file>
+
+<file path="db/insert.sql">
+-- Cancellare dati da tabella utente
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE utente;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- Cancellare dati da tabella drop-point
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE drop_point;
+SET FOREIGN_KEY_CHECKS = 1;
+</file>
+
+<file path="src/main/java/model/utente/ConnectionTest.java">
+package model.utente;
+
+import model.bean.Utente;
+import model.bean.enums.Ruolo;
+import model.dao.UtenteDAO;
+import model.utils.PasswordUtils; // Importa la nuova classe utility
+
+public class ConnectionTest {
+    public static void main(String[] args) {
+        System.out.println("🚀 Inizio Test Sicurezza Password...");
+
+        UtenteDAO utenteDAO = new UtenteDAO();
+        long timeSeed = System.currentTimeMillis();
+
+        // 1. Definiamo una password in chiaro
+        String passwordInChiaro = "Segreto123!";
+
+        System.out.println("🔑 Password utente: " + passwordInChiaro);
+
+        // 2. Creiamo l'hash
+        String passwordHashata = PasswordUtils.hashPassword(passwordInChiaro);
+        System.out.println("🔒 Hash generato (da salvare nel DB): " + passwordHashata);
+
+        // 3. Creiamo l'utente con l'hash
+        Utente nuovoUtente = new Utente();
+        nuovoUtente.setNome("Luigi");
+        nuovoUtente.setCognome("Verdi");
+        nuovoUtente.setUsername("luigi_" + timeSeed);
+        nuovoUtente.setEmail("luigi." + timeSeed + "@secure.com");
+
+        // IMPORTANTE: Settiamo l'hash, NON la password in chiaro!
+        nuovoUtente.setPasswordHash(passwordHashata);
+
+        nuovoUtente.setTelefono("3339998888");
+        nuovoUtente.setImmagineProfilo("img/avatar.png");
+        nuovoUtente.setRuolo(Ruolo.UTENTE_BASE);
+        nuovoUtente.setBadge("OCCHIO_DI_FALCO");
+
+        try {
+            // 4. Salviamo nel DB
+            if (utenteDAO.doSave(nuovoUtente)) {
+                System.out.println("✅ Utente salvato con password criptata.");
+            }
+
+            // 5. Simuliamo il LOGIN
+            System.out.println("\n--- Simulazione Login ---");
+            String emailLogin = nuovoUtente.getEmail();
+            String passwordInseritaLogin = "Segreto123!"; // Quella giusta
+            String passwordErrata = "Sbagliata!";
+
+            // Recuperiamo l'utente dal DB
+            Utente utenteDb = utenteDAO.doRetrieveByEmail(emailLogin);
+
+            if (utenteDb != null) {
+                // Test Password Corretta
+                boolean accessoConsentito = PasswordUtils.checkPassword(passwordInseritaLogin, utenteDb.getPasswordHash());
+                System.out.println("Tentativo con password corretta: " + (accessoConsentito ? "✅ ACCESSO RIUSCITO" : "❌ ERRORE"));
+
+                // Test Password Errata
+                boolean accessoNegato = PasswordUtils.checkPassword(passwordErrata, utenteDb.getPasswordHash());
+                System.out.println("Tentativo con password errata:   " + (!accessoNegato ? "✅ ACCESSO NEGATO (Corretto)" : "❌ ERRORE DI SICUREZZA"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+</file>
+
+<file path="pom.xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>Foundly</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>Foundly</name>
+    <packaging>war</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>23</maven.compiler.target>
+        <maven.compiler.source>23</maven.compiler.source>
+        <junit.version>5.11.0</junit.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>9.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+            <version>11.0.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.4.0</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+</file>
+
+<file path="README.md">
+<div align="center">
+  <img
+    src="https://github.com/user-attachments/assets/6e9a0026-0671-45b5-bb89-6ae375693952"
+    alt="logo_foundly"
+    width="200"
+    height="200"
+  />
+</div>
+
+**Foundly** is a web application that helps people **report, search for, and reclaim lost items** in a simple and secure way.  
+Those who find an item can post it, while those who are looking for something can locate it and claim ownership.  
+
+---
+
+## ✨ Features
+
+- 👥 **User roles**: finder & owner & drop-pointer
+- 🐾 **Lost pets page**: dedicated section for reporting and finding lost animals
+- 🏪 **Drop points**: local shops can register as safe places where found items are stored until the owner retrieves them
+- 🏠 **HomePage**: feed with lost and found items  
+- 📍 **Map view**: geolocation with pins for drop-point
+- 📤 **Upload & share**: add photos and details of found items  
+- 🛡 **Secure claim**: verification system with unique questions  
+- 🏆 **Gamification**: badges and points for active users  
+
+---
+
+## 🛠 Tech Stack
+
+- **Frontend**: Javascript, HTML5 and CSS3
+- **Backend**: Java, JSP, Java Servlets and XML
+- **Database**: MySQL
+</file>
+
+</files>

@@ -1,0 +1,234 @@
+:root {
+    /* Palette Colori Arancione (Stile Google/Material) */
+    --primary-color: #FB8C00;       /* Arancione principale */
+    --primary-hover: #F57C00;       /* Arancione più scuro per hover */
+    --primary-light: #FFE0B2;       /* Arancione chiarissimo */
+    --text-dark: #202124;           /* Nero morbido (stile Google) */
+    --text-grey: #5f6368;           /* Grigio testo */
+    --bg-color: #f0f2f5;            /* Grigio chiarissimo sfondo */
+    --white: #ffffff;
+    --border-radius: 8px;           /* Bordi arrotondati standard */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px; /* Aggiunto padding per evitare che tocchi i bordi su schermi piccoli */
+}
+
+/* --- CONTENITORE PRINCIPALE --- */
+.main-container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px; /* Aumentato leggermente per dare respiro */
+
+    /* MODIFICA CHIAVE: Invece di height fissa, usiamo min-height */
+    min-height: 80vh;
+    height: auto;      /* Permette al box di crescere se il form è lungo */
+
+    background-color: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    overflow: hidden; /* Mantiene i bordi arrotondati */
+}
+
+/* --- PARTE SINISTRA (Info) --- */
+.info-section {
+    flex: 1; /* Occupa il 50% dello spazio */
+    /* Il background viene sovrascritto inline nelle JSP specifiche, ma questo è il default */
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.brand-header {
+    margin-bottom: 40px;
+}
+
+.logo-placeholder {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #E65100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hero-text h1 {
+    font-size: 3rem;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    color: var(--text-dark);
+}
+
+.hero-text p {
+    font-size: 1.1rem;
+    color: var(--text-grey);
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.feature-pills {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.pill {
+    background-color: rgba(255,255,255,0.6);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #E65100;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* --- PARTE DESTRA (Form) --- */
+.auth-section {
+    flex: 1.2; /* Diamo un po' più di spazio al form (era 1) */
+    padding: 40px; /* Ridotto leggermente il padding per dare spazio al contenuto */
+    display: flex;
+    align-items: center; /* Centra verticalmente */
+    justify-content: center;
+    background-color: var(--white);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 480px; /* Allargato il form per evitare che i campi input-row siano stretti */
+}
+
+.auth-card h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: var(--text-grey);
+    margin-bottom: 30px;
+}
+
+/* --- STILE INPUT --- */
+.input-group {
+    margin-bottom: 20px;
+}
+
+/* Gestione righe affiancate (Nome/Cognome, Città/Prov) */
+.input-row {
+    display: flex;
+    gap: 15px; /* Spazio tra i due input */
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-grey);
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #dadce0;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #fafafa;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-color);
+    background-color: var(--white);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(251, 140, 0, 0.2);
+}
+
+/* --- BOTTONI --- */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    box-shadow: 0 4px 12px rgba(251, 140, 0, 0.3);
+}
+
+.mt-2 {
+    margin-top: 20px;
+}
+
+/* Utility Links */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.forgot-password {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.back-link {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-grey);
+}
+
+.back-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* --- RESPONSIVE MOBILE --- */
+/* Se lo schermo è più piccolo di 900px, impiliamo le colonne */
+@media (max-width: 960px) {
+    .main-container {
+        flex-direction: column; /* Colonna verticale invece che riga */
+        height: auto;
+        min-height: auto;
+    }
+
+    .info-section {
+        padding: 40px 30px;
+        min-height: 300px; /* Altezza minima per la parte colorata */
+    }
+
+    .auth-section {
+        padding: 40px 20px;
+    }
+
+    .hero-text h1 {
+        font-size: 2.2rem;
+    }
+}
