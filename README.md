@@ -57,9 +57,9 @@ The project strictly follows the **MVC (Model-View-Controller)** architectural p
 - **Schema**: *Joined Inheritance* strategy for polymorphic report management (Objects vs. Animals).
 
 ### Frontend
-- **Technology**: JSP (JavaServer Pages), JSTL
-- **Styling**: Custom CSS3, Responsive Design
-- **Scripting**: Vanilla JavaScript
+- **Technology**: JSP (JavaServer Pages)
+- **Styling**: Custom CSS3
+- **Scripting**: JavaScript
 
 ---
 
@@ -98,15 +98,13 @@ To run Foundly locally in your development environment:
 
 ## 👥 Authors
 
-## 👥 Authors
-
 This project was developed by the **NC05 Team** for the Bachelor's Degree in Computer Science at the **University of Salerno**.
 
 | Name | Role | Contact |
 | :--- | :--- | :--- |
+| **Salvador Davide Passarelli** | Backend & Architecture | [Email](mailto:s.passarelli2@studenti.unisa.it) |
 | **Natale Nappi** | Frontend & UI/UX | [Email](mailto:n.nappi8@studenti.unisa.it) |
 | **Salvatore Lepore** | DataBase & UI/UX| [Email](mailto:s.lepore11@studenti.unisa.it) |
-| **Salvador Davide Passarelli** | Backend & Architecture | [Email](mailto:s.passarelli2@studenti.unisa.it) |
 
 <p align="right">
   <i>Supervisor: Prof. Carmine Gravino</i>
