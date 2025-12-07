@@ -12,21 +12,21 @@ public class UtenteService {
 
     private final UtenteDAO utenteDAO = new UtenteDAO();
     public boolean registraUtente(String nome, String cognome, String username, String email, String password, String telefono) {
-        System.out.println("🔍 DEBUG: Inizio registrazione per " + email);
+        System.out.println("DEBUG: Inizio registrazione per " + email);
 
         // 1. Controllo Email
         if (utenteDAO.doRetrieveByEmail(email) != null) {
-            System.out.println("❌ DEBUG: Email già presente.");
+            System.out.println("DEBUG: Email già presente.");
             return false;
         }
 
         // 2. Controllo Username (NUOVO!)
         if (utenteDAO.doRetrieveByUsername(username) != null) {
-            System.out.println("❌ DEBUG: Username già presente.");
+            System.out.println("DEBUG: Username già presente.");
             return false;
         }
 
-        System.out.println("✅ DEBUG: Email e Username liberi. Procedo...");
+        System.out.println("DEBUG: Email e Username liberi. Procedo...");
 
         Utente nuovoUtente = new Utente();
         nuovoUtente.setNome(nome);
@@ -44,7 +44,7 @@ public class UtenteService {
         nuovoUtente.setImmagineProfilo("img/default-avatar.png");
 
         boolean salvato = utenteDAO.doSave(nuovoUtente);
-        System.out.println("💾 DEBUG: Risultato salvataggio DAO: " + salvato);
+        System.out.println("DEBUG: Risultato salvataggio DAO: " + salvato);
 
         return salvato;
     }
