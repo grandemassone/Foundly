@@ -14,7 +14,7 @@ public class ConPool {
             + "&enabledTLSProtocols=TLSv1.2,TLSv1.3";
 
     private static final String USER = "avnadmin";
-    private static final String PASSWORD = System.getenv("DB_PASSKEY");
+    private static final String PASSWORD = System.getenv("DB_PASSKEY"); //Ciao
 
     static {
         try {
