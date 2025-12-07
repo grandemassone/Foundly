@@ -54,12 +54,12 @@ public class LoginServlet extends HttpServlet {
             /*
             if ("IN_ATTESA".equals(dropPoint.getStato())) {
                  request.setAttribute("errore", "Il tuo account è ancora in attesa di approvazione.");
-                 request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
+                 request.getRequestDispatcher("/WEB-INF/jsp/index.jsp").forward(request, response);
                  return;
             }
             */
 
-            response.sendRedirect("index.jsp");
+            response.sendRedirect("login.jsp");
             return;
         }
 
