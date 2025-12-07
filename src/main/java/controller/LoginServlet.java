@@ -37,7 +37,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("utente", utente); // Chiave "utente"
             session.setAttribute("ruoloLoggato", "CITTADINO");
             session.setMaxInactiveInterval(30 * 60);
-            response.sendRedirect("index.jsp");
+            response.sendRedirect(request.getContextPath() + "/index");
             return;
         }
 
