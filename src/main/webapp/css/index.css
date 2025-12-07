@@ -31,22 +31,18 @@ body {
 .main-container {
     display: flex;
     width: 100%;
-    max-width: 1200px; /* Aumentato leggermente per dare respiro */
-
-    /* MODIFICA CHIAVE: Invece di height fissa, usiamo min-height */
+    max-width: 1200px;
     min-height: 80vh;
     height: auto;      /* Permette al box di crescere se il form è lungo */
-
     background-color: var(--white);
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    overflow: hidden; /* Mantiene i bordi arrotondati */
+    overflow: hidden;
 }
 
 /* --- PARTE SINISTRA (Info) --- */
 .info-section {
     flex: 1; /* Occupa il 50% dello spazio */
-    /* Il background viene sovrascritto inline nelle JSP specifiche, ma questo è il default */
     background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
     padding: 60px;
     display: flex;
@@ -101,17 +97,17 @@ body {
 
 /* --- PARTE DESTRA (Form) --- */
 .auth-section {
-    flex: 1.2; /* Diamo un po' più di spazio al form (era 1) */
-    padding: 40px; /* Ridotto leggermente il padding per dare spazio al contenuto */
+    flex: 1.2;
+    padding: 40px;
     display: flex;
-    align-items: center; /* Centra verticalmente */
+    align-items: center;
     justify-content: center;
     background-color: var(--white);
 }
 
 .auth-card {
     width: 100%;
-    max-width: 480px; /* Allargato il form per evitare che i campi input-row siano stretti */
+    max-width: 480px;
 }
 
 .auth-card h2 {
@@ -160,7 +156,7 @@ body {
     box-shadow: 0 0 0 3px rgba(251, 140, 0, 0.2);
 }
 
-/* --- BOTTONI --- */
+/* --- BOTTONI PRINCIPALI --- */
 .btn-primary {
     width: 100%;
     padding: 14px;
@@ -210,18 +206,91 @@ body {
     font-weight: 500;
 }
 
+/* --- DIVISORE "OPPURE" --- */
+.divider {
+    margin: 30px 0;
+    text-align: center;
+    position: relative;
+    width: 100%;
+}
+
+.divider span {
+    background-color: var(--white);
+    padding: 0 15px;
+    color: var(--text-grey);
+    font-size: 0.95rem;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+}
+
+.divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: #e0e0e0;
+    z-index: 0;
+}
+
+/* --- AREA REGISTRAZIONE --- */
+.registration-area {
+    text-align: center;
+}
+
+.registration-area p {
+    color: var(--text-grey);
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+}
+
+.reg-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;              /* Spazio verticale tra i bottoni */
+    margin-top: 10px;
+}
+
+/* Stile Outline (Registrati come...) */
+.btn-outline {
+    display: block;
+    width: 100%;
+    padding: 14px;            /* Stesso padding di .btn-primary */
+    text-align: center;
+
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius);
+
+    background-color: transparent;
+    color: var(--text-dark);
+    text-decoration: none;
+    font-weight: 600;         /* Font weight identico al primario */
+    font-size: 1rem;
+
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.btn-outline:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: #FFF3E0;
+}
+
 /* --- RESPONSIVE MOBILE --- */
-/* Se lo schermo è più piccolo di 900px, impiliamo le colonne */
 @media (max-width: 960px) {
     .main-container {
-        flex-direction: column; /* Colonna verticale invece che riga */
+        flex-direction: column;
         height: auto;
         min-height: auto;
     }
 
     .info-section {
         padding: 40px 30px;
-        min-height: 300px; /* Altezza minima per la parte colorata */
+        min-height: 300px;
     }
 
     .auth-section {

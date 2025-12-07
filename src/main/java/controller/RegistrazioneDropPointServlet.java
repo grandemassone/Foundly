@@ -15,7 +15,6 @@ public class RegistrazioneDropPointServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Mostra il form per i Drop-Point
         request.getRequestDispatcher("/WEB-INF/jsp/registrazione_droppoint.jsp").forward(request, response);
     }
 
@@ -30,16 +29,29 @@ public class RegistrazioneDropPointServlet extends HttpServlet {
         String telefono = request.getParameter("telefono");
         String orari = request.getParameter("orari");
 
-        if (email == null || password == null || nomeAttivita == null) {
-            request.setAttribute("errore", "Campi obbligatori mancanti.");
+        String latStr = request.getParameter("latitudine");
+        String lonStr = request.getParameter("longitudine");
+
+        Double latitudine = null;
+        Double longitudine = null;
+
+        try {
+            if (latStr != null && !latStr.isEmpty()) latitudine = Double.parseDouble(latStr);
+            if (lonStr != null && !lonStr.isEmpty()) longitudine = Double.parseDouble(lonStr);
+        } catch (NumberFormatException e) {
+            // Ignora
+        }
+
+        if (email == null || password == null || nomeAttivita == null || latitudine == null || longitudine == null) {
+            request.setAttribute("errore", "Campi obbligatori mancanti o posizione mappa non selezionata.");
             request.getRequestDispatcher("/WEB-INF/jsp/registrazione_droppoint.jsp").forward(request, response);
             return;
         }
 
-        boolean successo = dpService.registraDropPoint(nomeAttivita, email, password, indirizzo, citta, provincia, telefono, orari);
+        // CORRETTO: Ordine parametri allineato col Service aggiornato (Lat, Lon)
+        boolean successo = dpService.registraDropPoint(nomeAttivita, email, password, indirizzo, citta, provincia, telefono, orari, latitudine, longitudine);
 
         if (successo) {
-            // Manda alla login con un messaggio specifico
             response.sendRedirect("login?registrazione=attesa_approvazione");
         } else {
             request.setAttribute("errore", "Email già registrata per un altro Drop-Point.");
