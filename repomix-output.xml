@@ -759,76 +759,6 @@ public class RecuperoPasswordService {
 }
 </file>
 
-<file path="src/main/java/model/service/UtenteService.java">
-package model.service;
-
-import model.bean.Utente;
-import model.bean.enums.Ruolo;
-import model.dao.UtenteDAO;
-import model.utils.PasswordUtils;
-
-import java.sql.Timestamp;
-import java.time.Instant;
-
-public class UtenteService {
-
-    private final UtenteDAO utenteDAO = new UtenteDAO();
-    public boolean registraUtente(String nome, String cognome, String username, String email, String password, String telefono) {
-        System.out.println("🔍 DEBUG: Inizio registrazione per " + email);
-
-        // 1. Controllo Email
-        if (utenteDAO.doRetrieveByEmail(email) != null) {
-            System.out.println("❌ DEBUG: Email già presente.");
-            return false;
-        }
-
-        // 2. Controllo Username (NUOVO!)
-        if (utenteDAO.doRetrieveByUsername(username) != null) {
-            System.out.println("❌ DEBUG: Username già presente.");
-            return false;
-        }
-
-        System.out.println("✅ DEBUG: Email e Username liberi. Procedo...");
-
-        Utente nuovoUtente = new Utente();
-        nuovoUtente.setNome(nome);
-        nuovoUtente.setCognome(cognome);
-        nuovoUtente.setUsername(username);
-        nuovoUtente.setEmail(email);
-        nuovoUtente.setTelefono(telefono);
-
-        String passwordHash = PasswordUtils.hashPassword(password);
-        nuovoUtente.setPasswordHash(passwordHash);
-
-        nuovoUtente.setRuolo(Ruolo.UTENTE_BASE);
-        nuovoUtente.setPunteggio(0);
-        nuovoUtente.setBadge("OCCHIO_DI_FALCO");
-        nuovoUtente.setImmagineProfilo("img/default-avatar.png");
-
-        boolean salvato = utenteDAO.doSave(nuovoUtente);
-        System.out.println("💾 DEBUG: Risultato salvataggio DAO: " + salvato);
-
-        return salvato;
-    }
-
-    public Utente login(String email, String password) {
-        // 1. Recupera l'utente dal DB
-        Utente utente = utenteDAO.doRetrieveByEmail(email);
-
-        if (utente == null) {
-            return null; // Utente non trovato
-        }
-
-        // 2. Verifica la password (hash vs password in chiaro)
-        if (PasswordUtils.checkPassword(password, utente.getPasswordHash())) {
-            return utente; // Login successo
-        }
-
-        return null; // Password errata
-    }
-}
-</file>
-
 <file path="src/main/java/model/utils/PasswordUtils.java">
 package model.utils;
 
@@ -1082,184 +1012,6 @@ body {
         font-size: 2.2rem;
     }
 }
-</file>
-
-<file path="src/main/webapp/WEB-INF/jsp/index.jsp">
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foundly - Home</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/index.css">
-</head>
-<body>
-
-<nav class="navbar">
-    <a href="${pageContext.request.contextPath}/index" class="brand">
-        <div class="brand-icon">
-            <img src="<%= request.getContextPath() %>/assets/images/logo.png" alt="logo_foundly">
-        </div>
-    </a>
-
-    <div class="nav-links">
-        <a href="#" class="nav-item">
-            <span class="material-icons">home</span> Home
-        </a>
-        <a href="#" class="nav-item">
-            <span class="material-icons">add_circle_outline</span> Crea Segnalazione
-        </a>
-        <a href="#" class="nav-item">
-            <span class="material-icons">inventory</span> Le Mie Segnalazioni
-        </a>
-        <a href="#" class="nav-item">
-            <span class="material-icons">place</span> Drop-Point
-        </a>
-        <a href="#" class="nav-item">
-            <span class="material-icons">emoji_events</span> Classifica
-        </a>
-    </div>
-
-    <div class="user-avatar"></div> </nav>
-
-<header class="hero">
-    <h1>Hai perso qualcosa?</h1>
-    <p>
-        Foundly ti aiuta a ritrovare oggetti e animali smarriti grazie alla nostra
-        community. Segnala, cerca e restituisci!
-    </p>
-    <a href="#" class="btn-cta-hero">
-        <span class="material-icons">inventory_2</span>
-        Crea Segnalazione
-    </a>
-</header>
-
-<div class="search-wrapper">
-    <div class="search-card">
-
-        <form action="search" method="GET">
-            <div class="search-top">
-                <div class="input-box">
-                    <span class="material-icons" style="color: #9e9e9e;">search</span>
-                    <input type="text" name="q" placeholder="Cerca per titolo, descrizione o luogo...">
-                </div>
-                <button type="button" class="btn-droppoint">
-                    <span class="material-icons">location_on</span>
-                    Trova Drop-Point
-                </button>
-            </div>
-
-            <div class="filters-row">
-                <div class="filter-icon-container">
-                    <span class="material-icons">filter_alt</span>
-                </div>
-
-                <select class="filter-select" name="tipo">
-                    <option value="">Tutti i tipi</option>
-                    <option value="oggetto">Oggetto</option>
-                    <option value="animale">Animale</option>
-                </select>
-
-                <select class="filter-select" name="categoria">
-                    <option value="">Tutte</option>
-                    <option value="elettronica">Elettronica</option>
-                    <option value="documenti">Documenti</option>
-                    <option value="abbigliamento">Abbigliamento</option>
-                    <option value="gioielli">Gioielli</option>
-                    <option value="chiavi">Chiavi</option>
-                    <option value="portafogli">Portafogli</option>
-                    <option value="borse">Borse</option>
-                    <option value="altro">Altro</option>
-                </select>
-
-                <select class="filter-select" name="citta">
-                    <option value="">Tutte le città</option>
-                    <option value="Roma">Roma</option>
-                    <option value="Milano">Milano</option>
-                    <option value="Napoli">Napoli</option>
-                    <option value="Torino">Torino</option>
-                    <option value="Firenze">Firenze</option>
-                    <option value="Venezia">Venezia</option>
-                    <option value="Bari">Bari</option>
-                    <option value="Palermo">Palermo</option>
-                </select>
-            </div>
-        </form>
-    </div>
-</div>
-
-<section class="recent-section">
-    <div class="section-header">
-        <h2>Segnalazioni Recenti</h2>
-        <span class="result-count">7 risultati</span>
-    </div>
-
-    <div class="cards-grid">
-
-        <article class="card">
-            <div class="card-badges">
-                <span class="badge badge-active">Attiva</span>
-                <span class="badge badge-type">Oggetto</span>
-            </div>
-
-            <div class="card-image-placeholder">
-                <span class="material-icons">inventory_2</span>
-            </div>
-
-            <div class="card-footer">
-                <div class="card-title">Telefono</div>
-                <div class="card-info">
-                    Salerno • 2 ore fa
-                </div>
-            </div>
-        </article>
-
-        <article class="card">
-            <div class="card-badges">
-                <span class="badge badge-active">Attiva</span>
-                <span class="badge badge-type">Oggetto</span>
-            </div>
-
-            <div class="card-image-placeholder">
-                <span class="material-icons">inventory_2</span>
-            </div>
-
-            <div class="card-footer">
-                <div class="card-title">borraccia</div>
-                <div class="card-info">
-                    Fisciano • Ieri
-                </div>
-            </div>
-        </article>
-
-        <article class="card">
-            <div class="card-badges">
-                <span class="badge badge-active">Attiva</span>
-                <span class="badge badge-type">Oggetto</span>
-            </div>
-
-            <div class="card-image-placeholder">
-                <span class="material-icons">inventory_2</span>
-            </div>
-
-            <div class="card-footer">
-                <div class="card-title">dad</div>
-                <div class="card-info">
-                    Baronissi • 3 giorni fa
-                </div>
-            </div>
-        </article>
-
-    </div>
-</section>
-
-</body>
-</html>
 </file>
 
 <file path="src/main/webapp/WEB-INF/web.xml">
@@ -1922,86 +1674,266 @@ public class DropPoint {
 }
 </file>
 
-<file path="src/main/webapp/WEB-INF/jsp/login.jsp">
+<file path="src/main/java/model/service/UtenteService.java">
+package model.service;
+
+import model.bean.Utente;
+import model.bean.enums.Ruolo;
+import model.dao.UtenteDAO;
+import model.utils.PasswordUtils;
+
+import java.sql.Timestamp;
+import java.time.Instant;
+
+public class UtenteService {
+
+    private final UtenteDAO utenteDAO = new UtenteDAO();
+    public boolean registraUtente(String nome, String cognome, String username, String email, String password, String telefono) {
+        System.out.println("DEBUG: Inizio registrazione per " + email);
+
+        // 1. Controllo Email
+        if (utenteDAO.doRetrieveByEmail(email) != null) {
+            System.out.println("DEBUG: Email già presente.");
+            return false;
+        }
+
+        // 2. Controllo Username (NUOVO!)
+        if (utenteDAO.doRetrieveByUsername(username) != null) {
+            System.out.println("DEBUG: Username già presente.");
+            return false;
+        }
+
+        System.out.println("DEBUG: Email e Username liberi. Procedo...");
+
+        Utente nuovoUtente = new Utente();
+        nuovoUtente.setNome(nome);
+        nuovoUtente.setCognome(cognome);
+        nuovoUtente.setUsername(username);
+        nuovoUtente.setEmail(email);
+        nuovoUtente.setTelefono(telefono);
+
+        String passwordHash = PasswordUtils.hashPassword(password);
+        nuovoUtente.setPasswordHash(passwordHash);
+
+        nuovoUtente.setRuolo(Ruolo.UTENTE_BASE);
+        nuovoUtente.setPunteggio(0);
+        nuovoUtente.setBadge("OCCHIO_DI_FALCO");
+        nuovoUtente.setImmagineProfilo("img/default-avatar.png");
+
+        boolean salvato = utenteDAO.doSave(nuovoUtente);
+        System.out.println("DEBUG: Risultato salvataggio DAO: " + salvato);
+
+        return salvato;
+    }
+
+    public Utente login(String email, String password) {
+        // 1. Recupera l'utente dal DB
+        Utente utente = utenteDAO.doRetrieveByEmail(email);
+
+        if (utente == null) {
+            return null; // Utente non trovato
+        }
+
+        // 2. Verifica la password (hash vs password in chiaro)
+        if (PasswordUtils.checkPassword(password, utente.getPasswordHash())) {
+            return utente; // Login successo
+        }
+
+        return null; // Password errata
+    }
+}
+</file>
+
+<file path="src/main/webapp/WEB-INF/jsp/index.jsp">
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foundly - Login</title>
+    <title>Foundly - Home</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
+
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/index.css">
 </head>
 <body>
 
-<div class="main-container">
-
-    <div class="info-section">
-        <div class="brand-header">
-            <div class="logo-placeholder">
-                <span class="material-icons logo-icon">travel_explore</span> Foundly
-            </div>
+<nav class="navbar">
+    <a href="${pageContext.request.contextPath}/index" class="brand">
+        <div class="brand-icon">
+            <img src="<%= request.getContextPath() %>/assets/images/logo.png" alt="logo_foundly">
         </div>
+    </a>
 
-        <div class="hero-text">
-            <h1>Hai perso qualcosa?</h1>
-            <p>
-                Foundly ti aiuta a ritrovare oggetti e animali smarriti grazie alla nostra community.
-                Segnala uno smarrimento, cerca tra i ritrovamenti e restituisci in sicurezza tramite i nostri Drop-Point.
-            </p>
-            <div class="feature-pills">
-                <span class="pill"><span class="material-icons">security</span> Secure Claim</span>
-                <span class="pill"><span class="material-icons">store</span> Drop-Points</span>
-                <span class="pill"><span class="material-icons">emoji_events</span> Scoreboard</span>
-            </div>
-        </div>
+    <div class="nav-links">
+        <a href="${pageContext.request.contextPath}/index" class="nav-item">
+            <span class="material-icons">home</span> Home
+        </a>
+        <a href="#" class="nav-item">
+            <span class="material-icons">add_circle_outline</span> Crea Segnalazione
+        </a>
+        <a href="#" class="nav-item">
+            <span class="material-icons">inventory</span> Le Mie Segnalazioni
+        </a>
+        <a href="#" class="nav-item">
+            <span class="material-icons">place</span> Drop-Point
+        </a>
+        <a href="#" class="nav-item">
+            <span class="material-icons">emoji_events</span> Classifica
+        </a>
     </div>
 
-    <div class="auth-section">
-        <div class="auth-card">
-            <h2>Accedi</h2>
-            <p class="subtitle">Benvenuto su Foundly</p>
+    <%
+        Object utenteLoggato = session.getAttribute("utente");
+        if (utenteLoggato != null) {
+    %>
+    <!-- Utente loggato: mostra avatar -->
+    <div class="user-avatar"></div>
+    <%
+    } else {
+    %>
+    <!-- Utente NON loggato: mostra bottone Login/Registrati -->
+    <a href="${pageContext.request.contextPath}/login" class="btn-login-nav">
+        <span class="material-icons">login</span>
+        <span>Login/Registrati</span>
+    </a>
+    <%
+        }
+    %>
+</nav>
 
-            <form action="${pageContext.request.contextPath}/login" method="post">
+<header class="hero">
+    <h1>Hai perso qualcosa?</h1>
+    <p>
+        Foundly ti aiuta a ritrovare oggetti e animali smarriti grazie alla nostra
+        community. Segnala, cerca e restituisci!
+    </p>
+    <a href="#" class="btn-cta-hero">
+        <span class="material-icons">inventory_2</span>
+        Crea Segnalazione
+    </a>
+</header>
 
-                <div class="input-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="nome@esempio.com" required>
+<div class="search-wrapper">
+    <div class="search-card">
+
+        <form action="search" method="GET">
+            <div class="search-top">
+                <div class="input-box">
+                    <span class="material-icons" style="color: #9e9e9e;">search</span>
+                    <input type="text" name="q" placeholder="Cerca per titolo, descrizione o luogo...">
                 </div>
-
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Inserisci la tua password" required>
-                </div>
-
-                <div class="form-actions">
-                    <a href="${pageContext.request.contextPath}/recupero-password" class="forgot-password">Password dimenticata?</a>
-                </div>
-
-                <button type="submit" class="btn-primary">Accedi</button>
-            </form>
-
-            <div class="divider">
-                <span>oppure</span>
+                <button type="button" class="btn-cerca">
+                    <span class="material-icons">search</span>
+                    Cerca
+                </button>
             </div>
 
-            <div class="registration-area">
-                <p>Non hai un account?</p>
-                <div class="reg-buttons">
-                    <a href="${pageContext.request.contextPath}/registrazione-utente" class="btn-outline">
-                        Registrati come Utente
-                    </a>
-                    <a href="${pageContext.request.contextPath}/registrazione-droppoint" class="btn-outline">
-                        Registrati come Drop Point
-                    </a>
+            <div class="filters-row">
+                <div class="filter-icon-container">
+                    <span class="material-icons">filter_alt</span>
                 </div>
+
+                <select class="filter-select" name="tipo">
+                    <option value="">Tutti i tipi</option>
+                    <option value="oggetto">Oggetto</option>
+                    <option value="animale">Animale</option>
+                </select>
+
+                <select class="filter-select" name="categoria">
+                    <option value="">Tutte</option>
+                    <option value="elettronica">Elettronica</option>
+                    <option value="documenti">Documenti</option>
+                    <option value="abbigliamento">Abbigliamento</option>
+                    <option value="gioielli">Gioielli</option>
+                    <option value="chiavi">Chiavi</option>
+                    <option value="portafogli">Portafogli</option>
+                    <option value="borse">Borse</option>
+                    <option value="altro">Altro</option>
+                </select>
+
+                <select class="filter-select" name="citta">
+                    <option value="">Tutte le città</option>
+                    <option value="Roma">Roma</option>
+                    <option value="Milano">Milano</option>
+                    <option value="Napoli">Napoli</option>
+                    <option value="Torino">Torino</option>
+                    <option value="Firenze">Firenze</option>
+                    <option value="Venezia">Venezia</option>
+                    <option value="Bari">Bari</option>
+                    <option value="Palermo">Palermo</option>
+                </select>
             </div>
-        </div>
+        </form>
     </div>
 </div>
+
+<section class="recent-section">
+    <div class="section-header">
+        <h2>Segnalazioni Recenti</h2>
+        <span class="result-count">7 risultati</span>
+    </div>
+
+    <div class="cards-grid">
+
+        <article class="card">
+            <div class="card-badges">
+                <span class="badge badge-active">Attiva</span>
+                <span class="badge badge-type">Oggetto</span>
+            </div>
+
+            <div class="card-image-placeholder">
+                <span class="material-icons">inventory_2</span>
+            </div>
+
+            <div class="card-footer">
+                <div class="card-title">Telefono</div>
+                <div class="card-info">
+                    Salerno • 2 ore fa
+                </div>
+            </div>
+        </article>
+
+        <article class="card">
+            <div class="card-badges">
+                <span class="badge badge-active">Attiva</span>
+                <span class="badge badge-type">Oggetto</span>
+            </div>
+
+            <div class="card-image-placeholder">
+                <span class="material-icons">inventory_2</span>
+            </div>
+
+            <div class="card-footer">
+                <div class="card-title">borraccia</div>
+                <div class="card-info">
+                    Fisciano • Ieri
+                </div>
+            </div>
+        </article>
+
+        <article class="card">
+            <div class="card-badges">
+                <span class="badge badge-active">Attiva</span>
+                <span class="badge badge-type">Oggetto</span>
+            </div>
+
+            <div class="card-image-placeholder">
+                <span class="material-icons">inventory_2</span>
+            </div>
+
+            <div class="card-footer">
+                <div class="card-title">dad</div>
+                <div class="card-info">
+                    Baronissi • 3 giorni fa
+                </div>
+            </div>
+        </article>
+
+    </div>
+</section>
 
 </body>
 </html>
@@ -2295,161 +2227,6 @@ TRUNCATE TABLE drop_point;
 SET FOREIGN_KEY_CHECKS = 1;
 </file>
 
-<file path="src/main/java/controller/LoginServlet.java">
-package controller;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import model.bean.DropPoint;
-import model.bean.Utente;
-import model.service.DropPointService;
-import model.service.UtenteService;
-
-import java.io.IOException;
-
-@WebServlet(name = "LoginServlet", value = "/login")
-public class LoginServlet extends HttpServlet {
-
-    private final UtenteService utenteService = new UtenteService();
-    private final DropPointService dropPointService = new DropPointService();
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-
-        // 1. Proviamo il login come UTENTE
-        Utente utente = utenteService.login(email, password);
-
-        if (utente != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("utente", utente); // Chiave "utente"
-            session.setAttribute("ruoloLoggato", "CITTADINO");
-            session.setMaxInactiveInterval(30 * 60);
-            response.sendRedirect("index.jsp");
-            return;
-        }
-
-        // 2. Se fallisce, proviamo come DROP-POINT
-        DropPoint dropPoint = dropPointService.login(email, password);
-
-        if (dropPoint != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("dropPoint", dropPoint); // Chiave "dropPoint" (diversa da utente!)
-            session.setAttribute("ruoloLoggato", "DROPPOINT");
-            session.setMaxInactiveInterval(30 * 60);
-
-            response.sendRedirect("login.jsp");
-            return;
-        }
-
-        // 3. Se arriviamo qui, entrambi i login sono falliti
-        request.setAttribute("errore", "Email o Password non validi.");
-        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
-    }
-}
-</file>
-
-<file path="src/main/java/model/dao/DropPointDAO.java">
-package model.dao;
-
-import model.ConPool;
-import model.bean.DropPoint;
-import model.bean.enums.StatoDropPoint;
-import java.sql.*;
-
-public class DropPointDAO {
-
-    public boolean doSave(DropPoint dp) {
-        // CORRETTO: Nome tabella DropPoint e colonne corrispondenti allo script SQL
-        String query = "INSERT INTO drop_point (nome_attivita, email, password_hash, indirizzo, " +
-                "citta, provincia, telefono, orari_apertura, latitudine, longitudine, " +
-                "stato, ritiri_effettuati, immagine) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-
-            ps.setString(1, dp.getNomeAttivita());
-            ps.setString(2, dp.getEmail());
-            ps.setString(3, dp.getPasswordHash());
-            ps.setString(4, dp.getIndirizzo());
-            ps.setString(5, dp.getCitta());
-            ps.setString(6, dp.getProvincia());
-            ps.setString(7, dp.getTelefono());
-            ps.setString(8, dp.getOrariApertura());
-
-            // CORRETTO: setObject gestisce meglio i Double (anche se null)
-            ps.setObject(9, dp.getLatitudine());
-            ps.setObject(10, dp.getLongitudine());
-
-            // CORRETTO: Conversione Enum a Stringa
-            ps.setString(11, dp.getStato().toString());
-            ps.setInt(12, dp.getRitiriEffettuati());
-            ps.setString(13, dp.getImmagine());
-
-            int result = ps.executeUpdate();
-            if (result > 0) {
-                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-                    if (generatedKeys.next()) dp.setId(generatedKeys.getLong(1));
-                }
-                return true;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public DropPoint doRetrieveByEmail(String email) {
-        // CORRETTO: Nome tabella DropPoint
-        String query = "SELECT * FROM DropPoint WHERE email = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setString(1, email);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    DropPoint dp = new DropPoint();
-                    dp.setId(rs.getLong("id"));
-                    dp.setNomeAttivita(rs.getString("nome_attivita"));
-                    dp.setEmail(rs.getString("email"));
-                    dp.setPasswordHash(rs.getString("password_hash"));
-                    dp.setIndirizzo(rs.getString("indirizzo"));
-                    dp.setCitta(rs.getString("citta"));
-                    dp.setProvincia(rs.getString("provincia")); // Aggiunto
-                    dp.setTelefono(rs.getString("telefono"));   // Aggiunto
-                    dp.setOrariApertura(rs.getString("orari_apertura")); // Aggiunto
-
-                    dp.setLatitudine(rs.getObject("latitudine", Double.class));
-                    dp.setLongitudine(rs.getObject("longitudine", Double.class));
-
-                    // Gestione conversione stringa DB -> Enum Java
-                    try {
-                        dp.setStato(StatoDropPoint.valueOf(rs.getString("stato")));
-                    } catch (IllegalArgumentException | NullPointerException e) {
-                        dp.setStato(StatoDropPoint.IN_ATTESA);
-                    }
-
-                    return dp;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-}
-</file>
-
 <file path="src/main/java/model/service/DropPointService.java">
 package model.service;
 
@@ -2606,6 +2383,226 @@ public class ConPool {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }
+</file>
+
+<file path="src/main/webapp/WEB-INF/jsp/login.jsp">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foundly - Login</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
+
+    <style>
+        /* --- BOTTONI REGISTRAZIONE SOTTO --- */
+        .registration-area {
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .registration-area p {
+            margin-bottom: 12px;
+            color: #5f6368;
+        }
+
+        .reg-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-register {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid #FFB74D;
+            background: #FFF7EC; /* colore richiesto */
+            color: #E65100;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-register:hover {
+            background: #FFE7CF; /* hover leggermente più caldo */
+            border-color: #FFA726;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-register .material-icons {
+            font-size: 20px;
+        }
+
+        /* versione Drop Point, stesso colore base ma bordo un filo diverso */
+        .btn-register.drop {
+            border-color: #FFCC80;
+        }
+
+        .btn-register.drop:hover {
+            background: #FFE0C0;
+        }
+
+        /* Affianca i bottoni su schermi medi/grandi */
+        @media (min-width: 768px) {
+            .reg-buttons {
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+
+    <div class="info-section">
+        <div class="brand-header">
+            <div class="logo-placeholder">
+                <span class="material-icons logo-icon">travel_explore</span> Foundly
+            </div>
+        </div>
+
+        <div class="hero-text">
+            <h1>Hai perso qualcosa?</h1>
+            <p>
+                Foundly ti aiuta a ritrovare oggetti e animali smarriti grazie alla nostra community.
+                Segnala uno smarrimento, cerca tra i ritrovamenti e restituisci in sicurezza tramite i nostri
+                Drop-Point.
+            </p>
+            <div class="feature-pills">
+                <span class="pill"><span class="material-icons">security</span> Secure Claim</span>
+                <span class="pill"><span class="material-icons">store</span> Drop-Points</span>
+                <span class="pill"><span class="material-icons">emoji_events</span> Scoreboard</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-section">
+        <div class="auth-card">
+            <h2>Accedi</h2>
+            <p class="subtitle">Benvenuto su Foundly</p>
+
+            <form action="${pageContext.request.contextPath}/login" method="post">
+
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="nome@esempio.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Inserisci la tua password"
+                           required>
+                </div>
+
+                <div class="form-actions">
+                    <a href="${pageContext.request.contextPath}/recupero-password" class="forgot-password">Password
+                        dimenticata?</a>
+                </div>
+
+                <button type="submit" class="btn-primary">Accedi</button>
+            </form>
+
+            <div class="registration-area">
+                <p>Non hai un account?</p>
+                <div class="reg-buttons">
+                    <a href="${pageContext.request.contextPath}/registrazione-utente" class="btn-register">
+                        <span class="material-icons">person</span>
+                        <span>Registrati come Utente</span>
+                    </a>
+                    <a href="${pageContext.request.contextPath}/registrazione-droppoint" class="btn-register drop">
+                        <span class="material-icons">storefront</span>
+                        <span>Registrati come Drop Point</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+</file>
+
+<file path="pom.xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>Foundly</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>Foundly</name>
+    <packaging>war</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>23</maven.compiler.target>
+        <maven.compiler.source>23</maven.compiler.source>
+        <junit.version>5.11.0</junit.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>9.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+            <version>11.0.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.4.0</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
 </file>
 
 <file path="src/main/webapp/WEB-INF/jsp/registrazione_droppoint.jsp">
@@ -2785,126 +2782,330 @@ public class ConPool {
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
 <script>
-    // 1. Inizializza la mappa su una posizione di default (es. Italia centrale o Roma)
-    // Coordinate: [Latitudine, Longitudine], Zoom: 5 (vista Italia)
+    // Inizializza la mappa su Italia / Roma
     var map = L.map('map').setView([41.9028, 12.4964], 6);
 
-    // 2. Aggiungi il layer di OpenStreetMap (Il "disegno" della mappa)
+    // Layer OpenStreetMap
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
-    var marker;
+    var marker = null;
 
-    // 3. Gestisci il click sulla mappa
-    map.on('click', function(e) {
-        var lat = e.latlng.lat;
-        var lng = e.latlng.lng;
-
-        // Se c'è già un marker, rimuovilo (ne vogliamo solo uno)
+    function setMarker(lat, lng) {
         if (marker) {
-            map.removeLayer(marker);
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+            // Quando l'utente trascina il marker, aggiorna le coordinate
+            marker.on('dragend', function (e) {
+                var pos = e.target.getLatLng();
+                document.getElementById('latitudine').value = pos.lat;
+                document.getElementById('longitudine').value = pos.lng;
+                console.log("Posizione selezionata (drag):", pos.lat, pos.lng);
+            });
         }
 
-        // Aggiungi il marker dove ha cliccato l'utente
-        marker = L.marker([lat, lng]).addTo(map);
-
-        // Aggiorna i campi input nascosti
         document.getElementById('latitudine').value = lat;
         document.getElementById('longitudine').value = lng;
+    }
 
-        console.log("Posizione selezionata: " + lat + ", " + lng);
+    // CLICK MANUALE SULLA MAPPA
+    map.on('click', function (e) {
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
+        setMarker(lat, lng);
+        console.log("Posizione selezionata (click): " + lat + ", " + lng);
+    });
+
+    // ------- G E O C O D I N G  D A  I N D I R I Z Z O -------
+
+    let geocodeTimeout = null;
+
+    function geocodeAddress() {
+        var indirizzoRaw = document.getElementById('indirizzo').value.trim();
+        var citta        = document.getElementById('citta').value.trim();
+        var provincia    = document.getElementById('provincia').value.trim();
+
+        if (!indirizzoRaw || !citta || !provincia) {
+            return;
+        }
+
+        // Prova a separare via e civico: "Via Cervinia, 38" -> "38 Via Cervinia"
+        var street = indirizzoRaw;
+        var match = indirizzoRaw.match(/(.+?)(?:,?\s+(\d+\w*\/?\w*))$/);
+        if (match) {
+            var via    = match[1].trim();
+            var civico = match[2].trim();
+            street = civico + " " + via;
+        }
+
+        var params = new URLSearchParams({
+            format: "json",
+            limit: "1",
+            addressdetails: "1",
+            street: street,
+            city: citta,
+            // la sigla "SA" non è ottimale, ma la lasciamo come info in più
+            county: provincia,
+            country: "Italia"
+        });
+
+        var url = "https://nominatim.openstreetmap.org/search?" + params.toString();
+
+        fetch(url, {
+            method: "GET",
+            headers: {
+                "Accept-Language": "it"
+            }
+        })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                if (!data || data.length === 0) {
+                    console.warn("Indirizzo non trovato");
+                    return;
+                }
+
+                var result = data[0];
+                var lat = parseFloat(result.lat);
+                var lng = parseFloat(result.lon);
+
+                if (isNaN(lat) || isNaN(lng)) {
+                    console.warn("Coordinate non valide dal geocoder");
+                    return;
+                }
+
+                // Controllo se il geocoder ha effettivamente un house_number
+                var addr = result.address || {};
+                if (!addr.house_number) {
+                    console.warn("Nessun house_number nei dati: posizione solo approssimativa sulla via.");
+                    // qui potresti anche mostrare un messaggio all'utente:
+                    // es. un piccolo testo: "Posizione approssimativa, sposta il segnaposto sulla mappa"
+                }
+
+                setMarker(lat, lng);
+                map.setView([lat, lng], 16);
+
+                console.log("Posizione selezionata (geocode): " + lat + ", " + lng,
+                    "| street:", street, "| address:", addr);
+            })
+            .catch(function (error) {
+                console.error("Errore nel geocoding:", error);
+            });
+    }
+
+    function scheduleGeocode() {
+        clearTimeout(geocodeTimeout);
+        geocodeTimeout = setTimeout(geocodeAddress, 600);
+    }
+
+    // Lancia il geocoding quando l’utente compila indirizzo/città/provincia
+    window.addEventListener('DOMContentLoaded', function () {
+        ['indirizzo', 'citta', 'provincia'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('blur', scheduleGeocode);
+                el.addEventListener('keyup', function (e) {
+                    if (!['Tab', 'Shift', 'Alt', 'Control', 'Meta'].includes(e.key)) {
+                        scheduleGeocode();
+                    }
+                });
+            }
+        });
     });
 </script>
+
+
 
 </body>
 </html>
 </file>
 
-<file path="pom.xml">
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<file path="src/main/java/controller/LoginServlet.java">
+package controller;
 
-    <groupId>com.example</groupId>
-    <artifactId>Foundly</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <name>Foundly</name>
-    <packaging>war</packaging>
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.DropPoint;
+import model.bean.Utente;
+import model.service.DropPointService;
+import model.service.UtenteService;
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.target>23</maven.compiler.target>
-        <maven.compiler.source>23</maven.compiler.source>
-        <junit.version>5.11.0</junit.version>
-    </properties>
+import java.io.IOException;
 
-    <dependencies>
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
+@WebServlet(name = "LoginServlet", value = "/login")
+public class LoginServlet extends HttpServlet {
 
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <version>9.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-jdbc</artifactId>
-            <version>11.0.4</version>
-        </dependency>
+    private final UtenteService utenteService = new UtenteService();
+    private final DropPointService dropPointService = new DropPointService();
 
-        <dependency>
-            <groupId>org.mindrot</groupId>
-            <artifactId>jbcrypt</artifactId>
-            <version>0.4</version>
-        </dependency>
-    </dependencies>
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
+    }
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.4.0</version>
-            </plugin>
-        </plugins>
-    </build>
-</project>
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+
+        // 1. Proviamo il login come UTENTE
+        Utente utente = utenteService.login(email, password);
+
+        if (utente != null) {
+            HttpSession session = request.getSession();
+            session.setAttribute("utente", utente); // Chiave "utente"
+            session.setAttribute("ruoloLoggato", "CITTADINO");
+            session.setMaxInactiveInterval(30 * 60);
+            response.sendRedirect(request.getContextPath() + "/index");
+            return;
+        }
+
+        // 2. Se fallisce, proviamo come DROP-POINT
+        DropPoint dropPoint = dropPointService.login(email, password);
+
+        if (dropPoint != null) {
+            HttpSession session = request.getSession();
+            session.setAttribute("dropPoint", dropPoint); // Chiave "dropPoint" (diversa da utente!)
+            session.setAttribute("ruoloLoggato", "DROPPOINT");
+            session.setMaxInactiveInterval(30 * 60);
+
+            response.sendRedirect(request.getContextPath() + "/index");
+            return;
+        }
+
+        // 3. Se arriviamo qui, entrambi i login sono falliti
+        request.setAttribute("errore", "Email o Password non validi.");
+        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
+    }
+}
+</file>
+
+<file path="src/main/java/model/dao/DropPointDAO.java">
+package model.dao;
+
+import model.ConPool;
+import model.bean.DropPoint;
+import model.bean.enums.StatoDropPoint;
+import java.sql.*;
+
+public class DropPointDAO {
+
+    public boolean doSave(DropPoint dp) {
+        // CORRETTO: Nome tabella DropPoint e colonne corrispondenti allo script SQL
+        String query = "INSERT INTO drop_point (nome_attivita, email, password_hash, indirizzo, " +
+                "citta, provincia, telefono, orari_apertura, latitudine, longitudine, " +
+                "stato, ritiri_effettuati, immagine) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, dp.getNomeAttivita());
+            ps.setString(2, dp.getEmail());
+            ps.setString(3, dp.getPasswordHash());
+            ps.setString(4, dp.getIndirizzo());
+            ps.setString(5, dp.getCitta());
+            ps.setString(6, dp.getProvincia());
+            ps.setString(7, dp.getTelefono());
+            ps.setString(8, dp.getOrariApertura());
+
+            // CORRETTO: setObject gestisce meglio i Double (anche se null)
+            ps.setObject(9, dp.getLatitudine());
+            ps.setObject(10, dp.getLongitudine());
+
+            // CORRETTO: Conversione Enum a Stringa
+            ps.setString(11, dp.getStato().toString());
+            ps.setInt(12, dp.getRitiriEffettuati());
+            ps.setString(13, dp.getImmagine());
+
+            int result = ps.executeUpdate();
+            if (result > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) dp.setId(generatedKeys.getLong(1));
+                }
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public DropPoint doRetrieveByEmail(String email) {
+        // CORRETTO: Nome tabella DropPoint
+        String query = "SELECT * FROM drop_point WHERE email = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    DropPoint dp = new DropPoint();
+                    dp.setId(rs.getLong("id"));
+                    dp.setNomeAttivita(rs.getString("nome_attivita"));
+                    dp.setEmail(rs.getString("email"));
+                    dp.setPasswordHash(rs.getString("password_hash"));
+                    dp.setIndirizzo(rs.getString("indirizzo"));
+                    dp.setCitta(rs.getString("citta"));
+                    dp.setProvincia(rs.getString("provincia")); // Aggiunto
+                    dp.setTelefono(rs.getString("telefono"));   // Aggiunto
+                    dp.setOrariApertura(rs.getString("orari_apertura")); // Aggiunto
+
+                    dp.setLatitudine(rs.getObject("latitudine", Double.class));
+                    dp.setLongitudine(rs.getObject("longitudine", Double.class));
+
+                    // Gestione conversione stringa DB -> Enum Java
+                    try {
+                        dp.setStato(StatoDropPoint.valueOf(rs.getString("stato")));
+                    } catch (IllegalArgumentException | NullPointerException e) {
+                        dp.setStato(StatoDropPoint.IN_ATTESA);
+                    }
+
+                    return dp;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
 </file>
 
 <file path="src/main/webapp/css/index.css">
 :root {
-    /* Palette Colori Arancione (Stile Google/Material) */
-    --primary-color: #FB8C00;       /* Arancione principale */
-    --primary-hover: #F57C00;       /* Arancione più scuro per hover */
-    --primary-light: #FFE0B2;       /* Arancione chiarissimo */
-    --text-dark: #202124;           /* Nero morbido (stile Google) */
-    --text-grey: #5f6368;           /* Grigio testo */
-    --bg-color: #f0f2f5;            /* Grigio chiarissimo sfondo */
-    --white: #ffffff;
-    --border-radius: 8px;           /* Bordi arrotondati standard */
-}
+       --primary-color: #FB8C00;
+       --primary-hover: #F57C00;
+       --primary-light: #FFE0B2;
+       --bg-page: #FFFFFF;
+       --bg-grey: #F5F5F5;
+       --text-dark: #202124;
+       --text-grey: #5F6368;
+       --white: #FFFFFF;
+       --radius-md: 12px;
+       --shadow-soft: 0 4px 15px rgba(0,0,0,0.08);
+   }
 
 * {
     box-sizing: border-box;
@@ -2914,218 +3115,409 @@ public class ConPool {
 
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: var(--bg-color);
+    background-color: var(--bg-page);
     color: var(--text-dark);
-    min-height: 100vh;
+}
+
+/* ================= NAVBAR ================= */
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 48px;
+    background-color: var(--white);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* Brand / Logo */
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.brand-icon img {
+    height: 100px;
+    width: auto;
+}
+
+/* Link di navigazione */
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    color: #5F6368;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 999px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-item .material-icons {
+    font-size: 20px;
+}
+
+.nav-item:hover {
+    background-color: #F1F3F4;
+    color: #202124;
+}
+
+/* Avatar utente (se loggato) */
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFE0B2, #FB8C00);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Bottone Login / Registrati (se NON loggato) */
+
+.btn-login-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid #FFB74D;
+    background-color: #FFF7EC;
+    color: #E65100;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    transition: all 0.2s ease;
+}
+
+.btn-login-nav .material-icons {
+    font-size: 20px;
+}
+
+.btn-login-nav:hover {
+    background-color: #FFE7CF;
+    border-color: #FFA726;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* ================= HERO ================= */
+
+.hero {
+    position: relative;
+    padding: 80px 24px 120px;
+    text-align: center;
+    background: linear-gradient(135deg, #F57C00 0%, #FB8C00 40%, #F36C00 100%);
+    color: var(--white);
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 16px;
+}
+
+.hero p {
+    max-width: 640px;
+    margin: 0 auto 32px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+/* Pulsante call-to-action nel hero */
+
+.btn-cta-hero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background-color: #FFFFFF;
+    color: #E65100;
+    font-weight: 600;
+    font-size: 0.98rem;
+    border-radius: 999px;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-cta-hero .material-icons {
+    font-size: 20px;
+}
+
+.btn-cta-hero:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+}
+
+/* ================= SEARCH CARD ================= */
+
+.search-wrapper {
+    position: relative;
+    margin-top: -52px;
+    padding: 0 24px 32px;
+}
+
+.search-card {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    padding: 18px 22px 16px;
+}
+
+/* Riga superiore (input + bottone Drop-Point) */
+
+.search-top {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.input-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #F8F9FA;
+    border-radius: 999px;
+    padding: 8px 14px;
+    border: 1px solid #E0E0E0;
+}
+
+.input-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.95rem;
+    color: #202124;
+}
+
+/* Bottone Trova Drop-Point */
+
+.btn-cerca {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid #FFB74D;
+    background-color: #FFF7EC;
+    color: #E65100;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-droppoint .material-icons {
+    font-size: 18px;
+}
+
+.btn-droppoint:hover {
+    background-color: #FFE7CF;
+    border-color: #FFA726;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Filtri sotto */
+
+.filters-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.filter-icon-container {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #FFF3E0;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px; /* Aggiunto padding per evitare che tocchi i bordi su schermi piccoli */
 }
 
-/* --- CONTENITORE PRINCIPALE --- */
-.main-container {
+.filter-icon-container .material-icons {
+    font-size: 18px;
+    color: #E65100;
+}
+
+.filter-select {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid #E0E0E0;
+    background-color: #FAFAFA;
+    font-size: 0.9rem;
+    color: #424242;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.filter-select:focus {
+    border-color: var(--primary-color);
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(251, 140, 0, 0.16);
+}
+
+/* ================= SEZIONE SEGNALAZIONI ================= */
+
+.recent-section {
+    max-width: 1100px;
+    margin: 24px auto 40px;
+    padding: 0 24px;
+}
+
+.section-header {
     display: flex;
-    width: 100%;
-    max-width: 1200px; /* Aumentato leggermente per dare respiro */
-
-    /* MODIFICA CHIAVE: Invece di height fissa, usiamo min-height */
-    min-height: 80vh;
-    height: auto;      /* Permette al box di crescere se il form è lungo */
-
-    background-color: var(--white);
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    overflow: hidden; /* Mantiene i bordi arrotondati */
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
 }
 
-/* --- PARTE SINISTRA (Info) --- */
-.info-section {
-    flex: 1; /* Occupa il 50% dello spazio */
-    /* Il background viene sovrascritto inline nelle JSP specifiche, ma questo è il default */
-    background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
-    padding: 60px;
+.section-header h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #202124;
+}
+
+.result-count {
+    font-size: 0.85rem;
+    color: #757575;
+}
+
+/* Griglia cards */
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+/* Card singola */
+
+.card {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+    padding: 12px 12px 14px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 8px;
 }
 
-.brand-header {
-    margin-bottom: 40px;
+.card-badges {
+    display: flex;
+    gap: 6px;
 }
 
-.logo-placeholder {
-    font-size: 2rem;
-    font-weight: 700;
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.badge-active {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+}
+
+.badge-type {
+    background-color: #FFF3E0;
     color: #E65100;
+}
+
+/* Placeholder immagine */
+
+.card-image-placeholder {
+    height: 120px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #F5F5F5, #E0E0E0);
     display: flex;
     align-items: center;
-    gap: 10px;
-}
-
-.hero-text h1 {
-    font-size: 3rem;
-    line-height: 1.2;
-    margin-bottom: 20px;
-    color: var(--text-dark);
-}
-
-.hero-text p {
-    font-size: 1.1rem;
-    color: var(--text-grey);
-    line-height: 1.6;
-    margin-bottom: 30px;
-}
-
-.feature-pills {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.pill {
-    background-color: rgba(255,255,255,0.6);
-    padding: 8px 16px;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #E65100;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-/* --- PARTE DESTRA (Form) --- */
-.auth-section {
-    flex: 1.2; /* Diamo un po' più di spazio al form (era 1) */
-    padding: 40px; /* Ridotto leggermente il padding per dare spazio al contenuto */
-    display: flex;
-    align-items: center; /* Centra verticalmente */
     justify-content: center;
-    background-color: var(--white);
+    color: #9E9E9E;
 }
 
-.auth-card {
-    width: 100%;
-    max-width: 480px; /* Allargato il form per evitare che i campi input-row siano stretti */
+.card-image-placeholder .material-icons {
+    font-size: 42px;
 }
 
-.auth-card h2 {
-    font-size: 2rem;
-    margin-bottom: 10px;
+/* Footer card */
+
+.card-footer {
+    margin-top: 4px;
 }
 
-.subtitle {
-    color: var(--text-grey);
-    margin-bottom: 30px;
-}
-
-/* --- STILE INPUT --- */
-.input-group {
-    margin-bottom: 20px;
-}
-
-/* Gestione righe affiancate (Nome/Cognome, Città/Prov) */
-.input-row {
-    display: flex;
-    gap: 15px; /* Spazio tra i due input */
-}
-
-.input-group label {
-    display: block;
-    font-size: 0.9rem;
-    color: var(--text-grey);
-    margin-bottom: 5px;
-    font-weight: 500;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #dadce0;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background-color: #fafafa;
-}
-
-.input-group input:focus {
-    border-color: var(--primary-color);
-    background-color: var(--white);
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(251, 140, 0, 0.2);
-}
-
-/* --- BOTTONI --- */
-.btn-primary {
-    width: 100%;
-    padding: 14px;
-    background-color: var(--primary-color);
-    color: var(--white);
-    border: none;
-    border-radius: var(--border-radius);
+.card-title {
     font-size: 1rem;
     font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s;
+    margin-bottom: 2px;
+    color: #202124;
 }
 
-.btn-primary:hover {
-    background-color: var(--primary-hover);
-    box-shadow: 0 4px 12px rgba(251, 140, 0, 0.3);
+.card-info {
+    font-size: 0.85rem;
+    color: #757575;
 }
 
-.mt-2 {
-    margin-top: 20px;
-}
+/* ================= RESPONSIVE ================= */
 
-/* Utility Links */
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 20px;
-}
-
-.forgot-password {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.back-link {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 0.9rem;
-    color: var(--text-grey);
-}
-
-.back-link a {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-/* --- RESPONSIVE MOBILE --- */
-/* Se lo schermo è più piccolo di 900px, impiliamo le colonne */
-@media (max-width: 960px) {
-    .main-container {
-        flex-direction: column; /* Colonna verticale invece che riga */
-        height: auto;
-        min-height: auto;
+@media (max-width: 768px) {
+    .navbar {
+        padding: 8px 16px;
     }
 
-    .info-section {
-        padding: 40px 30px;
-        min-height: 300px; /* Altezza minima per la parte colorata */
+    .nav-links {
+        display: none; /* per ora, su mobile lasciamo solo logo + bottone login */
     }
 
-    .auth-section {
-        padding: 40px 20px;
+    .hero {
+        padding: 60px 16px 100px;
     }
 
-    .hero-text h1 {
-        font-size: 2.2rem;
+    .hero h1 {
+        font-size: 2.4rem;
+    }
+
+    .search-wrapper {
+        padding: 0 12px 24px;
+    }
+
+    .search-card {
+        padding: 14px 14px 12px;
+    }
+
+    .filters-row {
+        flex-wrap: wrap;
+    }
+
+    .filter-select {
+        flex: 1 1 calc(50% - 16px);
     }
 }
 </file>
