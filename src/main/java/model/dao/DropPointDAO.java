@@ -50,7 +50,7 @@ public class DropPointDAO {
 
     public DropPoint doRetrieveByEmail(String email) {
         // CORRETTO: Nome tabella DropPoint
-        String query = "SELECT * FROM DropPoint WHERE email = ?";
+        String query = "SELECT * FROM drop_point WHERE email = ?";
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setString(1, email);
