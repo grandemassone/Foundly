@@ -1,14 +1,15 @@
 :root {
-    /* Palette Colori Arancione (Stile Google/Material) */
-    --primary-color: #FB8C00;       /* Arancione principale */
-    --primary-hover: #F57C00;       /* Arancione più scuro per hover */
-    --primary-light: #FFE0B2;       /* Arancione chiarissimo */
-    --text-dark: #202124;           /* Nero morbido (stile Google) */
-    --text-grey: #5f6368;           /* Grigio testo */
-    --bg-color: #f0f2f5;            /* Grigio chiarissimo sfondo */
-    --white: #ffffff;
-    --border-radius: 8px;           /* Bordi arrotondati standard */
-}
+       --primary-color: #FB8C00;
+       --primary-hover: #F57C00;
+       --primary-light: #FFE0B2;
+       --bg-page: #FFFFFF;
+       --bg-grey: #F5F5F5;
+       --text-dark: #202124;
+       --text-grey: #5F6368;
+       --white: #FFFFFF;
+       --radius-md: 12px;
+       --shadow-soft: 0 4px 15px rgba(0,0,0,0.08);
+   }
 
 * {
     box-sizing: border-box;
@@ -18,217 +19,408 @@
 
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: var(--bg-color);
+    background-color: var(--bg-page);
     color: var(--text-dark);
-    min-height: 100vh;
+}
+
+/* ================= NAVBAR ================= */
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 48px;
+    background-color: var(--white);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* Brand / Logo */
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.brand-icon img {
+    height: 100px;
+    width: auto;
+}
+
+/* Link di navigazione */
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    color: #5F6368;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 999px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-item .material-icons {
+    font-size: 20px;
+}
+
+.nav-item:hover {
+    background-color: #F1F3F4;
+    color: #202124;
+}
+
+/* Avatar utente (se loggato) */
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFE0B2, #FB8C00);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Bottone Login / Registrati (se NON loggato) */
+
+.btn-login-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid #FFB74D;
+    background-color: #FFF7EC;
+    color: #E65100;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    transition: all 0.2s ease;
+}
+
+.btn-login-nav .material-icons {
+    font-size: 20px;
+}
+
+.btn-login-nav:hover {
+    background-color: #FFE7CF;
+    border-color: #FFA726;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* ================= HERO ================= */
+
+.hero {
+    position: relative;
+    padding: 80px 24px 120px;
+    text-align: center;
+    background: linear-gradient(135deg, #F57C00 0%, #FB8C00 40%, #F36C00 100%);
+    color: var(--white);
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 16px;
+}
+
+.hero p {
+    max-width: 640px;
+    margin: 0 auto 32px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+/* Pulsante call-to-action nel hero */
+
+.btn-cta-hero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background-color: #FFFFFF;
+    color: #E65100;
+    font-weight: 600;
+    font-size: 0.98rem;
+    border-radius: 999px;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-cta-hero .material-icons {
+    font-size: 20px;
+}
+
+.btn-cta-hero:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+}
+
+/* ================= SEARCH CARD ================= */
+
+.search-wrapper {
+    position: relative;
+    margin-top: -52px;
+    padding: 0 24px 32px;
+}
+
+.search-card {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    padding: 18px 22px 16px;
+}
+
+/* Riga superiore (input + bottone Drop-Point) */
+
+.search-top {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.input-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #F8F9FA;
+    border-radius: 999px;
+    padding: 8px 14px;
+    border: 1px solid #E0E0E0;
+}
+
+.input-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.95rem;
+    color: #202124;
+}
+
+/* Bottone Trova Drop-Point */
+
+.btn-cerca {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid #FFB74D;
+    background-color: #FFF7EC;
+    color: #E65100;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-droppoint .material-icons {
+    font-size: 18px;
+}
+
+.btn-droppoint:hover {
+    background-color: #FFE7CF;
+    border-color: #FFA726;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Filtri sotto */
+
+.filters-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.filter-icon-container {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #FFF3E0;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px; /* Aggiunto padding per evitare che tocchi i bordi su schermi piccoli */
 }
 
-/* --- CONTENITORE PRINCIPALE --- */
-.main-container {
+.filter-icon-container .material-icons {
+    font-size: 18px;
+    color: #E65100;
+}
+
+.filter-select {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid #E0E0E0;
+    background-color: #FAFAFA;
+    font-size: 0.9rem;
+    color: #424242;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.filter-select:focus {
+    border-color: var(--primary-color);
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(251, 140, 0, 0.16);
+}
+
+/* ================= SEZIONE SEGNALAZIONI ================= */
+
+.recent-section {
+    max-width: 1100px;
+    margin: 24px auto 40px;
+    padding: 0 24px;
+}
+
+.section-header {
     display: flex;
-    width: 100%;
-    max-width: 1200px; /* Aumentato leggermente per dare respiro */
-
-    /* MODIFICA CHIAVE: Invece di height fissa, usiamo min-height */
-    min-height: 80vh;
-    height: auto;      /* Permette al box di crescere se il form è lungo */
-
-    background-color: var(--white);
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    overflow: hidden; /* Mantiene i bordi arrotondati */
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
 }
 
-/* --- PARTE SINISTRA (Info) --- */
-.info-section {
-    flex: 1; /* Occupa il 50% dello spazio */
-    /* Il background viene sovrascritto inline nelle JSP specifiche, ma questo è il default */
-    background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
-    padding: 60px;
+.section-header h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #202124;
+}
+
+.result-count {
+    font-size: 0.85rem;
+    color: #757575;
+}
+
+/* Griglia cards */
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+/* Card singola */
+
+.card {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+    padding: 12px 12px 14px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 8px;
 }
 
-.brand-header {
-    margin-bottom: 40px;
+.card-badges {
+    display: flex;
+    gap: 6px;
 }
 
-.logo-placeholder {
-    font-size: 2rem;
-    font-weight: 700;
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.badge-active {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+}
+
+.badge-type {
+    background-color: #FFF3E0;
     color: #E65100;
+}
+
+/* Placeholder immagine */
+
+.card-image-placeholder {
+    height: 120px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #F5F5F5, #E0E0E0);
     display: flex;
     align-items: center;
-    gap: 10px;
-}
-
-.hero-text h1 {
-    font-size: 3rem;
-    line-height: 1.2;
-    margin-bottom: 20px;
-    color: var(--text-dark);
-}
-
-.hero-text p {
-    font-size: 1.1rem;
-    color: var(--text-grey);
-    line-height: 1.6;
-    margin-bottom: 30px;
-}
-
-.feature-pills {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.pill {
-    background-color: rgba(255,255,255,0.6);
-    padding: 8px 16px;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #E65100;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-/* --- PARTE DESTRA (Form) --- */
-.auth-section {
-    flex: 1.2; /* Diamo un po' più di spazio al form (era 1) */
-    padding: 40px; /* Ridotto leggermente il padding per dare spazio al contenuto */
-    display: flex;
-    align-items: center; /* Centra verticalmente */
     justify-content: center;
-    background-color: var(--white);
+    color: #9E9E9E;
 }
 
-.auth-card {
-    width: 100%;
-    max-width: 480px; /* Allargato il form per evitare che i campi input-row siano stretti */
+.card-image-placeholder .material-icons {
+    font-size: 42px;
 }
 
-.auth-card h2 {
-    font-size: 2rem;
-    margin-bottom: 10px;
+/* Footer card */
+
+.card-footer {
+    margin-top: 4px;
 }
 
-.subtitle {
-    color: var(--text-grey);
-    margin-bottom: 30px;
-}
-
-/* --- STILE INPUT --- */
-.input-group {
-    margin-bottom: 20px;
-}
-
-/* Gestione righe affiancate (Nome/Cognome, Città/Prov) */
-.input-row {
-    display: flex;
-    gap: 15px; /* Spazio tra i due input */
-}
-
-.input-group label {
-    display: block;
-    font-size: 0.9rem;
-    color: var(--text-grey);
-    margin-bottom: 5px;
-    font-weight: 500;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #dadce0;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background-color: #fafafa;
-}
-
-.input-group input:focus {
-    border-color: var(--primary-color);
-    background-color: var(--white);
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(251, 140, 0, 0.2);
-}
-
-/* --- BOTTONI --- */
-.btn-primary {
-    width: 100%;
-    padding: 14px;
-    background-color: var(--primary-color);
-    color: var(--white);
-    border: none;
-    border-radius: var(--border-radius);
+.card-title {
     font-size: 1rem;
     font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s;
+    margin-bottom: 2px;
+    color: #202124;
 }
 
-.btn-primary:hover {
-    background-color: var(--primary-hover);
-    box-shadow: 0 4px 12px rgba(251, 140, 0, 0.3);
+.card-info {
+    font-size: 0.85rem;
+    color: #757575;
 }
 
-.mt-2 {
-    margin-top: 20px;
-}
+/* ================= RESPONSIVE ================= */
 
-/* Utility Links */
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 20px;
-}
-
-.forgot-password {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.back-link {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 0.9rem;
-    color: var(--text-grey);
-}
-
-.back-link a {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-/* --- RESPONSIVE MOBILE --- */
-/* Se lo schermo è più piccolo di 900px, impiliamo le colonne */
-@media (max-width: 960px) {
-    .main-container {
-        flex-direction: column; /* Colonna verticale invece che riga */
-        height: auto;
-        min-height: auto;
+@media (max-width: 768px) {
+    .navbar {
+        padding: 8px 16px;
     }
 
-    .info-section {
-        padding: 40px 30px;
-        min-height: 300px; /* Altezza minima per la parte colorata */
+    .nav-links {
+        display: none; /* per ora, su mobile lasciamo solo logo + bottone login */
     }
 
-    .auth-section {
-        padding: 40px 20px;
+    .hero {
+        padding: 60px 16px 100px;
     }
 
-    .hero-text h1 {
-        font-size: 2.2rem;
+    .hero h1 {
+        font-size: 2.4rem;
+    }
+
+    .search-wrapper {
+        padding: 0 12px 24px;
+    }
+
+    .search-card {
+        padding: 14px 14px 12px;
+    }
+
+    .filters-row {
+        flex-wrap: wrap;
+    }
+
+    .filter-select {
+        flex: 1 1 calc(50% - 16px);
     }
 }

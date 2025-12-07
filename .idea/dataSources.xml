@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="FoundlyDB" uuid="27e93d35-af18-4bc8-8ab8-26ac736b59d6">
+    <data-source source="LOCAL" name="FoundlyDB" uuid="fb3c0b8e-62c4-47f7-94ac-53bf303480a7">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>

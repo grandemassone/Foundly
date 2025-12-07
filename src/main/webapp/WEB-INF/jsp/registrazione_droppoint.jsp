@@ -174,39 +174,157 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
 <script>
-    // 1. Inizializza la mappa su una posizione di default (es. Italia centrale o Roma)
-    // Coordinate: [Latitudine, Longitudine], Zoom: 5 (vista Italia)
+    // Inizializza la mappa su Italia / Roma
     var map = L.map('map').setView([41.9028, 12.4964], 6);
 
-    // 2. Aggiungi il layer di OpenStreetMap (Il "disegno" della mappa)
+    // Layer OpenStreetMap
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
-    var marker;
+    var marker = null;
 
-    // 3. Gestisci il click sulla mappa
-    map.on('click', function(e) {
-        var lat = e.latlng.lat;
-        var lng = e.latlng.lng;
-
-        // Se c'è già un marker, rimuovilo (ne vogliamo solo uno)
+    function setMarker(lat, lng) {
         if (marker) {
-            map.removeLayer(marker);
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+            // Quando l'utente trascina il marker, aggiorna le coordinate
+            marker.on('dragend', function (e) {
+                var pos = e.target.getLatLng();
+                document.getElementById('latitudine').value = pos.lat;
+                document.getElementById('longitudine').value = pos.lng;
+                console.log("Posizione selezionata (drag):", pos.lat, pos.lng);
+            });
         }
 
-        // Aggiungi il marker dove ha cliccato l'utente
-        marker = L.marker([lat, lng]).addTo(map);
-
-        // Aggiorna i campi input nascosti
         document.getElementById('latitudine').value = lat;
         document.getElementById('longitudine').value = lng;
+    }
 
-        console.log("Posizione selezionata: " + lat + ", " + lng);
+    // CLICK MANUALE SULLA MAPPA
+    map.on('click', function (e) {
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
+        setMarker(lat, lng);
+        console.log("Posizione selezionata (click): " + lat + ", " + lng);
+    });
+
+    // ------- G E O C O D I N G  D A  I N D I R I Z Z O -------
+
+    let geocodeTimeout = null;
+
+    function geocodeAddress() {
+        var indirizzoRaw = document.getElementById('indirizzo').value.trim();
+        var citta        = document.getElementById('citta').value.trim();
+        var provincia    = document.getElementById('provincia').value.trim();
+
+        if (!indirizzoRaw || !citta || !provincia) {
+            return;
+        }
+
+        // Prova a separare via e civico: "Via Cervinia, 38" -> "38 Via Cervinia"
+        var street = indirizzoRaw;
+        var match = indirizzoRaw.match(/(.+?)(?:,?\s+(\d+\w*\/?\w*))$/);
+        if (match) {
+            var via    = match[1].trim();
+            var civico = match[2].trim();
+            street = civico + " " + via;
+        }
+
+        var params = new URLSearchParams({
+            format: "json",
+            limit: "1",
+            addressdetails: "1",
+            street: street,
+            city: citta,
+            // la sigla "SA" non è ottimale, ma la lasciamo come info in più
+            county: provincia,
+            country: "Italia"
+        });
+
+        var url = "https://nominatim.openstreetmap.org/search?" + params.toString();
+
+        fetch(url, {
+            method: "GET",
+            headers: {
+                "Accept-Language": "it"
+            }
+        })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                if (!data || data.length === 0) {
+                    console.warn("Indirizzo non trovato");
+                    return;
+                }
+
+                var result = data[0];
+                var lat = parseFloat(result.lat);
+                var lng = parseFloat(result.lon);
+
+                if (isNaN(lat) || isNaN(lng)) {
+                    console.warn("Coordinate non valide dal geocoder");
+                    return;
+                }
+
+                // Controllo se il geocoder ha effettivamente un house_number
+                var addr = result.address || {};
+                if (!addr.house_number) {
+                    console.warn("Nessun house_number nei dati: posizione solo approssimativa sulla via.");
+                    // qui potresti anche mostrare un messaggio all'utente:
+                    // es. un piccolo testo: "Posizione approssimativa, sposta il segnaposto sulla mappa"
+                }
+
+                setMarker(lat, lng);
+                map.setView([lat, lng], 16);
+
+                console.log("Posizione selezionata (geocode): " + lat + ", " + lng,
+                    "| street:", street, "| address:", addr);
+            })
+            .catch(function (error) {
+                console.error("Errore nel geocoding:", error);
+            });
+    }
+
+    function scheduleGeocode() {
+        clearTimeout(geocodeTimeout);
+        geocodeTimeout = setTimeout(geocodeAddress, 600);
+    }
+
+    // Lancia il geocoding quando l’utente compila indirizzo/città/provincia
+    window.addEventListener('DOMContentLoaded', function () {
+        ['indirizzo', 'citta', 'provincia'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('blur', scheduleGeocode);
+                el.addEventListener('keyup', function (e) {
+                    if (!['Tab', 'Shift', 'Alt', 'Control', 'Meta'].includes(e.key)) {
+                        scheduleGeocode();
+                    }
+                });
+            }
+        });
     });
 </script>
+
+
 
 </body>
 </html>

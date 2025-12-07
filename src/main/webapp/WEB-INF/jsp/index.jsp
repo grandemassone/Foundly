@@ -21,7 +21,7 @@
     </a>
 
     <div class="nav-links">
-        <a href="#" class="nav-item">
+        <a href="${pageContext.request.contextPath}/index" class="nav-item">
             <span class="material-icons">home</span> Home
         </a>
         <a href="#" class="nav-item">
@@ -38,7 +38,24 @@
         </a>
     </div>
 
-    <div class="user-avatar"></div> </nav>
+    <%
+        Object utenteLoggato = session.getAttribute("utente");
+        if (utenteLoggato != null) {
+    %>
+    <!-- Utente loggato: mostra avatar -->
+    <div class="user-avatar"></div>
+    <%
+    } else {
+    %>
+    <!-- Utente NON loggato: mostra bottone Login/Registrati -->
+    <a href="${pageContext.request.contextPath}/login" class="btn-login-nav">
+        <span class="material-icons">login</span>
+        <span>Login/Registrati</span>
+    </a>
+    <%
+        }
+    %>
+</nav>
 
 <header class="hero">
     <h1>Hai perso qualcosa?</h1>
@@ -61,9 +78,9 @@
                     <span class="material-icons" style="color: #9e9e9e;">search</span>
                     <input type="text" name="q" placeholder="Cerca per titolo, descrizione o luogo...">
                 </div>
-                <button type="button" class="btn-droppoint">
-                    <span class="material-icons">location_on</span>
-                    Trova Drop-Point
+                <button type="button" class="btn-cerca">
+                    <span class="material-icons">search</span>
+                    Cerca
                 </button>
             </div>
 
