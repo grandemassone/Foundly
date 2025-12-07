@@ -50,15 +50,6 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("ruoloLoggato", "DROPPOINT");
             session.setMaxInactiveInterval(30 * 60);
 
-            // Opzionale: Se vuoi bloccare l'accesso a chi è ancora "IN_ATTESA"
-            /*
-            if ("IN_ATTESA".equals(dropPoint.getStato())) {
-                 request.setAttribute("errore", "Il tuo account è ancora in attesa di approvazione.");
-                 request.getRequestDispatcher("/WEB-INF/jsp/index.jsp").forward(request, response);
-                 return;
-            }
-            */
-
             response.sendRedirect("login.jsp");
             return;
         }

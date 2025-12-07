@@ -9,7 +9,7 @@ public class DropPointDAO {
 
     public boolean doSave(DropPoint dp) {
         // CORRETTO: Nome tabella DropPoint e colonne corrispondenti allo script SQL
-        String query = "INSERT INTO DropPoint (nome_attivita, email, password_hash, indirizzo, " +
+        String query = "INSERT INTO drop_point (nome_attivita, email, password_hash, indirizzo, " +
                 "citta, provincia, telefono, orari_apertura, latitudine, longitudine, " +
                 "stato, ritiri_effettuati, immagine) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";

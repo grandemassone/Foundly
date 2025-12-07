@@ -1,7 +1,7 @@
 package model.service;
 
 import model.bean.DropPoint;
-import model.bean.enums.StatoDropPoint; // Assicurati di avere questo import
+import model.bean.enums.StatoDropPoint;
 import model.dao.DropPointDAO;
 import model.utils.PasswordUtils;
 
@@ -15,7 +15,7 @@ public class DropPointService {
                                      String telefono, String orari,
                                      Double latitudine, Double longitudine) {
 
-        if (dropPointDAO.doRetrieveByEmail(email) != null) return false;
+        if(dropPointDAO.doRetrieveByEmail(email) != null) return false;
 
         DropPoint dp = new DropPoint();
         dp.setNomeAttivita(nomeAttivita);
@@ -41,8 +41,8 @@ public class DropPointService {
 
     public DropPoint login(String email, String password) {
         DropPoint dp = dropPointDAO.doRetrieveByEmail(email);
-        if (dp == null) return null;
-        if (PasswordUtils.checkPassword(password, dp.getPasswordHash())) return dp;
+        if(dp == null) return null;
+        if(PasswordUtils.checkPassword(password, dp.getPasswordHash())) return dp;
         return null;
     }
 }
