@@ -1,13 +1,13 @@
 :root {
     /* Palette Colori Arancione (Stile Google/Material) */
-    --primary-color: #FB8C00;       /* Arancione principale */
-    --primary-hover: #F57C00;       /* Arancione più scuro per hover */
-    --primary-light: #FFE0B2;       /* Arancione chiarissimo */
-    --text-dark: #202124;           /* Nero morbido (stile Google) */
-    --text-grey: #5f6368;           /* Grigio testo */
-    --bg-color: #f0f2f5;            /* Grigio chiarissimo sfondo */
+    --primary-color: #FB8C00;
+    --primary-hover: #F57C00;
+    --primary-light: #FFE0B2;
+    --text-dark: #202124;
+    --text-grey: #5f6368;
+    --bg-color: #f0f2f5;
     --white: #ffffff;
-    --border-radius: 8px;           /* Bordi arrotondati standard */
+    --border-radius: 8px;
 }
 
 * {
@@ -24,47 +24,44 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px; /* Aggiunto padding per evitare che tocchi i bordi su schermi piccoli */
+    padding: 20px;
 }
 
 /* --- CONTENITORE PRINCIPALE --- */
 .main-container {
     display: flex;
     width: 100%;
-    max-width: 1200px; /* Aumentato leggermente per dare respiro */
-
-    /* MODIFICA CHIAVE: Invece di height fissa, usiamo min-height */
+    max-width: 1200px;
     min-height: 80vh;
-    height: auto;      /* Permette al box di crescere se il form è lungo */
-
+    height: auto;
     background-color: var(--white);
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    overflow: hidden; /* Mantiene i bordi arrotondati */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
 }
 
 /* --- PARTE SINISTRA (Info) --- */
 .info-section {
-    flex: 1; /* Occupa il 50% dello spazio */
-    /* Il background viene sovrascritto inline nelle JSP specifiche, ma questo è il default */
+    position: relative;
+    flex: 1;
     background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
-    padding: 60px;
+    padding: 190px 60px 60px 60px; /* spazio tra logo e testo */
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
+/* Logo in alto a sinistra su schermi grandi */
 .brand-header {
-    margin-bottom: 40px;
+    position: absolute;
+    top: 32px;
+    left: 40px;
 }
 
-.logo-placeholder {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #E65100;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.brand-icon img {
+    height: 150px;
+    width: 150px;
+    display: block;
 }
 
 .hero-text h1 {
@@ -88,7 +85,7 @@ body {
 }
 
 .pill {
-    background-color: rgba(255,255,255,0.6);
+    background-color: rgba(255, 255, 255, 0.6);
     padding: 8px 16px;
     border-radius: 50px;
     font-size: 0.9rem;
@@ -99,19 +96,26 @@ body {
     gap: 5px;
 }
 
+/* pill attiva evidenziata */
+.pill.active {
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #FF9800;
+}
+
 /* --- PARTE DESTRA (Form) --- */
 .auth-section {
-    flex: 1.2; /* Diamo un po' più di spazio al form (era 1) */
-    padding: 40px; /* Ridotto leggermente il padding per dare spazio al contenuto */
+    flex: 1.2;
+    padding: 40px;
     display: flex;
-    align-items: center; /* Centra verticalmente */
+    align-items: center;
     justify-content: center;
     background-color: var(--white);
 }
 
 .auth-card {
     width: 100%;
-    max-width: 480px; /* Allargato il form per evitare che i campi input-row siano stretti */
+    max-width: 480px;
 }
 
 .auth-card h2 {
@@ -129,10 +133,10 @@ body {
     margin-bottom: 20px;
 }
 
-/* Gestione righe affiancate (Nome/Cognome, Città/Prov) */
+/* per righe affiancate */
 .input-row {
     display: flex;
-    gap: 15px; /* Spazio tra i due input */
+    gap: 15px;
 }
 
 .input-group label {
@@ -210,18 +214,155 @@ body {
     font-weight: 500;
 }
 
-/* --- RESPONSIVE MOBILE --- */
-/* Se lo schermo è più piccolo di 900px, impiliamo le colonne */
+/* --- FOOTER FORM (login/registrazione) --- */
+.form-footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.link-login {
+    color: #FB8C00;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.link-login:hover {
+    background-color: #FFF3E0;
+    color: #E65100;
+}
+
+/* --- BOTTONI REGISTRAZIONE / OSPITE (pagina login) --- */
+.registration-area {
+    margin-top: 24px;
+    text-align: center;
+}
+
+.registration-area p {
+    margin-bottom: 12px;
+    color: #5f6368;
+}
+
+.reg-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+/* base comune per registrazione e ospite */
+.btn-register,
+.btn-guest {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+/* stile registrazione */
+.btn-register {
+    border: 1px solid #FFB74D;
+    background: #FFF7EC;
+    color: #E65100;
+}
+
+.btn-register:hover {
+    background: #FFE7CF;
+    border-color: #FFA726;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* versione Drop Point */
+.btn-register.drop {
+    border-color: #FFCC80;
+}
+
+.btn-register.drop:hover {
+    background: #FFE0C0;
+}
+
+/* stile per "Continua come ospite" */
+.btn-guest {
+    border: 1px solid #e0e0e0;
+    background: #ffffff;
+    color: var(--text-grey);
+}
+
+.btn-guest:hover {
+    background: #f7f7f7;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-register .material-icons,
+.btn-guest .material-icons {
+    font-size: 18px;
+}
+
+/* Desktop: "Continua come ospite" sotto ma non a tutta larghezza */
+@media (min-width: 768px) {
+    .reg-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .reg-buttons .btn-guest {
+        flex-basis: 100%; /* resta su una riga tutta sua */
+        max-width: 220px; /* ma visivamente è più corto */
+        margin-top: 4px;
+        margin-inline: auto; /* centrato */
+        padding: 8px 12px; /* un filo meno largo */
+    }
+}
+
+/* --- STILE MAPPA (registrazione droppoint) --- */
+#map {
+    height: 250px;
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #dadce0;
+    z-index: 1;
+}
+
+.map-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-grey);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+/* --- RESPONSIVE MOBILE / TABLET --- */
 @media (max-width: 960px) {
     .main-container {
-        flex-direction: column; /* Colonna verticale invece che riga */
+        flex-direction: column;
         height: auto;
         min-height: auto;
     }
 
     .info-section {
         padding: 40px 30px;
-        min-height: 300px; /* Altezza minima per la parte colorata */
+        min-height: 300px;
     }
 
     .auth-section {
@@ -230,5 +371,18 @@ body {
 
     .hero-text h1 {
         font-size: 2.2rem;
+    }
+
+    /* Logo centrato sopra al testo su schermi medi/piccoli */
+    .brand-header {
+        position: static;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+
+    .brand-icon img {
+        height: 120px;
+        width: auto;
+        margin: 0 auto;
     }
 }

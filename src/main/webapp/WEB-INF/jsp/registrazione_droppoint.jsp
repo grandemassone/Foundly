@@ -15,61 +15,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin=""/>
-
-    <style>
-        .info-section {
-            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
-        }
-        .pill.active {
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border: 1px solid #FF9800;
-        }
-
-        /* --- STILE PER LA MAPPA --- */
-        #map {
-            height: 250px;
-            width: 100%;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #dadce0;
-            z-index: 1;
-        }
-
-        .map-label {
-            display: block;
-            font-size: 0.9rem;
-            color: var(--text-grey);
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        /* Stile footer form */
-        .form-footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            color: #666;
-            font-size: 0.95rem;
-        }
-        .link-login {
-            color: #FB8C00;
-            font-weight: 600;
-            text-decoration: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-        .link-login:hover {
-            background-color: #FFF3E0;
-            color: #E65100;
-        }
-    </style>
 </head>
 <body>
 
@@ -77,8 +22,8 @@
 
     <div class="info-section">
         <div class="brand-header">
-            <div class="logo-placeholder">
-                <span class="material-icons logo-icon">travel_explore</span> Foundly
+            <div class="brand-icon">
+                <img src="<%= request.getContextPath() %>/assets/images/logo.png" alt="logo_foundly">
             </div>
         </div>
 
@@ -86,7 +31,8 @@
             <h1>Diventa un Partner</h1>
             <p>
                 Trasforma la tua attività in un punto di riferimento per la community.
-                Diventando un <strong>Drop-Point</strong>, offrirai un luogo sicuro per la restituzione di oggetti smarriti.
+                Diventando un <strong>Drop-Point</strong>, offrirai un luogo sicuro per la restituzione di oggetti
+                smarriti.
             </p>
             <div class="feature-pills">
                 <span class="pill"><span class="material-icons">security</span> Secure Claim</span>
@@ -138,7 +84,8 @@
                     </div>
                     <div class="input-group" style="flex: 1;">
                         <label for="provincia">Prov.</label>
-                        <input type="text" id="provincia" name="provincia" maxlength="2" placeholder="MI" style="text-transform: uppercase;" required>
+                        <input type="text" id="provincia" name="provincia" maxlength="2" placeholder="MI"
+                               style="text-transform: uppercase;" required>
                     </div>
                 </div>
 
@@ -166,7 +113,8 @@
                             title="Almeno 8 caratteri, con una maiuscola, una minuscola, un numero e un carattere speciale (@$!%*?&._-)"
                     >
                     <small id="passwordHelp" style="color:#777; font-size:0.8rem;">
-                        Minimo 8 caratteri, almeno 1 maiuscola, 1 minuscola, 1 numero e 1 carattere speciale (@$!%*?&._-).
+                        Minimo 8 caratteri, almeno 1 maiuscola, 1 minuscola, 1 numero e 1 carattere speciale
+                        (@$!%*?&._-).
                     </small>
                     <div id="passwordError" style="display:none; color:#c62828; font-size:0.8rem; margin-top:4px;">
                         La password non rispetta i requisiti indicati.
@@ -205,7 +153,7 @@
         if (marker) {
             marker.setLatLng([lat, lng]);
         } else {
-            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+            marker = L.marker([lat, lng], {draggable: true}).addTo(map);
 
             // Quando l'utente trascina il marker, aggiorna le coordinate
             marker.on('dragend', function (e) {
@@ -234,8 +182,8 @@
 
     function geocodeAddress() {
         var indirizzoRaw = document.getElementById('indirizzo').value.trim();
-        var citta        = document.getElementById('citta').value.trim();
-        var provincia    = document.getElementById('provincia').value.trim();
+        var citta = document.getElementById('citta').value.trim();
+        var provincia = document.getElementById('provincia').value.trim();
 
         if (!indirizzoRaw || !citta || !provincia) {
             return;
@@ -245,7 +193,7 @@
         var street = indirizzoRaw;
         var match = indirizzoRaw.match(/(.+?)(?:,?\s+(\d+\w*\/?\w*))$/);
         if (match) {
-            var via    = match[1].trim();
+            var via = match[1].trim();
             var civico = match[2].trim();
             street = civico + " " + via;
         }

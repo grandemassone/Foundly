@@ -48,8 +48,8 @@
 
   <div class="info-section">
     <div class="brand-header">
-      <div class="logo-placeholder">
-        <span class="material-icons logo-icon">travel_explore</span> Foundly
+      <div class="brand-icon">
+        <img src="<%= request.getContextPath() %>/assets/images/logo.png" alt="logo_foundly">
       </div>
     </div>
 

@@ -10,48 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
-
-    <style>
-        /* Gradiente specifico per la colonna info */
-        .info-section {
-            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
-        }
-
-        /* Stile per il badge attivo nella lista feature */
-        .pill.active {
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border: 1px solid #FF9800;
-        }
-
-        /* --- NUOVO STILE PER IL FOOTER DEL FORM --- */
-        .form-footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            color: #666;
-            font-size: 0.95rem;
-        }
-
-        .link-login {
-            color: #FB8C00;
-            font-weight: 600;
-            text-decoration: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-
-        .link-login:hover {
-            background-color: #FFF3E0;
-            color: #E65100;
-        }
-    </style>
 </head>
 <body>
 
@@ -59,8 +17,8 @@
 
     <div class="info-section">
         <div class="brand-header">
-            <div class="logo-placeholder">
-                <span class="material-icons logo-icon">travel_explore</span> Foundly
+            <div class="brand-icon">
+                <img src="<%= request.getContextPath() %>/assets/images/logo.png" alt="logo_foundly">
             </div>
         </div>
 
@@ -129,11 +87,12 @@
                             placeholder="Minimo 8 caratteri"
                             required
                             minlength="8"
-                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._-])[A-Za-z\d@$!%*?&._-]{8,}$"
+                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&._-])[A-Za-z\\d@$!%*?&._-]{8,}$"
                             title="Almeno 8 caratteri, con una maiuscola, una minuscola, un numero e un carattere speciale (@$!%*?&._-)"
                     >
                     <small id="passwordHelp" style="color:#777; font-size:0.8rem;">
-                        Minimo 8 caratteri, almeno 1 maiuscola, 1 minuscola, 1 numero e 1 carattere speciale (@$!%*?&._-).
+                        Minimo 8 caratteri, almeno 1 maiuscola, 1 minuscola, 1 numero e 1 carattere speciale
+                        (@$!%*?&._-).
                     </small>
                     <div id="passwordError" style="display:none; color:#c62828; font-size:0.8rem; margin-top:4px;">
                         La password non rispetta i requisiti indicati.

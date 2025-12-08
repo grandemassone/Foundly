@@ -27,7 +27,7 @@
             <span class="material-icons">add_circle_outline</span> Crea Segnalazione
         </a>
         <a href="#" class="nav-item">
-            <span class="material-icons">inventory</span> Le Mie Segnalazioni
+            <span class="material-icons">inventory</span> Segnalazioni
         </a>
         <a href="#" class="nav-item">
             <span class="material-icons">place</span> Drop-Point
@@ -49,7 +49,7 @@
     <!-- Utente NON loggato: mostra bottone Login/Registrati -->
     <a href="${pageContext.request.contextPath}/login" class="btn-login-nav">
         <span class="material-icons">login</span>
-        <span>Login/Registrati</span>
+        <span>Accedi</span>
     </a>
     <%
         }
