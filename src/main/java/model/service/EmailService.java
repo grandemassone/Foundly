@@ -29,7 +29,7 @@ public class EmailService {
 
         this.mittente = "foundly.app@gmail.com";
         final String username = "foundly.app@gmail.com";
-        final String password = "jbei httx ixpz wzip"; // app password
+        final String password = System.getenv("SMTP_PASSKEY"); // app password
 
         this.session = Session.getInstance(props, new Authenticator() {
             @Override

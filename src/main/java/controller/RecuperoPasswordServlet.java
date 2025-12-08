@@ -156,7 +156,6 @@ public class RecuperoPasswordServlet extends HttpServlet {
         }
 
         // aggiorna password nel DB
-        // TODO: cifra/hash della password se necessario
         boolean aggiornato = utenteService.resetPasswordByEmail(emailSession, nuovaPassword);
         // implementa resetPasswordByEmail(email, nuovaPassword) nel tuo service
 
