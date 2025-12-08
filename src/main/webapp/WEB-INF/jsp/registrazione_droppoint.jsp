@@ -28,12 +28,12 @@
 
         /* --- STILE PER LA MAPPA --- */
         #map {
-            height: 250px; /* Altezza della mappa */
+            height: 250px;
             width: 100%;
             border-radius: 8px;
             margin-bottom: 20px;
             border: 1px solid #dadce0;
-            z-index: 1; /* Assicura che stia sotto header o dropdown se presenti */
+            z-index: 1;
         }
 
         .map-label {
@@ -142,7 +142,7 @@
                     </div>
                 </div>
 
-                <span class="map-label">Posizione sulla mappa (Clicca per selezionare)</span>
+                <span class="map-label">Posizione sulla mappa (clicca per selezionare)</span>
                 <div id="map"></div>
 
                 <input type="hidden" id="latitudine" name="latitudine" required>
@@ -155,7 +155,22 @@
 
                 <div class="input-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Crea una password sicura" required>
+                    <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Crea una password sicura"
+                            required
+                            minlength="8"
+                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&._-])[A-Za-z\\d@$!%*?&._-]{8,}$"
+                            title="Almeno 8 caratteri, con una maiuscola, una minuscola, un numero e un carattere speciale (@$!%*?&._-)"
+                    >
+                    <small id="passwordHelp" style="color:#777; font-size:0.8rem;">
+                        Minimo 8 caratteri, almeno 1 maiuscola, 1 minuscola, 1 numero e 1 carattere speciale (@$!%*?&._-).
+                    </small>
+                    <div id="passwordError" style="display:none; color:#c62828; font-size:0.8rem; margin-top:4px;">
+                        La password non rispetta i requisiti indicati.
+                    </div>
                 </div>
 
                 <button type="submit" class="btn-primary mt-2">Invia Richiesta</button>
@@ -169,18 +184,6 @@
         </div>
     </div>
 </div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
@@ -253,7 +256,6 @@
             addressdetails: "1",
             street: street,
             city: citta,
-            // la sigla "SA" non è ottimale, ma la lasciamo come info in più
             county: provincia,
             country: "Italia"
         });
@@ -284,12 +286,9 @@
                     return;
                 }
 
-                // Controllo se il geocoder ha effettivamente un house_number
                 var addr = result.address || {};
                 if (!addr.house_number) {
                     console.warn("Nessun house_number nei dati: posizione solo approssimativa sulla via.");
-                    // qui potresti anche mostrare un messaggio all'utente:
-                    // es. un piccolo testo: "Posizione approssimativa, sposta il segnaposto sulla mappa"
                 }
 
                 setMarker(lat, lng);
@@ -324,7 +323,47 @@
     });
 </script>
 
+<script>
+    // Validazione password (stessi controlli della registrazione utente)
+    (function () {
+        const form = document.querySelector('.auth-card form');
+        const passwordInput = document.getElementById('password');
+        const passwordError = document.getElementById('passwordError');
 
+        if (!form || !passwordInput || !passwordError) return;
+
+        const passwordRegex =
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._-])[A-Za-z\d@$!%*?&._-]{8,}$/;
+
+        function validatePassword() {
+            const value = passwordInput.value || "";
+
+            if (passwordRegex.test(value)) {
+                passwordInput.style.borderColor = '#ccc';
+                passwordError.style.display = 'none';
+                return true;
+            } else {
+                if (value.length > 0) {
+                    passwordInput.style.borderColor = '#c62828';
+                    passwordError.style.display = 'block';
+                } else {
+                    passwordInput.style.borderColor = '#ccc';
+                    passwordError.style.display = 'none';
+                }
+                return false;
+            }
+        }
+
+        passwordInput.addEventListener('input', validatePassword);
+
+        form.addEventListener('submit', function (e) {
+            if (!validatePassword()) {
+                e.preventDefault();
+                passwordInput.focus();
+            }
+        });
+    })();
+</script>
 
 </body>
 </html>

@@ -67,6 +67,26 @@ public class UtenteDAO {
         return null;
     }
 
+    public Utente doRetrieveByUsername(String username) {
+        String query = "SELECT * FROM utente WHERE username = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, username);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToUtente(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public List<Utente> doRetrieveAll() {
         List<Utente> utenti = new ArrayList<>();
         String query = "SELECT * FROM utente";
@@ -106,19 +126,29 @@ public class UtenteDAO {
         return u;
     }
 
-    public Utente doRetrieveByUsername(String username) {
-        String query = "SELECT * FROM utente WHERE username = ?";
+    /**
+     * Aggiorna l'hash della password per l'utente con la email specificata.
+     *
+     * @param email     email dell'utente
+     * @param nuovoHash nuovo valore di password_hash (già hashato)
+     * @return true se è stata aggiornata almeno una riga, false altrimenti
+     */
+    public boolean updatePasswordByEmail(String email, String nuovoHash) {
+        String query = "UPDATE utente SET password_hash = ? WHERE email = ?";
+
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setString(1, username);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return mapRowToUtente(rs);
-                }
-            }
+
+            ps.setString(1, nuovoHash);
+            ps.setString(2, email);
+
+            int updated = ps.executeUpdate();
+            return updated > 0;
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+
+        return false;
     }
 }

@@ -28,6 +28,13 @@ public class RegistrazioneUtenteServlet extends HttpServlet {
         String password = request.getParameter("password");
         String telefono = request.getParameter("telefono");
 
+        String passwordPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&._-])[A-Za-z\\d@$!%*?&._-]{8,}$";
+
+        if (!password.matches(passwordPattern)) {
+            request.setAttribute("errore", "La password non rispetta i requisiti di sicurezza.");
+            request.getRequestDispatcher("/WEB-INF/views/registrazione-utente.jsp").forward(request, response);
+            return;
+        }
         // Validazione minima
         if (email == null || password == null || username == null) {
             request.setAttribute("errore", "Campi obbligatori mancanti.");
@@ -43,5 +50,8 @@ public class RegistrazioneUtenteServlet extends HttpServlet {
             request.setAttribute("errore", "Email o Username già esistenti.");
             request.getRequestDispatcher("/WEB-INF/jsp/registrazione_utente.jsp").forward(request, response);
         }
+
+
+
     }
 }

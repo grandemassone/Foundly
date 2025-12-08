@@ -26,20 +26,20 @@
 
         /* --- NUOVO STILE PER IL FOOTER DEL FORM --- */
         .form-footer {
-            margin-top: 30px;           /* Distanza dal pulsante di registrazione */
-            padding-top: 20px;          /* Spazio interno sopra il testo */
-            border-top: 1px solid #eee; /* Linea divisoria sottile ed elegante */
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
             text-align: center;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;                   /* Spazio tra testo e link */
+            gap: 8px;
             color: #666;
             font-size: 0.95rem;
         }
 
         .link-login {
-            color: #FB8C00;             /* Arancione Foundly */
+            color: #FB8C00;
             font-weight: 600;
             text-decoration: none;
             padding: 6px 12px;
@@ -48,7 +48,7 @@
         }
 
         .link-login:hover {
-            background-color: #FFF3E0;  /* Sfondo leggero all'hover */
+            background-color: #FFF3E0;
             color: #E65100;
         }
     </style>
@@ -122,7 +122,22 @@
 
                 <div class="input-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Minimo 8 caratteri" required>
+                    <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Minimo 8 caratteri"
+                            required
+                            minlength="8"
+                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._-])[A-Za-z\d@$!%*?&._-]{8,}$"
+                            title="Almeno 8 caratteri, con una maiuscola, una minuscola, un numero e un carattere speciale (@$!%*?&._-)"
+                    >
+                    <small id="passwordHelp" style="color:#777; font-size:0.8rem;">
+                        Minimo 8 caratteri, almeno 1 maiuscola, 1 minuscola, 1 numero e 1 carattere speciale (@$!%*?&._-).
+                    </small>
+                    <div id="passwordError" style="display:none; color:#c62828; font-size:0.8rem; margin-top:4px;">
+                        La password non rispetta i requisiti indicati.
+                    </div>
                 </div>
 
                 <button type="submit" class="btn-primary mt-2">Registrati</button>
@@ -137,6 +152,47 @@
         </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        const form = document.querySelector('.auth-card form');
+        const passwordInput = document.getElementById('password');
+        const passwordError = document.getElementById('passwordError');
+
+        if (!form || !passwordInput || !passwordError) return;
+
+        const passwordRegex =
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._-])[A-Za-z\d@$!%*?&._-]{8,}$/;
+
+        function validatePassword() {
+            const value = passwordInput.value || "";
+
+            if (passwordRegex.test(value)) {
+                passwordInput.style.borderColor = '#ccc';
+                passwordError.style.display = 'none';
+                return true;
+            } else {
+                if (value.length > 0) {
+                    passwordInput.style.borderColor = '#c62828';
+                    passwordError.style.display = 'block';
+                } else {
+                    passwordInput.style.borderColor = '#ccc';
+                    passwordError.style.display = 'none';
+                }
+                return false;
+            }
+        }
+
+        passwordInput.addEventListener('input', validatePassword);
+
+        form.addEventListener('submit', function (e) {
+            if (!validatePassword()) {
+                e.preventDefault();
+                passwordInput.focus();
+            }
+        });
+    })();
+</script>
 
 </body>
 </html>

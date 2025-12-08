@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
 </head>
-<body>
+<body class="page-enter">
 
 <nav class="navbar">
     <a href="${pageContext.request.contextPath}/index" class="brand">
