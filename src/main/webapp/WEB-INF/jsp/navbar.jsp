@@ -47,7 +47,7 @@
         <a href="${pageContext.request.contextPath}/le-mie-segnalazioni" class="nav-item">
             <span class="material-icons">inventory</span> Le mie Segnalazioni
         </a>
-        <a href="#" class="nav-item">
+        <a href="${pageContext.request.contextPath}/drop-point" class="nav-item">
             <span class="material-icons">place</span> Drop-Point
         </a>
         <a href="#" class="nav-item">
