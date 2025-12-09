@@ -1,0 +1,259 @@
+.dp-main {
+    max-width: 1200px;
+    margin: 24px auto 40px;
+    padding: 0 24px;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Header card */
+.dp-header-card {
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    padding: 20px 24px 18px;
+    margin-bottom: 16px;
+}
+
+.dp-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.dp-title {
+    font-size: 1.6rem;
+    margin-bottom: 4px;
+    color: #202124;
+}
+
+.dp-subtitle {
+    font-size: 0.9rem;
+    color: #5f6368;
+}
+
+.dp-register-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 10px 22px;
+    border-radius: 999px;
+    border: none;
+
+    background: #FF7043;          /* arancione */
+    color: #FFFFFF;
+    font-weight: 500;
+    font-size: 0.9rem;
+
+    text-decoration: none;        /* <--- niente sottolineatura */
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.dp-register-btn:hover {
+    background: #F4511E;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    transform: translateY(-1px);
+    text-decoration: none;        /* <--- evita underline anche in hover */
+}
+
+.dp-register-btn .material-icons {
+    font-size: 18px;
+}
+
+/* search bar */
+.dp-search-wrapper {
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    background: #f5f5f5;
+    padding: 8px 14px;
+}
+
+.dp-search-icon {
+    font-size: 20px;
+    color: #9e9e9e;
+}
+
+.dp-search-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+/* info card */
+.dp-info-card {
+    margin-top: 16px;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dp-info-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dp-info-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #fff3e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dp-info-icon .material-icons {
+    color: #fb8c00;
+    font-size: 22px;
+}
+
+.dp-info-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.dp-info-label {
+    font-size: 0.85rem;
+    color: #757575;
+}
+
+.dp-info-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fb8c00;
+}
+
+/* toggle mappa/elenco */
+.dp-view-toggle {
+    display: inline-flex;
+    background: #f5f5f5;
+    border-radius: 999px;
+    padding: 2px;
+}
+
+.dp-toggle-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 14px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #5f6368;
+    cursor: pointer;
+}
+
+.dp-toggle-btn .material-icons {
+    font-size: 18px;
+}
+
+.dp-toggle-btn-active {
+    background: #ffffff;
+    color: #fb8c00;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* map + list card */
+.dp-map-card {
+    margin-top: 16px;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    padding: 10px;
+}
+
+.dp-map-container {
+    width: 100%;
+    height: 520px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.dp-list-container {
+    display: none; /* default: nascosta, attiva solo in modalità Elenco */
+    max-height: 520px;
+    overflow-y: auto;
+    padding: 6px 4px 2px;
+}
+
+/* lista Drop-Point */
+.dp-list-item {
+    border-radius: 12px;
+    border: 1px solid #f1f1f1;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: #fffdf9;
+}
+
+.dp-list-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #202124;
+    margin-bottom: 4px;
+}
+
+.dp-list-address {
+    font-size: 0.85rem;
+    color: #5f6368;
+    margin-bottom: 4px;
+}
+
+.dp-list-phone,
+.dp-list-hours {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #5f6368;
+}
+
+.dp-list-phone .material-icons,
+.dp-list-hours .material-icons {
+    font-size: 16px;
+    color: #fb8c00;
+}
+
+.dp-empty {
+    font-size: 0.9rem;
+    color: #757575;
+    padding: 12px;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+    .dp-header-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .dp-info-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .dp-view-toggle {
+        align-self: stretch;
+        justify-content: flex-end;
+    }
+
+    .dp-map-container,
+    .dp-list-container {
+        height: 420px;
+    }
+}
