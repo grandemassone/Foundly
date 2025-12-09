@@ -37,7 +37,7 @@ public class LoginServlet extends HttpServlet {
         // 1. Login come UTENTE (cittadino)
         Utente utente = utenteService.login(email, password);
         if (utente != null) {
-            session.setAttribute("utente", utente);         // usato in index.jsp
+            session.setAttribute("utente", utente); // usato in index.jsp
             session.setAttribute("ruoloLoggato", "CITTADINO");
             session.setMaxInactiveInterval(30 * 60);
 

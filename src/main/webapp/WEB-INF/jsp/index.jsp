@@ -1,5 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="model.bean.Utente" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -24,7 +26,7 @@
         <a href="${pageContext.request.contextPath}/index" class="nav-item">
             <span class="material-icons">home</span> Home
         </a>
-        <a href="#" class="nav-item">
+        <a href="crea-segnalazione" class="nav-item">
             <span class="material-icons">add_circle_outline</span> Crea Segnalazione
         </a>
         <a href="#" class="nav-item">
@@ -86,7 +88,7 @@
         Foundly ti aiuta a ritrovare oggetti e animali smarriti grazie alla nostra
         community. Segnala, cerca e restituisci!
     </p>
-    <a href="#" class="btn-cta-hero">
+    <a href="crea-segnalazione" class="btn-cta-hero">
         <span class="material-icons">inventory_2</span>
         Crea Segnalazione
     </a>
@@ -148,64 +150,42 @@
 <section class="recent-section">
     <div class="section-header">
         <h2>Segnalazioni Recenti</h2>
-        <span class="result-count">7 risultati</span>
+        <%-- Conta quanti elementi ci sono nella lista --%>
+        <span class="result-count">${segnalazioni != null ? segnalazioni.size() : 0} risultati</span>
     </div>
 
     <div class="cards-grid">
 
-        <article class="card">
-            <div class="card-badges">
-                <span class="badge badge-active">Attiva</span>
-                <span class="badge badge-type">Oggetto</span>
-            </div>
+        <%-- Se la lista è vuota --%>
+        <c:if test="${empty segnalazioni}">
+            <p style="color: #666; font-style: italic;">Nessuna segnalazione recente trovata.</p>
+        </c:if>
 
-            <div class="card-image-placeholder">
-                <span class="material-icons">inventory_2</span>
-            </div>
-
-            <div class="card-footer">
-                <div class="card-title">Telefono</div>
-                <div class="card-info">
-                    Salerno • 2 ore fa
+        <%-- Ciclo sulle segnalazioni reali --%>
+        <c:forEach var="s" items="${segnalazioni}">
+            <article class="card">
+                <div class="card-badges">
+                    <span class="badge badge-active">${s.stato}</span>
+                    <span class="badge badge-type">${s.tipoSegnalazione}</span>
                 </div>
-            </div>
-        </article>
 
-        <article class="card">
-            <div class="card-badges">
-                <span class="badge badge-active">Attiva</span>
-                <span class="badge badge-type">Oggetto</span>
-            </div>
+                <div class="card-image-placeholder"
+                     style="${not empty s.immagine and s.immagine != 'default.png' ? 'background-image: url(' += pageContext.request.contextPath += '/' += s.immagine += '); background-size: cover; background-position: center;' : ''}">
 
-            <div class="card-image-placeholder">
-                <span class="material-icons">inventory_2</span>
-            </div>
-
-            <div class="card-footer">
-                <div class="card-title">borraccia</div>
-                <div class="card-info">
-                    Fisciano • Ieri
+                    <c:if test="${empty s.immagine or s.immagine == 'default.png'}">
+                        <span class="material-icons">inventory_2</span>
+                    </c:if>
                 </div>
-            </div>
-        </article>
 
-        <article class="card">
-            <div class="card-badges">
-                <span class="badge badge-active">Attiva</span>
-                <span class="badge badge-type">Oggetto</span>
-            </div>
-
-            <div class="card-image-placeholder">
-                <span class="material-icons">inventory_2</span>
-            </div>
-
-            <div class="card-footer">
-                <div class="card-title">dad</div>
-                <div class="card-info">
-                    Baronissi • 3 giorni fa
+                <div class="card-footer">
+                    <div class="card-title">${s.titolo}</div>
+                    <div class="card-info">
+                            ${s.citta} •
+                        <fmt:formatDate value="${s.dataRitrovamento}" pattern="dd MMM" />
+                    </div>
                 </div>
-            </div>
-        </article>
+            </article>
+        </c:forEach>
 
     </div>
 </section>

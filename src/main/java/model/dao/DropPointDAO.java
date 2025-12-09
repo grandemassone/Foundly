@@ -4,6 +4,8 @@ import model.ConPool;
 import model.bean.DropPoint;
 import model.bean.enums.StatoDropPoint;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DropPointDAO {
 
@@ -84,5 +86,25 @@ public class DropPointDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public List<DropPoint> doRetrieveAllApprovati() {
+        List<DropPoint> list = new ArrayList<>();
+        String query = "SELECT * FROM drop_point WHERE stato = 'APPROVATO'";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                DropPoint dp = new DropPoint();
+                dp.setId(rs.getLong("id"));
+                dp.setNomeAttivita(rs.getString("nome_attivita"));
+                dp.setIndirizzo(rs.getString("indirizzo"));
+                dp.setCitta(rs.getString("citta"));
+                list.add(dp);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

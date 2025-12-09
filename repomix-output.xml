@@ -53,14 +53,18 @@ src/
   main/
     java/
       controller/
+        CreaSegnalazioneServlet.java
         IndexServlet.java
         LoginServlet.java
+        LogoutServlet.java
+        ProfiloServlet.java
         RecuperoPasswordServlet.java
         RegistrazioneDropPointServlet.java
         RegistrazioneUtenteServlet.java
       model/
         bean/
           enums/
+            Badge.java
             CategoriaOggetto.java
             ModalitaConsegna.java
             Ruolo.java
@@ -76,30 +80,40 @@ src/
           Utente.java
         dao/
           DropPointDAO.java
+          SegnalazioneDAO.java
           UtenteDAO.java
         service/
           DropPointService.java
           EmailService.java
           RecuperoPasswordService.java
+          SegnalazioneService.java
           UtenteService.java
         utente/
           ConnectionTest.java
         utils/
+          GeocodingUtils.java
           PasswordUtils.java
         ConPool.java
     webapp/
       assets/
         images/
+          badges/
+            badge_detective.png
+            badge_occhio_di_falco.png
+            badge_sherlock_holmes.png
           logo.png
       css/
         index.css
         login.css
+        profilo.css
       javascript/
         index.js
       WEB-INF/
         jsp/
+          crea_segnalazione.jsp
           index.jsp
           login.jsp
+          profilo.jsp
           recupero_password_codice.jsp
           recupero_password_email.jsp
           registrazione_droppoint.jsp
@@ -114,6 +128,719 @@ README.md
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="src/main/java/controller/CreaSegnalazioneServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneAnimale;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.CategoriaOggetto;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoSegnalazione;
+import model.service.DropPointService;
+import model.service.SegnalazioneService;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.UUID;
+
+@WebServlet(name = "CreaSegnalazioneServlet", value = "/crea-segnalazione")
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 10,      // 10MB
+        maxRequestSize = 1024 * 1024 * 50    // 50MB
+)
+public class CreaSegnalazioneServlet extends HttpServlet {
+
+    private final DropPointService dropPointService = new DropPointService();
+    private final SegnalazioneService segnalazioneService = new SegnalazioneService();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
+
+        if (utente == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        // CARICA LA LISTA DEI DROP-POINT PER LA SELECT
+        request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
+
+        request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
+
+        if (utente == null) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        try {
+            // 1. Recupero parametri comuni
+            String tipo = request.getParameter("tipo"); // OGGETTO o ANIMALE
+            String titolo = request.getParameter("titolo");
+            String descrizione = request.getParameter("descrizione");
+            String dataStr = request.getParameter("dataRitrovamento");
+            String luogo = request.getParameter("luogo"); // Via/Piazza
+            String citta = request.getParameter("citta");
+            String provincia = request.getParameter("provincia");
+            String domanda1 = request.getParameter("domanda1");
+            String domanda2 = request.getParameter("domanda2");
+
+            // 2. Creazione Oggetto Polimorfico
+            Segnalazione segnalazione;
+
+            // ... dentro doPost ...
+
+            if ("OGGETTO".equalsIgnoreCase(tipo)) {
+                SegnalazioneOggetto so = new SegnalazioneOggetto();
+                String categoriaStr = request.getParameter("categoria");
+                so.setCategoria(CategoriaOggetto.valueOf(categoriaStr));
+
+                // NUOVA LOGICA CONSEGNA
+                String modalitaStr = request.getParameter("modalita");
+                if ("DROP_POINT".equals(modalitaStr)) {
+                    so.setModalitaConsegna(ModalitaConsegna.DROP_POINT);
+                    String idDpStr = request.getParameter("idDropPoint");
+                    if (idDpStr != null && !idDpStr.isEmpty()) {
+                        so.setIdDropPoint(Long.parseLong(idDpStr));
+                    }
+                } else {
+                    so.setModalitaConsegna(ModalitaConsegna.DIRETTA);
+                    so.setIdDropPoint(null);
+                }
+
+                segnalazione = so;
+            } else {
+                SegnalazioneAnimale sa = new SegnalazioneAnimale();
+                sa.setSpecie(request.getParameter("specie"));
+                sa.setRazza(request.getParameter("razza"));
+                segnalazione = sa;
+            }
+
+            // 3. Popolamento Dati Comuni
+            segnalazione.setIdUtente(utente.getId());
+            segnalazione.setTitolo(titolo);
+            segnalazione.setDescrizione(descrizione);
+            segnalazione.setLuogoRitrovamento(luogo);
+            segnalazione.setCitta(citta);
+            segnalazione.setProvincia(provincia);
+            segnalazione.setDomandaVerifica1(domanda1);
+            segnalazione.setDomandaVerifica2(domanda2);
+            segnalazione.setStato(StatoSegnalazione.APERTA);
+            segnalazione.setDataPubblicazione(new Timestamp(System.currentTimeMillis()));
+
+            // Conversione Data (da HTML yyyy-mm-dd a Timestamp)
+            if (dataStr != null && !dataStr.isEmpty()) {
+                LocalDate date = LocalDate.parse(dataStr);
+                segnalazione.setDataRitrovamento(Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)));
+            }
+
+            // 4. Gestione Immagine (Salvataggio su disco)
+            Part filePart = request.getPart("immagine");
+            String fileName = "default.png";
+
+            if (filePart != null && filePart.getSize() > 0) {
+                // Genera nome unico per evitare sovrascritture
+                String originalName = filePart.getSubmittedFileName();
+                String ext = originalName.substring(originalName.lastIndexOf("."));
+                fileName = UUID.randomUUID().toString() + ext;
+
+                // Percorso di salvataggio (nella cartella upload del server)
+                String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) uploadDir.mkdir();
+
+                filePart.write(uploadPath + File.separator + fileName);
+
+                // Salviamo il path relativo nel DB (es. "uploads/foto.jpg")
+                segnalazione.setImmagine("uploads/" + fileName);
+            } else {
+                segnalazione.setImmagine("assets/images/default-item.png");
+            }
+
+            // 5. Chiamata al Service (che farà anche il Geocoding)
+            boolean successo = segnalazioneService.creaSegnalazione(segnalazione);
+
+            if (successo) {
+                response.sendRedirect(request.getContextPath() + "/index?msg=success_segnalazione");
+            } else {
+                request.setAttribute("errore", "Errore nel salvataggio. Riprova.");
+                request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp").forward(request, response);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errore", "Errore tecnico: " + e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp").forward(request, response);
+        }
+    }
+}
+</file>
+
+<file path="src/main/java/model/dao/SegnalazioneDAO.java">
+package model.dao;
+
+import model.ConPool;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneAnimale;
+import model.bean.SegnalazioneOggetto;
+import model.bean.enums.TipoSegnalazione;
+
+import java.sql.*;
+
+public class SegnalazioneDAO {
+
+    /**
+     * Salva una segnalazione (Oggetto o Animale) gestendo la strategia Joined.
+     */
+    public boolean doSave(Segnalazione s) {
+        Connection con = null;
+        PreparedStatement psPadre = null;
+        PreparedStatement psFiglio = null;
+
+        // Query per la tabella padre
+        String sqlPadre = "INSERT INTO segnalazione (id_utente, titolo, descrizione, data_ritrovamento, " +
+                "luogo_ritrovamento, citta, provincia, latitudine, longitudine, immagine, " +
+                "domanda_verifica1, domanda_verifica2, stato, tipo_segnalazione) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try {
+            con = ConPool.getConnection();
+            con.setAutoCommit(false); // Iniziamo una transazione manuale
+
+            // 1. Inserimento tabella PADRE
+            psPadre = con.prepareStatement(sqlPadre, Statement.RETURN_GENERATED_KEYS);
+            psPadre.setLong(1, s.getIdUtente());
+            psPadre.setString(2, s.getTitolo());
+            psPadre.setString(3, s.getDescrizione());
+            psPadre.setTimestamp(4, s.getDataRitrovamento());
+            psPadre.setString(5, s.getLuogoRitrovamento());
+            psPadre.setString(6, s.getCitta());
+            psPadre.setString(7, s.getProvincia());
+            psPadre.setDouble(8, s.getLatitudine());
+            psPadre.setDouble(9, s.getLongitudine());
+            psPadre.setString(10, s.getImmagine());
+            psPadre.setString(11, s.getDomandaVerifica1());
+            psPadre.setString(12, s.getDomandaVerifica2());
+            psPadre.setString(13, s.getStato().toString());
+            psPadre.setString(14, s.getTipoSegnalazione().toString());
+
+            int resultPadre = psPadre.executeUpdate();
+
+            if (resultPadre > 0) {
+                // Recuperiamo ID generato
+                ResultSet generatedKeys = psPadre.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    long idSegnalazione = generatedKeys.getLong(1);
+                    s.setId(idSegnalazione);
+
+                    // 2. Inserimento tabella FIGLIA in base al tipo
+                    if (s instanceof SegnalazioneOggetto) {
+                        SegnalazioneOggetto so = (SegnalazioneOggetto) s;
+                        String sqlOggetto = "INSERT INTO segnalazione_oggetto (id_segnalazione, categoria, modalita_consegna, id_drop_point) VALUES (?, ?, ?, ?)";
+                        psFiglio = con.prepareStatement(sqlOggetto);
+                        psFiglio.setLong(1, idSegnalazione);
+                        psFiglio.setString(2, so.getCategoria().toString());
+                        psFiglio.setString(3, so.getModalitaConsegna().toString());
+
+                        if (so.getIdDropPoint() != null && so.getIdDropPoint() > 0) {
+                            psFiglio.setLong(4, so.getIdDropPoint());
+                        } else {
+                            psFiglio.setNull(4, Types.BIGINT);
+                        }
+
+                    } else if (s instanceof SegnalazioneAnimale) {
+                        SegnalazioneAnimale sa = (SegnalazioneAnimale) s;
+                        String sqlAnimale = "INSERT INTO segnalazione_animale (id_segnalazione, specie, razza) VALUES (?, ?, ?)";
+                        psFiglio = con.prepareStatement(sqlAnimale);
+                        psFiglio.setLong(1, idSegnalazione);
+                        psFiglio.setString(2, sa.getSpecie());
+                        psFiglio.setString(3, sa.getRazza());
+                    }
+
+                    // Eseguiamo insert figlio
+                    if (psFiglio != null) {
+                        psFiglio.executeUpdate();
+                    }
+
+                    con.commit(); // Conferma tutto
+                    return true;
+                }
+            }
+            con.rollback(); // Se qualcosa va storto, annulla l'inserimento padre
+            return false;
+
+        } catch (SQLException e) {
+            try {
+                if (con != null) con.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            // Chiudiamo tutto manualmente perché non usiamo try-with-resources per gestire il rollback
+            try {
+                if (psPadre != null) psPadre.close();
+                if (psFiglio != null) psFiglio.close();
+                if (con != null) {
+                    con.setAutoCommit(true); // Ripristina default
+                    con.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Recupera le ultime N segnalazioni ordinate per data decrescente.
+     */
+    public java.util.List<Segnalazione> doRetrieveLatest(int limit) {
+        java.util.List<Segnalazione> list = new java.util.ArrayList<>();
+
+        // Query che unisce Padre + Figlio Oggetto + Figlio Animale
+        String query = "SELECT s.*, " +
+                "so.categoria, so.modalita_consegna, so.id_drop_point, " +
+                "sa.specie, sa.razza " +
+                "FROM segnalazione s " +
+                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
+                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
+                "WHERE s.stato = 'APERTA' " + // Mostriamo solo quelle aperte
+                "ORDER BY s.data_pubblicazione DESC " +
+                "LIMIT ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setInt(1, limit);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Segnalazione s = null;
+                    String tipoStr = rs.getString("tipo_segnalazione");
+
+                    // Istanziamo il bean corretto in base al tipo
+                    if ("OGGETTO".equals(tipoStr)) {
+                        SegnalazioneOggetto so = new SegnalazioneOggetto();
+                        try {
+                            so.setCategoria(model.bean.enums.CategoriaOggetto.valueOf(rs.getString("categoria")));
+                            so.setModalitaConsegna(model.bean.enums.ModalitaConsegna.valueOf(rs.getString("modalita_consegna")));
+                        } catch (Exception e) { /* Enum error handling */ }
+                        so.setIdDropPoint(rs.getLong("id_drop_point"));
+                        if (rs.wasNull()) so.setIdDropPoint(null);
+                        s = so;
+                    } else {
+                        SegnalazioneAnimale sa = new SegnalazioneAnimale();
+                        sa.setSpecie(rs.getString("specie"));
+                        sa.setRazza(rs.getString("razza"));
+                        s = sa;
+                    }
+
+                    // Popoliamo i dati comuni (Tabella Padre)
+                    s.setId(rs.getLong("id"));
+                    s.setIdUtente(rs.getLong("id_utente"));
+                    s.setTitolo(rs.getString("titolo"));
+                    s.setDescrizione(rs.getString("descrizione"));
+                    s.setDataRitrovamento(rs.getTimestamp("data_ritrovamento"));
+                    s.setLuogoRitrovamento(rs.getString("luogo_ritrovamento"));
+                    s.setCitta(rs.getString("citta"));
+                    s.setProvincia(rs.getString("provincia"));
+                    s.setLatitudine(rs.getDouble("latitudine"));
+                    s.setLongitudine(rs.getDouble("longitudine"));
+                    s.setImmagine(rs.getString("immagine"));
+                    s.setDataPubblicazione(rs.getTimestamp("data_pubblicazione"));
+
+                    try {
+                        s.setStato(model.bean.enums.StatoSegnalazione.valueOf(rs.getString("stato")));
+                        s.setTipoSegnalazione(model.bean.enums.TipoSegnalazione.valueOf(tipoStr));
+                    } catch (Exception e) { /* Enum handling */ }
+
+                    list.add(s);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+}
+</file>
+
+<file path="src/main/java/model/service/SegnalazioneService.java">
+package model.service;
+
+import model.bean.Segnalazione;
+import model.dao.SegnalazioneDAO;
+import model.utils.GeocodingUtils; // Importa la utility
+
+public class SegnalazioneService {
+
+    private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
+
+    public boolean creaSegnalazione(Segnalazione segnalazione) {
+
+        // 1. Calcolo automatico Latitudine e Longitudine
+        // CORREZIONE: getIndirizzo() -> getLuogoRitrovamento()
+        if (segnalazione.getLuogoRitrovamento() != null && !segnalazione.getLuogoRitrovamento().isEmpty() &&
+                segnalazione.getCitta() != null && !segnalazione.getCitta().isEmpty()) {
+
+            double[] coords = GeocodingUtils.getCoordinates(
+                    segnalazione.getLuogoRitrovamento(), // QUI ERA L'ERRORE
+                    segnalazione.getCitta(),
+                    segnalazione.getProvincia()
+            );
+
+            segnalazione.setLatitudine(coords[0]);
+            segnalazione.setLongitudine(coords[1]);
+        }
+
+        // 2. Salvataggio nel DB
+        return segnalazioneDAO.doSave(segnalazione);
+    }
+
+    public java.util.List<Segnalazione> getUltimeSegnalazioni() {
+        // Recuperiamo ad esempio le ultime 8 per la Home Page
+        return segnalazioneDAO.doRetrieveLatest(8);
+    }
+}
+</file>
+
+<file path="src/main/java/model/utils/GeocodingUtils.java">
+package model.utils;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+public class GeocodingUtils {
+
+    // Coordinate di default (es. Roma) se l'indirizzo non viene trovato
+    private static final double DEFAULT_LAT = 41.9028;
+    private static final double DEFAULT_LON = 12.4964;
+
+    /**
+     * Restituisce un array di double {latitudine, longitudine} dato un indirizzo.
+     */
+    public static double[] getCoordinates(String indirizzo, String citta, String provincia) {
+        try {
+            // 1. Costruiamo la query per OpenStreetMap
+            String fullAddress = indirizzo + ", " + citta + ", " + provincia;
+            String encodedAddress = URLEncoder.encode(fullAddress, StandardCharsets.UTF_8);
+
+            // URL API Nominatim (OpenStreetMap)
+            String urlString = "https://nominatim.openstreetmap.org/search?q=" + encodedAddress + "&format=json&limit=1";
+
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            // IMPORTANTE: Nominatim richiede uno User-Agent identificativo
+            conn.setRequestProperty("User-Agent", "FoundlyApp/1.0 (student.project@unisa.it)");
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode == 200) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String inputLine;
+                StringBuilder content = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    content.append(inputLine);
+                }
+                in.close();
+
+                // 2. Parsiamo il JSON ricevuto
+                JSONArray jsonArray = new JSONArray(content.toString());
+
+                if (jsonArray.length() > 0) {
+                    JSONObject location = jsonArray.getJSONObject(0);
+                    double lat = location.getDouble("lat");
+                    double lon = location.getDouble("lon");
+
+                    System.out.println("Geocoding Successo: " + fullAddress + " -> " + lat + ", " + lon);
+                    return new double[]{lat, lon};
+                }
+            } else {
+                System.err.println("Errore API Geocoding: HTTP " + responseCode);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Eccezione durante il geocoding per: " + indirizzo);
+        }
+
+        System.out.println("Indirizzo non trovato, uso coordinate default.");
+        return new double[]{DEFAULT_LAT, DEFAULT_LON};
+    }
+}
+</file>
+
+<file path="src/main/webapp/WEB-INF/jsp/crea_segnalazione.jsp">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="model.bean.enums.CategoriaOggetto" %>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crea Segnalazione - Foundly</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
+
+    <style>
+        /* Stili extra per il form dinamico */
+        .hidden { display: none; }
+        .form-section-title {
+            font-size: 0.9rem;
+            color: #E65100;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin: 20px 0 10px;
+            border-bottom: 1px solid #FFE0B2;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="info-section">
+        <div class="brand-header">
+            <div class="brand-icon">
+                <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="logo_foundly">
+            </div>
+        </div>
+        <div class="hero-text">
+            <h1>Nuova Segnalazione</h1>
+            <p>Hai trovato qualcosa? Compila il modulo con i dettagli per aiutare il proprietario a ritrovarlo.</p>
+            <div class="feature-pills">
+                <span class="pill"><span class="material-icons">photo_camera</span> Foto</span>
+                <span class="pill"><span class="material-icons">location_on</span> Geolocalizzazione</span>
+                <span class="pill"><span class="material-icons">verified_user</span> Domande di Verifica</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-section">
+        <div class="auth-card" style="max-width: 600px;">
+            <h2>Dettagli Ritrovamento</h2>
+
+            <% if (request.getAttribute("errore") != null) { %>
+            <div style="background:#ffebee; color:#c62828; padding:10px; border-radius:8px; margin-bottom:15px;">
+                <%= request.getAttribute("errore") %>
+            </div>
+            <% } %>
+
+            <form action="${pageContext.request.contextPath}/crea-segnalazione" method="post" enctype="multipart/form-data">
+
+                <div class="input-group">
+                    <label>Cosa hai trovato?</label>
+                    <select name="tipo" id="tipoSelect" onchange="toggleFormFields()" required style="width:100%; padding:12px; border-radius:8px; border:1px solid #ccc;">
+                        <option value="OGGETTO">Un Oggetto</option>
+                        <option value="ANIMALE">Un Animale</option>
+                    </select>
+                </div>
+
+                <div id="fieldsOggetto">
+                    <div class="input-group">
+                        <label>Categoria</label>
+                        <select name="categoria" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ccc;">
+                            <% for(CategoriaOggetto c : CategoriaOggetto.values()) { %>
+                            <option value="<%= c %>"><%= c %></option>
+                            <% } %>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="fieldsAnimale" class="hidden">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Specie</label>
+                            <input type="text" name="specie" placeholder="es. Cane, Gatto">
+                        </div>
+                        <div class="input-group">
+                            <label>Razza (Opzionale)</label>
+                            <input type="text" name="razza" placeholder="es. Labrador">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="deliverySection" class="hidden">
+                    <div class="form-section-title">Modalità di Restituzione</div>
+
+                    <div class="input-group">
+                        <label>Come vuoi restituirlo?</label>
+
+                        <div class="radio-container">
+                            <label class="radio-label">
+                                <input type="radio" name="modalita" value="DIRETTA" checked onclick="toggleDropPointList(false)">
+                                <span>Consegna Diretta (A mano)</span>
+                            </label>
+
+                            <label class="radio-label">
+                                <input type="radio" name="modalita" value="DROP_POINT" onclick="toggleDropPointList(true)">
+                                <span>Tramite Drop-Point (Negozio)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="dropPointSelection" class="hidden" style="margin-top: 15px;">
+                        <div class="input-group">
+                            <label>Scegli il Drop-Point più vicino</label>
+                            <select name="idDropPoint" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ccc;">
+                                <option value="">-- Seleziona un negozio --</option>
+                                <c:forEach var="dp" items="${listaDropPoint}">
+                                    <option value="${dp.id}">${dp.nomeAttivita} - ${dp.indirizzo}, ${dp.citta}</option>
+                                </c:forEach>
+                            </select>
+                            <small style="color: #666;">Lasciando l'oggetto qui, il proprietario potrà ritirarlo con un codice sicuro.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section-title">Informazioni Generali</div>
+
+                <div class="input-group">
+                    <label>Titolo Annuncio</label>
+                    <input type="text" name="titolo" placeholder="es. Mazzo di chiavi con portachiavi rosso" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Descrizione Dettagliata</label>
+                    <textarea name="descrizione" rows="4" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc;" required></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Data Ritrovamento</label>
+                    <input type="date" name="dataRitrovamento" required>
+                </div>
+
+                <div class="form-section-title">Posizione</div>
+
+                <div class="input-group">
+                    <label>Via / Piazza (Luogo esatto)</label>
+                    <input type="text" name="luogo" placeholder="es. Via Roma 10" required>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Città</label>
+                        <input type="text" name="citta" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Provincia (Sigla)</label>
+                        <input type="text" name="provincia" maxlength="2" placeholder="NA" required>
+                    </div>
+                </div>
+
+                <div class="form-section-title">Sicurezza (Secure Claim)</div>
+                <p style="font-size:0.8rem; color:#666; margin-bottom:10px;">
+                    Imposta due domande a cui solo il vero proprietario può rispondere.
+                </p>
+
+                <div class="input-group">
+                    <label>Domanda 1</label>
+                    <input type="text" name="domanda1" placeholder="es. Di che colore è il portachiavi?" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Domanda 2</label>
+                    <input type="text" name="domanda2" placeholder="es. Quante chiavi ci sono?" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Foto (Opzionale)</label>
+                    <input type="file" name="immagine" accept="image/*">
+                </div>
+
+                <button type="submit" class="btn-primary mt-2">Pubblica Segnalazione</button>
+            </form>
+
+            <div style="text-align:center; margin-top:20px;">
+                <a href="${pageContext.request.contextPath}/index" style="color:#666; text-decoration:none;">Annulla</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleFormFields() {
+        const tipo = document.getElementById("tipoSelect").value;
+        const fieldsOggetto = document.getElementById("fieldsOggetto");
+        const fieldsAnimale = document.getElementById("fieldsAnimale");
+        const deliverySection = document.getElementById("deliverySection"); // Recupera la sezione consegna
+
+        if (tipo === "OGGETTO") {
+            fieldsOggetto.classList.remove("hidden");
+            fieldsAnimale.classList.add("hidden");
+            // MOSTRA la scelta consegna solo se è un oggetto
+            if (deliverySection) deliverySection.classList.remove("hidden");
+        } else {
+            fieldsOggetto.classList.add("hidden");
+            fieldsAnimale.classList.remove("hidden");
+            // NASCONDI la scelta consegna se è un animale (sempre diretta)
+            if (deliverySection) deliverySection.classList.add("hidden");
+        }
+    }
+
+    // Nuova funzione per mostrare la tendina solo se si sceglie Drop-Point
+    function toggleDropPointList(show) {
+        const dpDiv = document.getElementById("dropPointSelection");
+        if (show) {
+            dpDiv.classList.remove("hidden");
+            // Rendiamo la select obbligatoria se visibile
+            const select = dpDiv.querySelector("select");
+            if(select) select.setAttribute("required", "required");
+        } else {
+            dpDiv.classList.add("hidden");
+            // Togliamo l'obbligo se nascosta
+            const select = dpDiv.querySelector("select");
+            if(select) select.removeAttribute("required");
+        }
+    }
+
+    // Eseguiamo al caricamento per impostare lo stato corretto se la pagina viene ricaricata
+    document.addEventListener("DOMContentLoaded", function() {
+        toggleFormFields();
+        // Controlla anche lo stato iniziale dei radio button
+        const radioDrop = document.querySelector('input[name="modalita"][value="DROP_POINT"]');
+        if (radioDrop && radioDrop.checked) {
+            toggleDropPointList(true);
+        } else {
+            toggleDropPointList(false);
+        }
+    });
+</script>
+
+</body>
+</html>
+</file>
 
 <file path=".mvn/wrapper/maven-wrapper.properties">
 distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.6/apache-maven-3.9.6-bin.zip
@@ -233,16 +960,156 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.bean.Segnalazione;
+import model.service.SegnalazioneService;
 
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(name = "IndexServlet", urlPatterns = {"/index"})
 public class IndexServlet extends HttpServlet {
+
+    private final SegnalazioneService segnalazioneService = new SegnalazioneService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // 1. Recupera la lista dal DB
+        List<Segnalazione> lista = segnalazioneService.getUltimeSegnalazioni();
+
+        // 2. Passa la lista alla JSP
+        request.setAttribute("segnalazioni", lista);
+
         request.getRequestDispatcher("/WEB-INF/jsp/index.jsp").forward(request, response);
     }
+}
+</file>
+
+<file path="src/main/java/controller/LogoutServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import java.io.IOException;
+
+@WebServlet(name = "LogoutServlet", value = "/logout")
+public class LogoutServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
+
+        // Recupera la sessione se esiste (false = non crearne una nuova)
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.removeAttribute("utente");
+        }
+
+        // Dopo il logout rimanda alla home (o alla pagina di login se preferisci)
+        response.sendRedirect(request.getContextPath() + "/index");
+        // oppure:
+        // response.sendRedirect(request.getContextPath() + "/login");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
+    }
+}
+</file>
+
+<file path="src/main/java/controller/ProfiloServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.Utente;
+import model.service.UtenteService;
+
+import java.io.IOException;
+
+@WebServlet(name = "ProfiloServlet", value = "/profilo")
+public class ProfiloServlet extends HttpServlet {
+
+    private final UtenteService utenteService = new UtenteService();
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+
+        Utente utente = null;
+        if (session != null) {
+            utente = (Utente) session.getAttribute("utente");
+        }
+
+        if (utente == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        // RICALCOLA SEMPRE IL BADGE IN BASE AI PUNTI ATTUALI (senza cambiare i punti)
+        utenteService.aggiornaPunteggioEBadge(utente, 0);
+
+        // aggiorna la sessione con eventuali modifiche
+        session.setAttribute("utente", utente);
+
+        request.getRequestDispatcher("/WEB-INF/jsp/profilo.jsp")
+                .forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
+
+        if (utente == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        // leggi valori modificati
+        String username = request.getParameter("username");
+        String nome = request.getParameter("nome");
+        String cognome = request.getParameter("cognome");
+
+        // (qui potresti fare validazioni base, es. non vuoti)
+
+        utente.setUsername(username);
+        utente.setNome(nome);
+        utente.setCognome(cognome);
+
+        // persisti nel DB
+        utenteService.aggiornaProfilo(utente);   // implementa questo metodo nel service/DAO
+
+        // aggiorna anche la sessione
+        session.setAttribute("utente", utente);
+
+        // torna alla pagina profilo (magari con un flag success)
+        response.sendRedirect(request.getContextPath() + "/profilo?success=1");
+    }
+}
+</file>
+
+<file path="src/main/java/model/bean/enums/Badge.java">
+package model.bean.enums;
+
+public enum Badge {
+    OCCHIO_DI_FALCO, DETECTIVE, SHERLOCK_HOLMES
 }
 </file>
 
@@ -565,6 +1432,650 @@ public class PasswordUtils {
         return BCrypt.checkpw(plainPassword, hashedPassword);
     }
 }
+</file>
+
+<file path="src/main/webapp/css/profilo.css">
+/* Layout generale della pagina profilo */
+
+.profile-main {
+    max-width: 900px;
+    margin: 32px auto 40px;
+    padding: 0 24px;
+}
+
+/* CARD PROFILO */
+
+.profile-card {
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFFFFF 45%, #FFF3E0 100%);
+    border-radius: 24px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+    padding: 24px 24px 28px;
+    border: 1px solid rgba(255, 183, 77, 0.45);
+}
+
+/* Header con avatar grande + nome & email */
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.profile-avatar-large {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFE0B2, #FB8C00);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.profile-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #202124;
+    margin-bottom: 4px;
+}
+
+.profile-subtitle {
+    font-size: 0.9rem;
+    color: #5F6368;
+}
+
+/* BOX PUNTI: più evidente */
+
+.profile-points-box {
+    margin: 12px 0 18px;
+    padding: 14px 20px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #FF9800 0%, #FB8C00 40%, #EF6C00 90%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 10px 26px rgba(244, 143, 0, 0.5);
+}
+
+.points-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.points-icon {
+    font-size: 24px;
+    color: #FFFDE7;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+}
+
+.points-label-big {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.points-right {
+    display: flex;
+    align-items: center;
+}
+
+.points-value-big {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* BADGE: medaglia grafica */
+
+.profile-badge-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 10px 14px;
+    border-radius: 16px;
+    background-color: rgba(255, 243, 224, 0.9);
+    border: 1px dashed rgba(251, 140, 0, 0.6);
+}
+
+.badge-medal {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    background: radial-gradient(circle at 30% 20%, #FFF3E0 0%, #FFB74D 40%, #F57C00 100%);
+}
+
+.badge-medal .material-icons {
+    font-size: 24px;
+    color: #FFFDE7;
+}
+
+.badge-medal-img {
+    max-width: 65px;
+    max-height: 65px;
+    display: block;
+}
+
+.badge-texts {
+    display: flex;
+    flex-direction: column;
+}
+
+.badge-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #E65100;
+    margin-bottom: 2px;
+}
+
+.badge-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #BF360C;
+}
+
+/* BOX MODIFICA DATI: un solo bottone Modifica */
+
+.profile-edit-card {
+    margin-bottom: 22px;
+    padding: 14px 16px 10px;
+    border-radius: 18px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #FFE0B2;
+}
+
+.profile-edit-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.profile-edit-header-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #E65100;
+}
+
+.profile-edit-header-left .material-icons {
+    font-size: 20px;
+}
+
+/* bottone principale Modifica */
+
+.edit-main-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(135deg, #FFB74D 0%, #FB8C00 60%);
+    color: #FFFFFF;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(251, 140, 0, 0.5);
+    transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+}
+
+.edit-main-button .material-icons {
+    font-size: 18px;
+}
+
+.edit-main-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(251, 140, 0, 0.7);
+    filter: brightness(1.05);
+}
+
+.profile-edit-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 0;
+    border-top: 1px solid #FFE0B2;
+}
+
+.profile-edit-row:first-of-type {
+    border-top: none;
+}
+
+.edit-field-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.field-label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #9E9E9E;
+    margin-bottom: 2px;
+}
+
+.field-value {
+    font-size: 0.95rem;
+    color: #212121;
+}
+
+/* Griglia campi profilo (altri dati) */
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px 18px;
+    margin-top: 8px;
+}
+
+.profile-field {
+    padding: 8px 10px;
+    border-radius: 12px;
+    background-color: #FAFAFA;
+    border: 1px solid #EEEEEE;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+    .profile-card {
+        padding: 20px 16px 22px;
+    }
+
+    .profile-main {
+        padding: 0 16px;
+    }
+
+    .profile-header {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .profile-title {
+        font-size: 1.2rem;
+    }
+
+    .points-value-big {
+        font-size: 2.4rem;
+    }
+
+    .profile-edit-row {
+        align-items: flex-start;
+    }
+}
+
+/* modalità view/edit */
+/* input in modalità edit */
+
+.field-input {
+    display: none;
+    border: none;
+    border-bottom: 1px solid #FFE0B2;
+    padding: 4px 0;
+    font-size: 0.95rem;
+    background-color: transparent;
+    color: #212121;
+    outline: none;
+}
+
+.field-input:focus {
+    border-color: #FB8C00;
+}
+
+/* default: solo view, niente bottoni azione */
+
+.profile-edit-card .edit-mode {
+    display: none;
+}
+
+.profile-edit-form .edit-actions {
+    display: none;
+    margin-top: 16px;
+    display: none;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* quando il form è in editing */
+
+.profile-edit-form.editing .view-mode {
+    display: none;
+}
+
+.profile-edit-form.editing .edit-mode {
+    display: block;
+}
+
+.profile-edit-form.editing .edit-actions {
+    display: flex;
+}
+
+/* bottoni Conferma/Annulla */
+
+.btn-confirm,
+.btn-cancel {
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-confirm {
+    background: linear-gradient(135deg, #FFB74D 0%, #FB8C00 60%);
+    color: #FFFFFF;
+    box-shadow: 0 3px 10px rgba(251, 140, 0, 0.5);
+}
+
+.btn-confirm:hover {
+    filter: brightness(1.05);
+}
+
+.btn-cancel {
+    background-color: #FFFFFF;
+    color: #E65100;
+    border: 1px solid #FFB74D;
+}
+
+.btn-cancel:hover {
+    background-color: #FFF3E0;
+}
+</file>
+
+<file path="src/main/webapp/WEB-INF/jsp/profilo.jsp">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="model.bean.Utente" %>
+
+<%
+    Utente utente = (Utente) session.getAttribute("utente");
+    if (utente == null) {
+        response.sendRedirect(request.getContextPath() + "/login");
+        return;
+    }
+
+    // Valore grezzo dal DB (ENUM)
+    String rawBadge = utente.getBadge(); // OCCHIO_DI_FALCO / DETECTIVE / SHERLOCK_HOLMES
+
+    // Nome “bello” da mostrare
+    String badgeDisplay = "";
+    if (rawBadge != null) {
+        String[] parts = rawBadge.toLowerCase().split("_");
+        StringBuilder sb = new StringBuilder();
+        for (String p : parts) {
+            if (p == null || p.isEmpty()) continue;
+            if (sb.length() > 0) sb.append(" ");
+            sb.append(Character.toUpperCase(p.charAt(0)));
+            if (p.length() > 1) sb.append(p.substring(1));
+        }
+        badgeDisplay = sb.toString();    // es. "Occhio Di Falco"
+    }
+
+    // Immagine del badge in base all'ENUM
+    String badgeImg = "badge_default.png"; // fallback
+
+    if ("OCCHIO_DI_FALCO".equals(rawBadge)) {
+        badgeImg = "badge_occhio_di_falco.png";
+    } else if ("DETECTIVE".equals(rawBadge)) {
+        badgeImg = "badge_detective.png";
+    } else if ("SHERLOCK_HOLMES".equals(rawBadge)) {
+        badgeImg = "badge_sherlock_holmes.png";
+    }
+%>
+
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profilo - Foundly</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/profilo.css">
+</head>
+<body class="page-enter">
+
+<nav class="navbar">
+    <a href="${pageContext.request.contextPath}/index" class="brand">
+        <div class="brand-icon">
+            <img src="<%= request.getContextPath() %>/assets/images/logo.png" alt="logo_foundly">
+        </div>
+    </a>
+
+    <div class="nav-links">
+        <a href="${pageContext.request.contextPath}/index" class="nav-item">
+            <span class="material-icons">home</span> Home
+        </a>
+        <a href="#" class="nav-item">
+            <span class="material-icons">add_circle_outline</span> Crea Segnalazione
+        </a>
+        <a href="#" class="nav-item">
+            <span class="material-icons">inventory</span> Segnalazioni
+        </a>
+        <a href="#" class="nav-item">
+            <span class="material-icons">place</span> Drop-Point
+        </a>
+        <a href="#" class="nav-item">
+            <span class="material-icons">emoji_events</span> Classifica
+        </a>
+    </div>
+
+    <%
+        Utente utenteLoggato = (Utente) session.getAttribute("utente");
+        if (utenteLoggato != null) {
+    %>
+    <div class="user-menu">
+        <button type="button" class="user-avatar-btn">
+            <div class="user-avatar"></div>
+        </button>
+
+        <div class="user-dropdown">
+            <div class="user-dropdown-header">
+                <div class="user-email"><%= utenteLoggato.getEmail() %></div>
+                <div class="user-points-row">
+                    <span class="points-label">punti</span>
+                    <span class="points-value"><%= utenteLoggato.getPunteggio() %></span>
+                </div>
+            </div>
+
+            <a href="${pageContext.request.contextPath}/profilo" class="user-dropdown-item">
+                <span class="material-icons">person</span>
+                <span>Profilo</span>
+            </a>
+            <a href="${pageContext.request.contextPath}/logout" class="user-dropdown-item user-dropdown-item-logout">
+                <span class="material-icons">logout</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+    <%
+    } else {
+    %>
+    <a href="${pageContext.request.contextPath}/login" class="btn-login-nav">
+        <span class="material-icons">login</span>
+        <span>Accedi</span>
+    </a>
+    <%
+        }
+    %>
+</nav>
+
+<main class="profile-main">
+    <section class="profile-card">
+        <!-- HEADER: avatar + nome + email -->
+        <div class="profile-header">
+            <div class="profile-avatar-large"></div>
+            <div>
+                <h1 class="profile-title">
+                    <%= utente.getNome() %> <%= utente.getCognome() %>
+                </h1>
+                <p class="profile-subtitle">
+                    <%= utente.getEmail() %>
+                </p>
+            </div>
+        </div>
+
+        <!-- BOX PUNTI -->
+        <div class="profile-points-box">
+            <div class="points-left">
+                <span class="material-icons points-icon">star_rate</span>
+                <span class="points-label-big">PUNTI TOTALI</span>
+            </div>
+            <div class="points-right">
+                <span class="points-value-big">
+                    <%= utente.getPunteggio() %>
+                </span>
+            </div>
+        </div>
+
+        <!-- BADGE -->
+        <div class="profile-badge-card">
+            <div class="badge-medal">
+                <img src="<%= request.getContextPath() %>/assets/images/badges/<%= badgeImg %>"
+                     alt="<%= badgeDisplay %>"
+                     class="badge-medal-img">
+            </div>
+            <div class="badge-texts">
+                <span class="badge-label">Badge</span>
+                <span class="badge-name"><%= badgeDisplay %></span>
+            </div>
+        </div>
+
+        <!-- BOX MODIFICA DATI (form) -->
+        <form method="post"
+              action="${pageContext.request.contextPath}/profilo"
+              id="profileEditForm"
+              class="profile-edit-form">
+
+            <section class="profile-edit-card" id="profileEditCard">
+                <div class="profile-edit-header">
+                    <div class="profile-edit-header-left">
+                        <span class="material-icons">manage_accounts</span>
+                        <span>Dettagli account</span>
+                    </div>
+                    <button type="button" class="edit-main-button" id="editToggleBtn">
+                        <span class="material-icons">edit</span>
+                        <span>Modifica</span>
+                    </button>
+                </div>
+
+                <!-- USERNAME -->
+                <div class="profile-edit-row">
+                    <div class="edit-field-text">
+                        <span class="field-label">Username</span>
+                        <span class="field-value view-mode" id="usernameView">
+                    <%= utente.getUsername() %>
+                </span>
+                        <input type="text"
+                               class="field-input edit-mode"
+                               name="username"
+                               id="usernameInput"
+                               value="<%= utente.getUsername() %>">
+                    </div>
+                </div>
+
+                <!-- NOME -->
+                <div class="profile-edit-row">
+                    <div class="edit-field-text">
+                        <span class="field-label">Nome</span>
+                        <span class="field-value view-mode" id="nomeView">
+                    <%= utente.getNome() %>
+                </span>
+                        <input type="text"
+                               class="field-input edit-mode"
+                               name="nome"
+                               id="nomeInput"
+                               value="<%= utente.getNome() %>">
+                    </div>
+                </div>
+
+                <!-- COGNOME -->
+                <div class="profile-edit-row">
+                    <div class="edit-field-text">
+                        <span class="field-label">Cognome</span>
+                        <span class="field-value view-mode" id="cognomeView">
+                    <%= utente.getCognome() %>
+                </span>
+                        <input type="text"
+                               class="field-input edit-mode"
+                               name="cognome"
+                               id="cognomeInput"
+                               value="<%= utente.getCognome() %>">
+                    </div>
+                </div>
+            </section>
+
+            <!-- PULSANTI SOTTO IL BOX, CENTRATI -->
+            <div class="edit-actions">
+                <button type="submit" class="btn-confirm">
+                    Conferma Modifiche
+                </button>
+                <button type="button" class="btn-cancel" id="cancelEditBtn">
+                    Annulla Modifiche
+                </button>
+            </div>
+        </form>
+
+
+        <div class="profile-grid">
+            <!-- altri campi se servono -->
+        </div>
+    </section>
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // dropdown utente
+        const userMenu = document.querySelector(".user-menu");
+        if (userMenu) {
+            const btnAvatar = userMenu.querySelector(".user-avatar-btn");
+            btnAvatar.addEventListener("click", function (e) {
+                e.stopPropagation();
+                userMenu.classList.toggle("open");
+            });
+            document.addEventListener("click", function () {
+                userMenu.classList.remove("open");
+            });
+        }
+
+        // logica modifica profilo
+        const editForm = document.getElementById("profileEditForm");
+        const editToggleBtn = document.getElementById("editToggleBtn");
+        const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+        if (editForm && editToggleBtn && cancelEditBtn) {
+            editToggleBtn.addEventListener("click", function () {
+                editForm.classList.add("editing");
+            });
+
+            cancelEditBtn.addEventListener("click", function () {
+                // torna ai valori originali
+                window.location.reload();
+            });
+        }
+    });
+</script>
+
+
+</body>
+</html>
 </file>
 
 <file path="src/main/webapp/WEB-INF/web.xml">
@@ -1287,322 +2798,6 @@ public class DropPoint {
 }
 </file>
 
-<file path="src/main/java/model/dao/UtenteDAO.java">
-package model.dao;
-
-import model.ConPool;
-import model.bean.Utente;
-import model.bean.enums.Ruolo;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-
-public class UtenteDAO {
-
-    public boolean doSave(Utente utente) {
-        // Rimossi 'citta' e 'provincia' dalla query
-        String query = "INSERT INTO utente (username, email, password_hash, nome, cognome, " +
-                "telefono, immagine_profilo, punteggio, ruolo, badge) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-
-            ps.setString(1, utente.getUsername());
-            ps.setString(2, utente.getEmail());
-            ps.setString(3, utente.getPasswordHash());
-            ps.setString(4, utente.getNome());
-            ps.setString(5, utente.getCognome());
-            ps.setString(6, utente.getTelefono());
-            ps.setString(7, utente.getImmagineProfilo());
-            ps.setInt(8, utente.getPunteggio());
-            ps.setString(9, utente.getRuolo().toString());
-            ps.setString(10, utente.getBadge());
-
-            int result = ps.executeUpdate();
-
-            if (result > 0) {
-                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        utente.setId(generatedKeys.getLong(1));
-                    }
-                }
-                return true;
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public Utente doRetrieveByEmail(String email) {
-        String query = "SELECT * FROM utente WHERE email = ?";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setString(1, email);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return mapRowToUtente(rs);
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public Utente doRetrieveByUsername(String username) {
-        String query = "SELECT * FROM utente WHERE username = ?";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setString(1, username);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return mapRowToUtente(rs);
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public List<Utente> doRetrieveAll() {
-        List<Utente> utenti = new ArrayList<>();
-        String query = "SELECT * FROM utente";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                utenti.add(mapRowToUtente(rs));
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return utenti;
-    }
-
-    private Utente mapRowToUtente(ResultSet rs) throws SQLException {
-        Utente u = new Utente();
-        u.setId(rs.getLong("id"));
-        u.setUsername(rs.getString("username"));
-        u.setEmail(rs.getString("email"));
-        u.setPasswordHash(rs.getString("password_hash"));
-        u.setNome(rs.getString("nome"));
-        u.setCognome(rs.getString("cognome"));
-        u.setTelefono(rs.getString("telefono"));
-        u.setImmagineProfilo(rs.getString("immagine_profilo"));
-        u.setPunteggio(rs.getInt("punteggio"));
-
-        String ruoloStr = rs.getString("ruolo");
-        if (ruoloStr != null) {
-            u.setRuolo(Ruolo.valueOf(ruoloStr));
-        }
-
-        u.setBadge(rs.getString("badge"));
-        return u;
-    }
-
-    /**
-     * Aggiorna l'hash della password per l'utente con la email specificata.
-     *
-     * @param email     email dell'utente
-     * @param nuovoHash nuovo valore di password_hash (già hashato)
-     * @return true se è stata aggiornata almeno una riga, false altrimenti
-     */
-    public boolean updatePasswordByEmail(String email, String nuovoHash) {
-        String query = "UPDATE utente SET password_hash = ? WHERE email = ?";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setString(1, nuovoHash);
-            ps.setString(2, email);
-
-            int updated = ps.executeUpdate();
-            return updated > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-}
-</file>
-
-<file path="src/main/java/model/service/EmailService.java">
-package model.service;
-
-import jakarta.mail.Authenticator;
-import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeBodyPart;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.internet.MimeMultipart;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Properties;
-
-public class EmailService {
-    private final Session session;
-    private final String mittente;
-    private final String nomeMittente = "Foundly";
-
-    public EmailService() {
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
-
-        this.mittente = "foundly.app@gmail.com";
-        final String username = "foundly.app@gmail.com";
-        final String password = System.getenv("SMTP_PASSKEY"); // app password
-
-        this.session = Session.getInstance(props, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
-            }
-        });
-    }
-
-    public void inviaCodiceRecuperoPassword(String destinatario, String codice)
-            throws MessagingException {
-
-        MimeMessage message = new MimeMessage(session);
-
-        try {
-            message.setFrom(new InternetAddress(mittente, nomeMittente, StandardCharsets.UTF_8.name()));
-        } catch (Exception e) {
-            message.setFrom(new InternetAddress(mittente));
-        }
-
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
-        message.setSubject("Codice per il recupero password Foundly", StandardCharsets.UTF_8.name());
-
-        // versione testo semplice
-        String testoPlain =
-                "Ciao,\n\n" +
-                        "hai richiesto il recupero della password per il tuo account Foundly.\n\n" +
-                        "Questo è il tuo codice di verifica:\n\n" +
-                        codice + "\n\n" +
-                        "Inseriscilo nella pagina di recupero password e scegli una nuova password.\n\n" +
-                        "Se non hai richiesto tu questo recupero, puoi ignorare questa email.\n\n" +
-                        "Il team Foundly";
-
-        // versione HTML più curata
-        String testoHtml =
-                "<!DOCTYPE html>" +
-                        "<html lang=\"it\">" +
-                        "<head>" +
-                        "  <meta charset=\"UTF-8\">" +
-                        "  <title>Codice recupero password Foundly</title>" +
-                        "</head>" +
-                        "<body style=\"margin:0;padding:0;background-color:#f5f5f5;font-family:Roboto,Arial,sans-serif;\">" +
-                        "  <table align=\"center\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding:24px 0;\">" +
-                        "    <tr>" +
-                        "      <td>" +
-                        "        <table align=\"center\" cellpadding=\"0\" cellspacing=\"0\" " +
-                        "               style=\"max-width:520px;width:100%;background-color:#ffffff;border-radius:12px;" +
-                        "                      box-shadow:0 4px 16px rgba(0,0,0,0.06);overflow:hidden;\">" +
-                        "          <tr>" +
-                        "            <td style=\"padding:18px 24px;background:linear-gradient(135deg,#FB8C00,#F57C00);color:#ffffff;\">" +
-                        "              <div style=\"font-size:20px;font-weight:700;\">Foundly</div>" +
-                        "              <div style=\"font-size:12px;opacity:0.9;\">Recupero password</div>" +
-                        "            </td>" +
-                        "          </tr>" +
-                        "          <tr>" +
-                        "            <td style=\"padding:24px 24px 16px 24px;color:#202124;font-size:14px;line-height:1.6;\">" +
-                        "              <p style=\"margin:0 0 12px 0;\">Ciao,</p>" +
-                        "              <p style=\"margin:0 0 12px 0;\">" +
-                        "                hai richiesto il recupero della password per il tuo account <strong>Foundly</strong>." +
-                        "              </p>" +
-                        "              <p style=\"margin:0 0 8px 0;\">Questo è il tuo codice di verifica:</p>" +
-                        "            </td>" +
-                        "          </tr>" +
-                        "          <tr>" +
-                        "            <td style=\"padding:0 24px 16px 24px;\">" +
-                        "              <div style=\"text-align:center;margin:8px 0 16px 0;\">" +
-                        "                <span style=\"" +
-                        "                       display:inline-block;" +
-                        "                       padding:12px 24px;" +
-                        "                       border-radius:999px;" +
-                        "                       background-color:#FFF3E0;" +
-                        "                       color:#E65100;" +
-                        "                       font-size:22px;" +
-                        "                       font-weight:700;" +
-                        "                       letter-spacing:4px;" +
-                        "                       font-family:monospace;\">" +
-                        codice +
-                        "                </span>" +
-                        "              </div>" +
-                        "              <p style=\"margin:0 0 8px 0;font-size:13px;color:#5f6368;text-align:center;\">" +
-                        "                Inserisci questo codice nella pagina di <strong>Recupero password</strong> e scegli una nuova password." +
-                        "              </p>" +
-                        "            </td>" +
-                        "          </tr>" +
-                        "          <tr>" +
-                        "            <td style=\"padding:0 24px 20px 24px;color:#5f6368;font-size:12px;line-height:1.6;\">" +
-                        "              <p style=\"margin:0 0 10px 0;\">" +
-                        "                Se non hai richiesto tu questo recupero, puoi ignorare questa email in totale sicurezza." +
-                        "              </p>" +
-                        "              <p style=\"margin:0;\">" +
-                        "                A presto,<br>" +
-                        "                <span style=\"color:#E65100;font-weight:600;\">Il team Foundly</span>" +
-                        "              </p>" +
-                        "            </td>" +
-                        "          </tr>" +
-                        "          <tr>" +
-                        "            <td style=\"padding:12px 24px 18px 24px;border-top:1px solid #eee;color:#9e9e9e;font-size:10px;text-align:center;\">" +
-                        "              Non rispondere a questa email: il messaggio è stato generato automaticamente." +
-                        "            </td>" +
-                        "          </tr>" +
-                        "        </table>" +
-                        "      </td>" +
-                        "    </tr>" +
-                        "  </table>" +
-                        "</body>" +
-                        "</html>";
-
-        MimeBodyPart textPart = new MimeBodyPart();
-        textPart.setText(testoPlain, StandardCharsets.UTF_8.name());
-
-        MimeBodyPart htmlPart = new MimeBodyPart();
-        htmlPart.setContent(testoHtml, "text/html; charset=UTF-8");
-
-        MimeMultipart multipart = new MimeMultipart("alternative");
-        multipart.addBodyPart(textPart);
-        multipart.addBodyPart(htmlPart);
-
-        message.setContent(multipart);
-
-        message.setHeader("X-Mailer", "Foundly Mailer");
-        message.setHeader("Content-Transfer-Encoding", "8bit");
-
-        Transport.send(message);
-    }
-}
-</file>
-
 <file path="src/main/webapp/css/login.css">
 :root {
     /* Palette Colori Arancione (Stile Google/Material) */
@@ -1992,6 +3187,42 @@ body {
         margin: 0 auto;
     }
 }
+
+/* --- FIX PER I RADIO BUTTON (Scelta Consegna) --- */
+
+/* Impedisce che il pallino diventi largo quanto tutto lo schermo */
+.input-group input[type="radio"] {
+    width: auto !important;       /* Torna alla dimensione naturale */
+    height: auto !important;
+    margin-right: 8px;            /* Spazio tra pallino e testo */
+    margin-bottom: 0;
+    padding: 0;
+    box-shadow: none;             /* Rimuove l'ombra degli input di testo */
+    border: none;
+    background-color: transparent;
+}
+
+/* Contenitore per mettere le due opzioni in riga */
+.radio-container {
+    display: flex;
+    gap: 25px;       /* Spazio tra le due opzioni */
+    margin-top: 8px;
+}
+
+/* Stile per l'etichetta cliccabile (pallino + testo) */
+.radio-label {
+    display: flex !important;     /* Forza allineamento orizzontale */
+    align-items: center;
+    font-weight: 500 !important;
+    color: #333 !important;
+    cursor: pointer;
+    margin-bottom: 0 !important;  /* Rimuove il margine sotto */
+    width: auto !important;       /* Non prendere tutta la riga */
+}
+
+.radio-label span {
+    font-size: 0.95rem;
+}
 </file>
 
 <file path="src/main/webapp/WEB-INF/jsp/recupero_password_codice.jsp">
@@ -2309,6 +3540,553 @@ TRUNCATE TABLE drop_point;
 SET FOREIGN_KEY_CHECKS = 1;
 </file>
 
+<file path="src/main/java/model/dao/UtenteDAO.java">
+package model.dao;
+
+import model.ConPool;
+import model.bean.Utente;
+import model.bean.enums.Ruolo;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class UtenteDAO {
+
+    public boolean doSave(Utente utente) {
+        String query = "INSERT INTO utente (username, email, password_hash, nome, cognome, " +
+                "telefono, immagine_profilo, punteggio, ruolo, badge) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, utente.getUsername());
+            ps.setString(2, utente.getEmail());
+            ps.setString(3, utente.getPasswordHash());
+            ps.setString(4, utente.getNome());
+            ps.setString(5, utente.getCognome());
+            ps.setString(6, utente.getTelefono());
+            ps.setString(7, utente.getImmagineProfilo());
+            ps.setInt(8, utente.getPunteggio());
+            ps.setString(9, utente.getRuolo().toString());
+            ps.setString(10, utente.getBadge());
+
+            int result = ps.executeUpdate();
+
+            if (result > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        utente.setId(generatedKeys.getLong(1));
+                    }
+                }
+                return true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Utente doRetrieveByEmail(String email) {
+        String query = "SELECT * FROM utente WHERE email = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToUtente(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Utente doRetrieveByUsername(String username) {
+        String query = "SELECT * FROM utente WHERE username = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, username);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToUtente(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<Utente> doRetrieveAll() {
+        List<Utente> utenti = new ArrayList<>();
+        String query = "SELECT * FROM utente";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                utenti.add(mapRowToUtente(rs));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return utenti;
+    }
+
+    /**
+     * Recupera un utente per id.
+     */
+    public Utente doRetrieveById(Long id) {
+        String query = "SELECT * FROM utente WHERE id = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setLong(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToUtente(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Aggiorna i dati base del profilo (username, nome, cognome).
+     */
+    public boolean updateProfilo(Utente utente) {
+        String query = "UPDATE utente SET username = ?, nome = ?, cognome = ? WHERE id = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, utente.getUsername());
+            ps.setString(2, utente.getNome());
+            ps.setString(3, utente.getCognome());
+            ps.setLong(4, utente.getId());
+
+            int updated = ps.executeUpdate();
+            return updated > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private Utente mapRowToUtente(ResultSet rs) throws SQLException {
+        Utente u = new Utente();
+        u.setId(rs.getLong("id"));
+        u.setUsername(rs.getString("username"));
+        u.setEmail(rs.getString("email"));
+        u.setPasswordHash(rs.getString("password_hash"));
+        u.setNome(rs.getString("nome"));
+        u.setCognome(rs.getString("cognome"));
+        u.setTelefono(rs.getString("telefono"));
+        u.setImmagineProfilo(rs.getString("immagine_profilo"));
+        u.setPunteggio(rs.getInt("punteggio"));
+
+        String ruoloStr = rs.getString("ruolo");
+        if (ruoloStr != null) {
+            u.setRuolo(Ruolo.valueOf(ruoloStr));
+        }
+
+        u.setBadge(rs.getString("badge"));
+        return u;
+    }
+
+    /**
+     * Aggiorna l'hash della password per l'utente con la email specificata.
+     *
+     * @param email     email dell'utente
+     * @param nuovoHash nuovo valore di password_hash (già hashato)
+     * @return true se è stata aggiornata almeno una riga, false altrimenti
+     */
+    public boolean updatePasswordByEmail(String email, String nuovoHash) {
+        String query = "UPDATE utente SET password_hash = ? WHERE email = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, nuovoHash);
+            ps.setString(2, email);
+
+            int updated = ps.executeUpdate();
+            return updated > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    /**
+     * Aggiorna punteggio e badge per un utente.
+     */
+    public boolean updatePunteggioEBadge(Utente utente) {
+        String sql = "UPDATE utente SET punteggio = ?, badge = ? WHERE id = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, utente.getPunteggio());
+            ps.setString(2, utente.getBadge());
+            ps.setLong(3, utente.getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+}
+</file>
+
+<file path="src/main/java/model/service/DropPointService.java">
+package model.service;
+
+import model.bean.DropPoint;
+import model.bean.enums.StatoDropPoint;
+import model.dao.DropPointDAO;
+import model.utils.PasswordUtils;
+
+public class DropPointService {
+
+    private final DropPointDAO dropPointDAO = new DropPointDAO();
+
+    // NOTA: Ho corretto l'ordine: prima latitudine, poi longitudine (come nella Servlet)
+    public boolean registraDropPoint(String nomeAttivita, String email, String password,
+                                     String indirizzo, String citta, String provincia,
+                                     String telefono, String orari,
+                                     Double latitudine, Double longitudine) {
+
+        if(dropPointDAO.doRetrieveByEmail(email) != null) return false;
+
+        DropPoint dp = new DropPoint();
+        dp.setNomeAttivita(nomeAttivita);
+        dp.setEmail(email);
+        dp.setPasswordHash(PasswordUtils.hashPassword(password));
+        dp.setIndirizzo(indirizzo);
+        dp.setCitta(citta);
+        dp.setProvincia(provincia);
+        dp.setTelefono(telefono);
+        dp.setOrariApertura(orari);
+
+        // CORRETTO: Uso dei setter
+        dp.setLatitudine(latitudine);
+        dp.setLongitudine(longitudine);
+
+        // CORRETTO: Uso Enum e valori default obbligatori nel DB
+        dp.setStato(StatoDropPoint.IN_ATTESA);
+        dp.setRitiriEffettuati(0);
+        dp.setImmagine("default.png");
+
+        return dropPointDAO.doSave(dp);
+    }
+
+    public DropPoint login(String email, String password) {
+        DropPoint dp = dropPointDAO.doRetrieveByEmail(email);
+        if(dp == null) return null;
+        if(PasswordUtils.checkPassword(password, dp.getPasswordHash())) return dp;
+        return null;
+    }
+
+     /**
+      * Recupera la lista di tutti i Drop-Point approvati.
+     */
+    public java.util.List<DropPoint> findAllApprovati() {
+        return dropPointDAO.doRetrieveAllApprovati();
+    }
+}
+</file>
+
+<file path="src/main/java/model/service/EmailService.java">
+package model.service;
+
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Properties;
+
+public class EmailService {
+    private final Session session;
+    private final String mittente;
+    private final String nomeMittente = "Foundly";
+
+    public EmailService() {
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        this.mittente = "foundly.app@gmail.com";
+        final String username = "foundly.app@gmail.com";
+        final String password = System.getenv("SMTP_PASSKEY"); // app password
+
+        this.session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+    }
+
+    public void inviaCodiceRecuperoPassword(String destinatario, String codice)
+            throws MessagingException {
+
+        MimeMessage message = new MimeMessage(session);
+
+        try {
+            message.setFrom(new InternetAddress(mittente, nomeMittente, StandardCharsets.UTF_8.name()));
+        } catch (Exception e) {
+            message.setFrom(new InternetAddress(mittente));
+        }
+
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
+        message.setSubject("Codice per il recupero password Foundly", StandardCharsets.UTF_8.name());
+
+        // versione testo semplice
+        String testoPlain =
+                "Ciao,\n\n" +
+                        "hai richiesto il recupero della password per il tuo account Foundly.\n\n" +
+                        "Questo è il tuo codice di verifica:\n\n" +
+                        codice + "\n\n" +
+                        "Inseriscilo nella pagina di recupero password e scegli una nuova password.\n\n" +
+                        "Se non hai richiesto tu questo recupero, puoi ignorare questa email.\n\n" +
+                        "Il team Foundly";
+
+        // versione HTML più curata
+        String testoHtml =
+                "<!DOCTYPE html>" +
+                        "<html lang=\"it\">" +
+                        "<head>" +
+                        "  <meta charset=\"UTF-8\">" +
+                        "  <title>Codice recupero password Foundly</title>" +
+                        "</head>" +
+                        "<body style=\"margin:0;padding:0;background-color:#f5f5f5;font-family:Roboto,Arial,sans-serif;\">" +
+                        "  <table align=\"center\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding:24px 0;\">" +
+                        "    <tr>" +
+                        "      <td>" +
+                        "        <table align=\"center\" cellpadding=\"0\" cellspacing=\"0\" " +
+                        "               style=\"max-width:520px;width:100%;background-color:#ffffff;border-radius:12px;" +
+                        "                      box-shadow:0 4px 16px rgba(0,0,0,0.06);overflow:hidden;\">" +
+                        "          <tr>" +
+                        "            <td style=\"padding:18px 24px;background:linear-gradient(135deg,#FB8C00,#F57C00);color:#ffffff;\">" +
+                        "              <div style=\"font-size:20px;font-weight:700;\">Foundly</div>" +
+                        "              <div style=\"font-size:12px;opacity:0.9;\">Recupero password</div>" +
+                        "            </td>" +
+                        "          </tr>" +
+                        "          <tr>" +
+                        "            <td style=\"padding:24px 24px 16px 24px;color:#202124;font-size:14px;line-height:1.6;\">" +
+                        "              <p style=\"margin:0 0 12px 0;\">Ciao,</p>" +
+                        "              <p style=\"margin:0 0 12px 0;\">" +
+                        "                hai richiesto il recupero della password per il tuo account <strong>Foundly</strong>." +
+                        "              </p>" +
+                        "              <p style=\"margin:0 0 8px 0;\">Questo è il tuo codice di verifica:</p>" +
+                        "            </td>" +
+                        "          </tr>" +
+                        "          <tr>" +
+                        "            <td style=\"padding:0 24px 16px 24px;\">" +
+                        "              <div style=\"text-align:center;margin:8px 0 16px 0;\">" +
+                        "                <span style=\"" +
+                        "                       display:inline-block;" +
+                        "                       padding:12px 24px;" +
+                        "                       border-radius:999px;" +
+                        "                       background-color:#FFF3E0;" +
+                        "                       color:#E65100;" +
+                        "                       font-size:22px;" +
+                        "                       font-weight:700;" +
+                        "                       letter-spacing:4px;" +
+                        "                       font-family:monospace;\">" +
+                        codice +
+                        "                </span>" +
+                        "              </div>" +
+                        "              <p style=\"margin:0 0 8px 0;font-size:13px;color:#5f6368;text-align:center;\">" +
+                        "                Inserisci questo codice nella pagina di <strong>Recupero password</strong> e scegli una nuova password." +
+                        "              </p>" +
+                        "            </td>" +
+                        "          </tr>" +
+                        "          <tr>" +
+                        "            <td style=\"padding:0 24px 20px 24px;color:#5f6368;font-size:12px;line-height:1.6;\">" +
+                        "              <p style=\"margin:0 0 10px 0;\">" +
+                        "                Se non hai richiesto tu questo recupero, puoi ignorare questa email in totale sicurezza." +
+                        "              </p>" +
+                        "              <p style=\"margin:0;\">" +
+                        "                A presto,<br>" +
+                        "                <span style=\"color:#E65100;font-weight:600;\">Il team Foundly</span>" +
+                        "              </p>" +
+                        "            </td>" +
+                        "          </tr>" +
+                        "          <tr>" +
+                        "            <td style=\"padding:12px 24px 18px 24px;border-top:1px solid #eee;color:#9e9e9e;font-size:10px;text-align:center;\">" +
+                        "              Non rispondere a questa email: il messaggio è stato generato automaticamente." +
+                        "            </td>" +
+                        "          </tr>" +
+                        "        </table>" +
+                        "      </td>" +
+                        "    </tr>" +
+                        "  </table>" +
+                        "</body>" +
+                        "</html>";
+
+        MimeBodyPart textPart = new MimeBodyPart();
+        textPart.setText(testoPlain, StandardCharsets.UTF_8.name());
+
+        MimeBodyPart htmlPart = new MimeBodyPart();
+        htmlPart.setContent(testoHtml, "text/html; charset=UTF-8");
+
+        MimeMultipart multipart = new MimeMultipart("alternative");
+        multipart.addBodyPart(textPart);
+        multipart.addBodyPart(htmlPart);
+
+        message.setContent(multipart);
+
+        message.setHeader("X-Mailer", "Foundly Mailer");
+        message.setHeader("Content-Transfer-Encoding", "8bit");
+
+        Transport.send(message);
+    }
+}
+</file>
+
+<file path="src/main/java/model/utente/ConnectionTest.java">
+package model.utente;
+
+import model.bean.Utente;
+import model.bean.enums.Ruolo;
+import model.dao.UtenteDAO;
+import model.utils.PasswordUtils; // Importa la nuova classe utility
+
+public class ConnectionTest {
+    public static void main(String[] args) {
+        System.out.println("🚀 Inizio Test Sicurezza Password...");
+
+        UtenteDAO utenteDAO = new UtenteDAO();
+        long timeSeed = System.currentTimeMillis();
+
+        // 1. Definiamo una password in chiaro
+        String passwordInChiaro = "Segreto123!";
+
+        System.out.println("🔑 Password utente: " + passwordInChiaro);
+
+        // 2. Creiamo l'hash
+        String passwordHashata = PasswordUtils.hashPassword(passwordInChiaro);
+        System.out.println("🔒 Hash generato (da salvare nel DB): " + passwordHashata);
+
+        // 3. Creiamo l'utente con l'hash
+        Utente nuovoUtente = new Utente();
+        nuovoUtente.setNome("Luigi");
+        nuovoUtente.setCognome("Verdi");
+        nuovoUtente.setUsername("luigi_" + timeSeed);
+        nuovoUtente.setEmail("luigi." + timeSeed + "@secure.com");
+
+        // IMPORTANTE: Settiamo l'hash, NON la password in chiaro!
+        nuovoUtente.setPasswordHash(passwordHashata);
+
+        nuovoUtente.setTelefono("3339998888");
+        nuovoUtente.setImmagineProfilo("img/avatar.png");
+        nuovoUtente.setRuolo(Ruolo.UTENTE_BASE);
+        nuovoUtente.setBadge("OCCHIO_DI_FALCO");
+
+        try {
+            // 4. Salviamo nel DB
+            if (utenteDAO.doSave(nuovoUtente)) {
+                System.out.println("✅ Utente salvato con password criptata.");
+            }
+
+            // 5. Simuliamo il LOGIN
+            System.out.println("\n--- Simulazione Login ---");
+            String emailLogin = nuovoUtente.getEmail();
+            String passwordInseritaLogin = "Segreto123!"; // Quella giusta
+            String passwordErrata = "Sbagliata!";
+
+            // Recuperiamo l'utente dal DB
+            Utente utenteDb = utenteDAO.doRetrieveByEmail(emailLogin);
+
+            if (utenteDb != null) {
+                // Test Password Corretta
+                boolean accessoConsentito = PasswordUtils.checkPassword(passwordInseritaLogin, utenteDb.getPasswordHash());
+                System.out.println("Tentativo con password corretta: " + (accessoConsentito ? "✅ ACCESSO RIUSCITO" : "❌ ERRORE"));
+
+                // Test Password Errata
+                boolean accessoNegato = PasswordUtils.checkPassword(passwordErrata, utenteDb.getPasswordHash());
+                System.out.println("Tentativo con password errata:   " + (!accessoNegato ? "✅ ACCESSO NEGATO (Corretto)" : "❌ ERRORE DI SICUREZZA"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+</file>
+
+<file path="src/main/java/model/ConPool.java">
+package model;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class ConPool {
+    private static final String URL = "jdbc:mysql://foundly-db-salvolepore7.j.aivencloud.com:21893/defaultdb"
+            + "?useSSL=true"
+            + "&requireSSL=true"
+            + "&verifyServerCertificate=false"
+            + "&allowPublicKeyRetrieval=true"
+            + "&serverTimezone=Europe/Rome"
+            + "&enabledTLSProtocols=TLSv1.2,TLSv1.3";
+
+    private static final String USER = "avnadmin";
+    private static final String PASSWORD = System.getenv("DB_PASSKEY"); //Ciao
+
+    static {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Driver MySQL non trovato!", e);
+        }
+    }
+
+    /**
+     * Restituisce una connessione attiva al database.
+     */
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+}
+</file>
+
 <file path="src/main/java/controller/RecuperoPasswordServlet.java">
 package controller;
 
@@ -2497,57 +4275,6 @@ public class RecuperoPasswordServlet extends HttpServlet {
 }
 </file>
 
-<file path="src/main/java/model/service/DropPointService.java">
-package model.service;
-
-import model.bean.DropPoint;
-import model.bean.enums.StatoDropPoint;
-import model.dao.DropPointDAO;
-import model.utils.PasswordUtils;
-
-public class DropPointService {
-
-    private final DropPointDAO dropPointDAO = new DropPointDAO();
-
-    // NOTA: Ho corretto l'ordine: prima latitudine, poi longitudine (come nella Servlet)
-    public boolean registraDropPoint(String nomeAttivita, String email, String password,
-                                     String indirizzo, String citta, String provincia,
-                                     String telefono, String orari,
-                                     Double latitudine, Double longitudine) {
-
-        if(dropPointDAO.doRetrieveByEmail(email) != null) return false;
-
-        DropPoint dp = new DropPoint();
-        dp.setNomeAttivita(nomeAttivita);
-        dp.setEmail(email);
-        dp.setPasswordHash(PasswordUtils.hashPassword(password));
-        dp.setIndirizzo(indirizzo);
-        dp.setCitta(citta);
-        dp.setProvincia(provincia);
-        dp.setTelefono(telefono);
-        dp.setOrariApertura(orari);
-
-        // CORRETTO: Uso dei setter
-        dp.setLatitudine(latitudine);
-        dp.setLongitudine(longitudine);
-
-        // CORRETTO: Uso Enum e valori default obbligatori nel DB
-        dp.setStato(StatoDropPoint.IN_ATTESA);
-        dp.setRitiriEffettuati(0);
-        dp.setImmagine("default.png");
-
-        return dropPointDAO.doSave(dp);
-    }
-
-    public DropPoint login(String email, String password) {
-        DropPoint dp = dropPointDAO.doRetrieveByEmail(email);
-        if(dp == null) return null;
-        if(PasswordUtils.checkPassword(password, dp.getPasswordHash())) return dp;
-        return null;
-    }
-}
-</file>
-
 <file path="src/main/java/model/service/UtenteService.java">
 package model.service;
 
@@ -2654,122 +4381,87 @@ public class UtenteService {
         String nuovoHash = PasswordUtils.hashPassword(nuovaPassword);
         utente.setPasswordHash(nuovoHash);
 
-        // Qui hai due possibilità:
-        // 1) se hai un metodo generico di update (es. doUpdate(utente)):
-        //    return utenteDAO.doUpdate(utente);
-        //
-        // 2) oppure definisci nel DAO un metodo dedicato:
-        //    boolean updatePasswordByEmail(String email, String nuovoHash)
-        //    e lo usi così:
-
         return utenteDAO.updatePasswordByEmail(email, nuovoHash);
     }
-}
-</file>
 
-<file path="src/main/java/model/utente/ConnectionTest.java">
-package model.utente;
-
-import model.bean.Utente;
-import model.bean.enums.Ruolo;
-import model.dao.UtenteDAO;
-import model.utils.PasswordUtils; // Importa la nuova classe utility
-
-public class ConnectionTest {
-    public static void main(String[] args) {
-        System.out.println("🚀 Inizio Test Sicurezza Password...");
-
-        UtenteDAO utenteDAO = new UtenteDAO();
-        long timeSeed = System.currentTimeMillis();
-
-        // 1. Definiamo una password in chiaro
-        String passwordInChiaro = "Segreto123!";
-
-        System.out.println("🔑 Password utente: " + passwordInChiaro);
-
-        // 2. Creiamo l'hash
-        String passwordHashata = PasswordUtils.hashPassword(passwordInChiaro);
-        System.out.println("🔒 Hash generato (da salvare nel DB): " + passwordHashata);
-
-        // 3. Creiamo l'utente con l'hash
-        Utente nuovoUtente = new Utente();
-        nuovoUtente.setNome("Luigi");
-        nuovoUtente.setCognome("Verdi");
-        nuovoUtente.setUsername("luigi_" + timeSeed);
-        nuovoUtente.setEmail("luigi." + timeSeed + "@secure.com");
-
-        // IMPORTANTE: Settiamo l'hash, NON la password in chiaro!
-        nuovoUtente.setPasswordHash(passwordHashata);
-
-        nuovoUtente.setTelefono("3339998888");
-        nuovoUtente.setImmagineProfilo("img/avatar.png");
-        nuovoUtente.setRuolo(Ruolo.UTENTE_BASE);
-        nuovoUtente.setBadge("OCCHIO_DI_FALCO");
-
-        try {
-            // 4. Salviamo nel DB
-            if (utenteDAO.doSave(nuovoUtente)) {
-                System.out.println("✅ Utente salvato con password criptata.");
-            }
-
-            // 5. Simuliamo il LOGIN
-            System.out.println("\n--- Simulazione Login ---");
-            String emailLogin = nuovoUtente.getEmail();
-            String passwordInseritaLogin = "Segreto123!"; // Quella giusta
-            String passwordErrata = "Sbagliata!";
-
-            // Recuperiamo l'utente dal DB
-            Utente utenteDb = utenteDAO.doRetrieveByEmail(emailLogin);
-
-            if (utenteDb != null) {
-                // Test Password Corretta
-                boolean accessoConsentito = PasswordUtils.checkPassword(passwordInseritaLogin, utenteDb.getPasswordHash());
-                System.out.println("Tentativo con password corretta: " + (accessoConsentito ? "✅ ACCESSO RIUSCITO" : "❌ ERRORE"));
-
-                // Test Password Errata
-                boolean accessoNegato = PasswordUtils.checkPassword(passwordErrata, utenteDb.getPasswordHash());
-                System.out.println("Tentativo con password errata:   " + (!accessoNegato ? "✅ ACCESSO NEGATO (Corretto)" : "❌ ERRORE DI SICUREZZA"));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-}
-</file>
-
-<file path="src/main/java/model/ConPool.java">
-package model;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
-public class ConPool {
-    private static final String URL = "jdbc:mysql://foundly-db-salvolepore7.j.aivencloud.com:21893/defaultdb"
-            + "?useSSL=true"
-            + "&requireSSL=true"
-            + "&verifyServerCertificate=false"
-            + "&allowPublicKeyRetrieval=true"
-            + "&serverTimezone=Europe/Rome"
-            + "&enabledTLSProtocols=TLSv1.2,TLSv1.3";
-
-    private static final String USER = "avnadmin";
-    private static final String PASSWORD = System.getenv("DB_PASSKEY"); //Ciao
-
-    static {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Driver MySQL non trovato!", e);
-        }
-    }
+    /* =========================================================
+       METODI PER GESTIONE PROFILO
+       ========================================================= */
 
     /**
-     * Restituisce una connessione attiva al database.
+     * Aggiorna i dati base del profilo (username, nome, cognome).
+     * Si aspetta un Utente già caricato (es. da sessione) con id valorizzato.
+     *
+     * @param utente utente da aggiornare
+     * @return true se l'update su DB va a buon fine, false altrimenti
      */
-    public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+    public boolean aggiornaProfilo(Utente utente) {
+        // id è un long primitivo: uso un controllo > 0 invece di null
+        if (utente == null || utente.getId() <= 0) {
+            return false;
+        }
+
+        // Controllo eventuale duplicato di username
+        Utente esistente = utenteDAO.doRetrieveByUsername(utente.getUsername());
+        if (esistente != null && esistente.getId() != utente.getId()) {
+            // c'è già un altro utente con questo username
+            return false;
+        }
+
+        return utenteDAO.updateProfilo(utente);
+    }
+
+
+    /**
+     * (Opzionale) Recupera utente per id, utile se in futuro
+     * ti serve ricaricare i dati dal DB.
+     */
+    public Utente trovaPerId(long id) {
+        return utenteDAO.doRetrieveById(id);
+    }
+    /* ==========================
+   LOGICA BADGE/PUNTEGGIO
+   ========================== */
+
+    /**
+     * Ritorna il nome del badge (stringa ENUM) in base al punteggio.
+     * 0-2 punti  -> OCCHIO_DI_FALCO
+     * 3-4 punti  -> DETECTIVE
+     * >=5 punti  -> SHERLOCK_HOLMES
+     */
+    // in UtenteService
+
+    /**
+     * 0-2 punti  -> OCCHIO_DI_FALCO
+     * 3-4 punti  -> DETECTIVE
+     * >=5 punti  -> SHERLOCK_HOLMES
+     */
+    private String calcolaBadgePerPunteggio(int punti) {
+        if (punti >= 5) {
+            return "SHERLOCK_HOLMES";
+        } else if (punti >= 3) {
+            return "DETECTIVE";
+        } else {
+            return "OCCHIO_DI_FALCO";
+        }
+    }
+
+    public boolean aggiornaPunteggioEBadge(Utente utente, int deltaPunti) {
+        if (utente == null || utente.getId() <= 0) {
+            return false;
+        }
+
+        int nuovoPunteggio = utente.getPunteggio() + deltaPunti;
+        if (nuovoPunteggio < 0) {
+            nuovoPunteggio = 0;
+        }
+
+        String nuovoBadge = calcolaBadgePerPunteggio(nuovoPunteggio);
+
+        utente.setPunteggio(nuovoPunteggio);
+        utente.setBadge(nuovoBadge);
+
+        return utenteDAO.updatePunteggioEBadge(utente);
     }
 }
 </file>
@@ -3088,6 +4780,23 @@ public class ConPool {
             <artifactId>jakarta.mail</artifactId>
             <version>2.0.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20231013</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.servlet.jsp.jstl</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+            <version>3.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -3109,6 +4818,8 @@ import model.ConPool;
 import model.bean.DropPoint;
 import model.bean.enums.StatoDropPoint;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DropPointDAO {
 
@@ -3190,11 +4901,105 @@ public class DropPointDAO {
         }
         return null;
     }
+
+    public List<DropPoint> doRetrieveAllApprovati() {
+        List<DropPoint> list = new ArrayList<>();
+        String query = "SELECT * FROM drop_point WHERE stato = 'APPROVATO'";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                DropPoint dp = new DropPoint();
+                dp.setId(rs.getLong("id"));
+                dp.setNomeAttivita(rs.getString("nome_attivita"));
+                dp.setIndirizzo(rs.getString("indirizzo"));
+                dp.setCitta(rs.getString("citta"));
+                list.add(dp);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+}
+</file>
+
+<file path="src/main/java/controller/LoginServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.DropPoint;
+import model.bean.Utente;
+import model.service.DropPointService;
+import model.service.UtenteService;
+
+import java.io.IOException;
+
+@WebServlet(name = "LoginServlet", value = "/login")
+public class LoginServlet extends HttpServlet {
+
+    private final UtenteService utenteService = new UtenteService();
+    private final DropPointService dropPointService = new DropPointService();
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
+
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+
+        HttpSession session = request.getSession();
+
+        // 1. Login come UTENTE (cittadino)
+        Utente utente = utenteService.login(email, password);
+        if (utente != null) {
+            session.setAttribute("utente", utente); // usato in index.jsp
+            session.setAttribute("ruoloLoggato", "CITTADINO");
+            session.setMaxInactiveInterval(30 * 60);
+
+            response.sendRedirect(request.getContextPath() + "/index");
+            return;
+        }
+
+        // 2. Login come DROP-POINT
+        DropPoint dropPoint = dropPointService.login(email, password);
+        if (dropPoint != null) {
+            // opzionale: tieni un attributo specifico
+            session.setAttribute("dropPoint", dropPoint);
+
+            // IMPORTANTE: metto anche "utente" così index.jsp lo vede come loggato
+            session.setAttribute("utente", dropPoint);
+
+            session.setAttribute("ruoloLoggato", "DROPPOINT");
+            session.setMaxInactiveInterval(30 * 60);
+
+            response.sendRedirect(request.getContextPath() + "/index");
+            return;
+        }
+
+        // 3. Nessun login valido
+        request.setAttribute("errore", "Email o Password non validi.");
+        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
+    }
 }
 </file>
 
 <file path="src/main/webapp/WEB-INF/jsp/index.jsp">
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="model.bean.Utente" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -3219,7 +5024,7 @@ public class DropPointDAO {
         <a href="${pageContext.request.contextPath}/index" class="nav-item">
             <span class="material-icons">home</span> Home
         </a>
-        <a href="#" class="nav-item">
+        <a href="crea-segnalazione" class="nav-item">
             <span class="material-icons">add_circle_outline</span> Crea Segnalazione
         </a>
         <a href="#" class="nav-item">
@@ -3234,11 +5039,34 @@ public class DropPointDAO {
     </div>
 
     <%
-        Object utenteLoggato = session.getAttribute("utente");
+        Utente utenteLoggato = (Utente) session.getAttribute("utente");
         if (utenteLoggato != null) {
     %>
-    <!-- Utente loggato: mostra avatar -->
-    <div class="user-avatar"></div>
+    <!-- Utente loggato: avatar + dropdown -->
+    <div class="user-menu">
+        <button type="button" class="user-avatar-btn">
+            <div class="user-avatar"></div>
+        </button>
+
+        <div class="user-dropdown">
+            <div class="user-dropdown-header">
+                <div class="user-email"><%= utenteLoggato.getEmail() %></div>
+                <div class="user-points-row">
+                    <span class="points-label">punti</span>
+                    <span class="points-value"><%= utenteLoggato.getPunteggio() %></span>
+                </div>
+            </div>
+
+            <a href="${pageContext.request.contextPath}/profilo" class="user-dropdown-item">
+                <span class="material-icons">person</span>
+                <span>Profilo</span>
+            </a>
+            <a href="${pageContext.request.contextPath}/logout" class="user-dropdown-item user-dropdown-item-logout">
+                <span class="material-icons">logout</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
     <%
     } else {
     %>
@@ -3258,7 +5086,7 @@ public class DropPointDAO {
         Foundly ti aiuta a ritrovare oggetti e animali smarriti grazie alla nostra
         community. Segnala, cerca e restituisci!
     </p>
-    <a href="#" class="btn-cta-hero">
+    <a href="crea-segnalazione" class="btn-cta-hero">
         <span class="material-icons">inventory_2</span>
         Crea Segnalazione
     </a>
@@ -3266,7 +5094,6 @@ public class DropPointDAO {
 
 <div class="search-wrapper">
     <div class="search-card">
-
         <form action="search" method="GET">
             <div class="search-top">
                 <div class="input-box">
@@ -3321,141 +5148,67 @@ public class DropPointDAO {
 <section class="recent-section">
     <div class="section-header">
         <h2>Segnalazioni Recenti</h2>
-        <span class="result-count">7 risultati</span>
+        <%-- Conta quanti elementi ci sono nella lista --%>
+        <span class="result-count">${segnalazioni != null ? segnalazioni.size() : 0} risultati</span>
     </div>
 
     <div class="cards-grid">
 
-        <article class="card">
-            <div class="card-badges">
-                <span class="badge badge-active">Attiva</span>
-                <span class="badge badge-type">Oggetto</span>
-            </div>
+        <%-- Se la lista è vuota --%>
+        <c:if test="${empty segnalazioni}">
+            <p style="color: #666; font-style: italic;">Nessuna segnalazione recente trovata.</p>
+        </c:if>
 
-            <div class="card-image-placeholder">
-                <span class="material-icons">inventory_2</span>
-            </div>
-
-            <div class="card-footer">
-                <div class="card-title">Telefono</div>
-                <div class="card-info">
-                    Salerno • 2 ore fa
+        <%-- Ciclo sulle segnalazioni reali --%>
+        <c:forEach var="s" items="${segnalazioni}">
+            <article class="card">
+                <div class="card-badges">
+                    <span class="badge badge-active">${s.stato}</span>
+                    <span class="badge badge-type">${s.tipoSegnalazione}</span>
                 </div>
-            </div>
-        </article>
 
-        <article class="card">
-            <div class="card-badges">
-                <span class="badge badge-active">Attiva</span>
-                <span class="badge badge-type">Oggetto</span>
-            </div>
+                <div class="card-image-placeholder"
+                     style="${not empty s.immagine and s.immagine != 'default.png' ? 'background-image: url(' += pageContext.request.contextPath += '/' += s.immagine += '); background-size: cover; background-position: center;' : ''}">
 
-            <div class="card-image-placeholder">
-                <span class="material-icons">inventory_2</span>
-            </div>
-
-            <div class="card-footer">
-                <div class="card-title">borraccia</div>
-                <div class="card-info">
-                    Fisciano • Ieri
+                    <c:if test="${empty s.immagine or s.immagine == 'default.png'}">
+                        <span class="material-icons">inventory_2</span>
+                    </c:if>
                 </div>
-            </div>
-        </article>
 
-        <article class="card">
-            <div class="card-badges">
-                <span class="badge badge-active">Attiva</span>
-                <span class="badge badge-type">Oggetto</span>
-            </div>
-
-            <div class="card-image-placeholder">
-                <span class="material-icons">inventory_2</span>
-            </div>
-
-            <div class="card-footer">
-                <div class="card-title">dad</div>
-                <div class="card-info">
-                    Baronissi • 3 giorni fa
+                <div class="card-footer">
+                    <div class="card-title">${s.titolo}</div>
+                    <div class="card-info">
+                            ${s.citta} •
+                        <fmt:formatDate value="${s.dataRitrovamento}" pattern="dd MMM" />
+                    </div>
                 </div>
-            </div>
-        </article>
+            </article>
+        </c:forEach>
 
     </div>
 </section>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const userMenu = document.querySelector(".user-menu");
+        if (!userMenu) return;
+
+        const btn = userMenu.querySelector(".user-avatar-btn");
+
+        btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            userMenu.classList.toggle("open");
+        });
+
+        // chiude cliccando fuori
+        document.addEventListener("click", function () {
+            userMenu.classList.remove("open");
+        });
+    });
+</script>
+
 </body>
 </html>
-</file>
-
-<file path="src/main/java/controller/LoginServlet.java">
-package controller;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import model.bean.DropPoint;
-import model.bean.Utente;
-import model.service.DropPointService;
-import model.service.UtenteService;
-
-import java.io.IOException;
-
-@WebServlet(name = "LoginServlet", value = "/login")
-public class LoginServlet extends HttpServlet {
-
-    private final UtenteService utenteService = new UtenteService();
-    private final DropPointService dropPointService = new DropPointService();
-
-    @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response) throws ServletException, IOException {
-
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-
-        HttpSession session = request.getSession();
-
-        // 1. Login come UTENTE (cittadino)
-        Utente utente = utenteService.login(email, password);
-        if (utente != null) {
-            session.setAttribute("utente", utente);         // usato in index.jsp
-            session.setAttribute("ruoloLoggato", "CITTADINO");
-            session.setMaxInactiveInterval(30 * 60);
-
-            response.sendRedirect(request.getContextPath() + "/index");
-            return;
-        }
-
-        // 2. Login come DROP-POINT
-        DropPoint dropPoint = dropPointService.login(email, password);
-        if (dropPoint != null) {
-            // opzionale: tieni un attributo specifico
-            session.setAttribute("dropPoint", dropPoint);
-
-            // IMPORTANTE: metto anche "utente" così index.jsp lo vede come loggato
-            session.setAttribute("utente", dropPoint);
-
-            session.setAttribute("ruoloLoggato", "DROPPOINT");
-            session.setMaxInactiveInterval(30 * 60);
-
-            response.sendRedirect(request.getContextPath() + "/index");
-            return;
-        }
-
-        // 3. Nessun login valido
-        request.setAttribute("errore", "Email o Password non validi.");
-        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
-    }
-}
 </file>
 
 <file path="src/main/webapp/WEB-INF/jsp/registrazione_droppoint.jsp">
@@ -4308,6 +6061,106 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+/* ================= USER MENU DROPDOWN ================= */
+
+.user-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar-btn {
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+/* .user-avatar esiste già: lo riuso, quindi non toccarlo */
+
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 230px;
+    background-color: #FFFFFF;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    padding: 10px 0;
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 30;
+}
+
+/* stato aperto */
+.user-menu.open .user-dropdown {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* header con email e punti */
+
+.user-dropdown-header {
+    padding: 8px 14px 10px;
+    border-bottom: 1px solid #F1F3F4;
+}
+
+.user-email {
+    font-size: 0.85rem;
+    color: #5F6368;
+    margin-bottom: 4px;
+    word-break: break-all;
+}
+
+.user-points-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.points-label {
+    font-size: 0.75rem;
+    color: #FFAB91;
+}
+
+.points-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #E65100;
+}
+
+/* voci menu Profilo / Logout */
+
+.user-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: #202124;
+    transition: background-color 0.15s ease;
+}
+
+.user-dropdown-item .material-icons {
+    font-size: 20px;
+    color: #757575;
+}
+
+.user-dropdown-item:hover {
+    background-color: #FFF3E0;
+}
+
+.user-dropdown-item-logout {
+    color: #D32F2F;
+}
+
+.user-dropdown-item-logout .material-icons {
+    color: #D32F2F;
 }
 </file>
 

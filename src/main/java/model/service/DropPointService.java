@@ -45,4 +45,11 @@ public class DropPointService {
         if(PasswordUtils.checkPassword(password, dp.getPasswordHash())) return dp;
         return null;
     }
+
+     /**
+      * Recupera la lista di tutti i Drop-Point approvati.
+     */
+    public java.util.List<DropPoint> findAllApprovati() {
+        return dropPointDAO.doRetrieveAllApprovati();
+    }
 }

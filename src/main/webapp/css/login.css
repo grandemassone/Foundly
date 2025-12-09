@@ -386,3 +386,39 @@ body {
         margin: 0 auto;
     }
 }
+
+/* --- FIX PER I RADIO BUTTON (Scelta Consegna) --- */
+
+/* Impedisce che il pallino diventi largo quanto tutto lo schermo */
+.input-group input[type="radio"] {
+    width: auto !important;       /* Torna alla dimensione naturale */
+    height: auto !important;
+    margin-right: 8px;            /* Spazio tra pallino e testo */
+    margin-bottom: 0;
+    padding: 0;
+    box-shadow: none;             /* Rimuove l'ombra degli input di testo */
+    border: none;
+    background-color: transparent;
+}
+
+/* Contenitore per mettere le due opzioni in riga */
+.radio-container {
+    display: flex;
+    gap: 25px;       /* Spazio tra le due opzioni */
+    margin-top: 8px;
+}
+
+/* Stile per l'etichetta cliccabile (pallino + testo) */
+.radio-label {
+    display: flex !important;     /* Forza allineamento orizzontale */
+    align-items: center;
+    font-weight: 500 !important;
+    color: #333 !important;
+    cursor: pointer;
+    margin-bottom: 0 !important;  /* Rimuove il margine sotto */
+    width: auto !important;       /* Non prendere tutta la riga */
+}
+
+.radio-label span {
+    font-size: 0.95rem;
+}
