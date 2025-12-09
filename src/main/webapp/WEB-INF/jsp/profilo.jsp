@@ -2,6 +2,8 @@
 <%@ page import="model.bean.Utente" %>
 <%@ page import="model.bean.enums.Ruolo" %>
 
+
+
 <%
     Utente utente = (Utente) session.getAttribute("utente");
     if (utente == null) {
@@ -68,112 +70,7 @@
 </head>
 <body class="page-enter">
 
-<nav class="navbar">
-    <a href="${pageContext.request.contextPath}/index" class="brand">
-        <div class="brand-icon">
-            <img src="<%= request.getContextPath() %>/assets/images/logo.png" alt="logo_foundly">
-        </div>
-    </a>
-
-    <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/index" class="nav-item">
-            <span class="material-icons">home</span> Home
-        </a>
-        <a href="#" class="nav-item">
-            <span class="material-icons">add_circle_outline</span> Crea Segnalazione
-        </a>
-        <a href="#" class="nav-item">
-            <span class="material-icons">inventory</span> Segnalazioni
-        </a>
-        <a href="#" class="nav-item">
-            <span class="material-icons">place</span> Drop-Point
-        </a>
-        <a href="#" class="nav-item">
-            <span class="material-icons">emoji_events</span> Classifica
-        </a>
-    </div>
-
-    <%
-        Utente utenteLoggato = (Utente) session.getAttribute("utente");
-
-        String navAvatarPath = null;
-        boolean navHasAvatar = false;
-
-        if (utenteLoggato != null) {
-            navAvatarPath = utenteLoggato.getImmagineProfilo();
-            if (navAvatarPath != null && !navAvatarPath.trim().isEmpty()) {
-                try {
-                    java.io.File navFile = new java.io.File(
-                            application.getRealPath("/" + navAvatarPath)
-                    );
-                    navHasAvatar = navFile.exists();
-                    if (!navHasAvatar) {
-                        navAvatarPath = null;
-                    }
-                } catch (Exception e) {
-                    navHasAvatar = false;
-                    navAvatarPath = null;
-                }
-            }
-        }
-
-        if (utenteLoggato != null) {
-    %>
-    <div class="user-menu">
-        <button type="button" class="user-avatar-btn">
-            <% if (navHasAvatar) { %>
-            <img src="<%= request.getContextPath() + "/" + navAvatarPath %>"
-                 alt=""
-                 class="user-avatar-img">
-            <% } else { %>
-            <div class="user-avatar-placeholder"></div>
-            <% } %>
-        </button>
-
-        <div class="user-dropdown">
-            <div class="user-dropdown-header">
-                <div class="user-email"><%= utenteLoggato.getEmail() %></div>
-                <div class="user-points-row">
-                    <span class="points-label">punti</span>
-                    <span class="points-value"><%= utenteLoggato.getPunteggio() %></span>
-                </div>
-            </div>
-
-            <a href="${pageContext.request.contextPath}/profilo" class="user-dropdown-item">
-                <span class="material-icons">person</span>
-                <span>Profilo</span>
-            </a>
-
-            <%-- Link Area Admin solo se ruolo = ADMIN --%>
-            <%
-                if (utenteLoggato.getRuolo() == Ruolo.ADMIN) {
-            %>
-            <a href="${pageContext.request.contextPath}/admin" class="user-dropdown-item">
-                <span class="material-icons">admin_panel_settings</span>
-                <span>Area Admin</span>
-            </a>
-            <%
-                }
-            %>
-
-            <a href="${pageContext.request.contextPath}/logout" class="user-dropdown-item user-dropdown-item-logout">
-                <span class="material-icons">logout</span>
-                <span>Logout</span>
-            </a>
-        </div>
-    </div>
-    <%
-    } else {
-    %>
-    <a href="${pageContext.request.contextPath}/login" class="btn-login-nav">
-        <span class="material-icons">login</span>
-        <span>Accedi</span>
-    </a>
-    <%
-        }
-    %>
-
-</nav>
+<jsp:include page="navbar.jsp" />
 
 <main class="profile-main">
     <section class="profile-card">
