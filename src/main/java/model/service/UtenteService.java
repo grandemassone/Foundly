@@ -5,6 +5,8 @@ import model.bean.enums.Ruolo;
 import model.dao.UtenteDAO;
 import model.utils.PasswordUtils;
 
+import java.util.List;
+
 public class UtenteService {
 
     private final UtenteDAO utenteDAO = new UtenteDAO();
@@ -56,6 +58,9 @@ public class UtenteService {
         System.out.println("DEBUG: Risultato salvataggio DAO: " + salvato);
 
         return salvato;
+    }
+    public List<Utente> getClassificaUtenti() {
+        return utenteDAO.doRetrieveAllByPunteggio();
     }
 
     /**

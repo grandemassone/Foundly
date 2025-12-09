@@ -85,6 +85,23 @@ public class UtenteDAO {
         }
         return null;
     }
+    public List<Utente> doRetrieveAllByPunteggio() {
+        List<Utente> utenti = new ArrayList<>();
+        String query = "SELECT * FROM utente ORDER BY punteggio DESC LIMIT 50"; // Limitiamo ai primi 50 per performance
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                utenti.add(mapRowToUtente(rs)); // Usa il tuo metodo mapRowToUtente esistente
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return utenti;
+    }
 
     public List<Utente> doRetrieveAll() {
         List<Utente> utenti = new ArrayList<>();
