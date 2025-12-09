@@ -11,7 +11,6 @@ import java.util.List;
 public class UtenteDAO {
 
     public boolean doSave(Utente utente) {
-        // Rimossi 'citta' e 'provincia' dalla query
         String query = "INSERT INTO utente (username, email, password_hash, nome, cognome, " +
                 "telefono, immagine_profilo, punteggio, ruolo, badge) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -105,6 +104,52 @@ public class UtenteDAO {
         return utenti;
     }
 
+    /**
+     * Recupera un utente per id.
+     */
+    public Utente doRetrieveById(Long id) {
+        String query = "SELECT * FROM utente WHERE id = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setLong(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToUtente(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Aggiorna i dati base del profilo (username, nome, cognome).
+     */
+    public boolean updateProfilo(Utente utente) {
+        String query = "UPDATE utente SET username = ?, nome = ?, cognome = ? WHERE id = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, utente.getUsername());
+            ps.setString(2, utente.getNome());
+            ps.setString(3, utente.getCognome());
+            ps.setLong(4, utente.getId());
+
+            int updated = ps.executeUpdate();
+            return updated > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private Utente mapRowToUtente(ResultSet rs) throws SQLException {
         Utente u = new Utente();
         u.setId(rs.getLong("id"));
@@ -151,4 +196,25 @@ public class UtenteDAO {
 
         return false;
     }
+    /**
+     * Aggiorna punteggio e badge per un utente.
+     */
+    public boolean updatePunteggioEBadge(Utente utente) {
+        String sql = "UPDATE utente SET punteggio = ?, badge = ? WHERE id = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, utente.getPunteggio());
+            ps.setString(2, utente.getBadge());
+            ps.setLong(3, utente.getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

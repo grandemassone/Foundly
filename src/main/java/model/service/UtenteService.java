@@ -103,14 +103,86 @@ public class UtenteService {
         String nuovoHash = PasswordUtils.hashPassword(nuovaPassword);
         utente.setPasswordHash(nuovoHash);
 
-        // Qui hai due possibilità:
-        // 1) se hai un metodo generico di update (es. doUpdate(utente)):
-        //    return utenteDAO.doUpdate(utente);
-        //
-        // 2) oppure definisci nel DAO un metodo dedicato:
-        //    boolean updatePasswordByEmail(String email, String nuovoHash)
-        //    e lo usi così:
-
         return utenteDAO.updatePasswordByEmail(email, nuovoHash);
+    }
+
+    /* =========================================================
+       METODI PER GESTIONE PROFILO
+       ========================================================= */
+
+    /**
+     * Aggiorna i dati base del profilo (username, nome, cognome).
+     * Si aspetta un Utente già caricato (es. da sessione) con id valorizzato.
+     *
+     * @param utente utente da aggiornare
+     * @return true se l'update su DB va a buon fine, false altrimenti
+     */
+    public boolean aggiornaProfilo(Utente utente) {
+        // id è un long primitivo: uso un controllo > 0 invece di null
+        if (utente == null || utente.getId() <= 0) {
+            return false;
+        }
+
+        // Controllo eventuale duplicato di username
+        Utente esistente = utenteDAO.doRetrieveByUsername(utente.getUsername());
+        if (esistente != null && esistente.getId() != utente.getId()) {
+            // c'è già un altro utente con questo username
+            return false;
+        }
+
+        return utenteDAO.updateProfilo(utente);
+    }
+
+
+    /**
+     * (Opzionale) Recupera utente per id, utile se in futuro
+     * ti serve ricaricare i dati dal DB.
+     */
+    public Utente trovaPerId(long id) {
+        return utenteDAO.doRetrieveById(id);
+    }
+    /* ==========================
+   LOGICA BADGE/PUNTEGGIO
+   ========================== */
+
+    /**
+     * Ritorna il nome del badge (stringa ENUM) in base al punteggio.
+     * 0-2 punti  -> OCCHIO_DI_FALCO
+     * 3-4 punti  -> DETECTIVE
+     * >=5 punti  -> SHERLOCK_HOLMES
+     */
+    // in UtenteService
+
+    /**
+     * 0-2 punti  -> OCCHIO_DI_FALCO
+     * 3-4 punti  -> DETECTIVE
+     * >=5 punti  -> SHERLOCK_HOLMES
+     */
+    private String calcolaBadgePerPunteggio(int punti) {
+        if (punti >= 5) {
+            return "SHERLOCK_HOLMES";
+        } else if (punti >= 3) {
+            return "DETECTIVE";
+        } else {
+            return "OCCHIO_DI_FALCO";
+        }
+    }
+
+    public boolean aggiornaPunteggioEBadge(Utente utente, int deltaPunti) {
+        if (utente == null || utente.getId() <= 0) {
+            return false;
+        }
+
+        int nuovoPunteggio = utente.getPunteggio() + deltaPunti;
+        if (nuovoPunteggio < 0) {
+            nuovoPunteggio = 0;
+        }
+
+        String nuovoBadge = calcolaBadgePerPunteggio(nuovoPunteggio);
+
+        utente.setPunteggio(nuovoPunteggio);
+        utente.setBadge(nuovoBadge);
+
+        return utenteDAO.updatePunteggioEBadge(utente);
     }
 }

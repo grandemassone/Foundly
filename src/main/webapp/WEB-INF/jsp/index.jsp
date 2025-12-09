@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="model.bean.Utente" %>
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -38,11 +39,34 @@
     </div>
 
     <%
-        Object utenteLoggato = session.getAttribute("utente");
+        Utente utenteLoggato = (Utente) session.getAttribute("utente");
         if (utenteLoggato != null) {
     %>
-    <!-- Utente loggato: mostra avatar -->
-    <div class="user-avatar"></div>
+    <!-- Utente loggato: avatar + dropdown -->
+    <div class="user-menu">
+        <button type="button" class="user-avatar-btn">
+            <div class="user-avatar"></div>
+        </button>
+
+        <div class="user-dropdown">
+            <div class="user-dropdown-header">
+                <div class="user-email"><%= utenteLoggato.getEmail() %></div>
+                <div class="user-points-row">
+                    <span class="points-label">punti</span>
+                    <span class="points-value"><%= utenteLoggato.getPunteggio() %></span>
+                </div>
+            </div>
+
+            <a href="${pageContext.request.contextPath}/profilo" class="user-dropdown-item">
+                <span class="material-icons">person</span>
+                <span>Profilo</span>
+            </a>
+            <a href="${pageContext.request.contextPath}/logout" class="user-dropdown-item user-dropdown-item-logout">
+                <span class="material-icons">logout</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
     <%
     } else {
     %>
@@ -70,7 +94,6 @@
 
 <div class="search-wrapper">
     <div class="search-card">
-
         <form action="search" method="GET">
             <div class="search-top">
                 <div class="input-box">
@@ -186,6 +209,25 @@
 
     </div>
 </section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const userMenu = document.querySelector(".user-menu");
+        if (!userMenu) return;
+
+        const btn = userMenu.querySelector(".user-avatar-btn");
+
+        btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            userMenu.classList.toggle("open");
+        });
+
+        // chiude cliccando fuori
+        document.addEventListener("click", function () {
+            userMenu.classList.remove("open");
+        });
+    });
+</script>
 
 </body>
 </html>

@@ -528,3 +528,103 @@ body {
         transform: translateY(0);
     }
 }
+/* ================= USER MENU DROPDOWN ================= */
+
+.user-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar-btn {
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+/* .user-avatar esiste già: lo riuso, quindi non toccarlo */
+
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 230px;
+    background-color: #FFFFFF;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    padding: 10px 0;
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 30;
+}
+
+/* stato aperto */
+.user-menu.open .user-dropdown {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* header con email e punti */
+
+.user-dropdown-header {
+    padding: 8px 14px 10px;
+    border-bottom: 1px solid #F1F3F4;
+}
+
+.user-email {
+    font-size: 0.85rem;
+    color: #5F6368;
+    margin-bottom: 4px;
+    word-break: break-all;
+}
+
+.user-points-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.points-label {
+    font-size: 0.75rem;
+    color: #FFAB91;
+}
+
+.points-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #E65100;
+}
+
+/* voci menu Profilo / Logout */
+
+.user-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: #202124;
+    transition: background-color 0.15s ease;
+}
+
+.user-dropdown-item .material-icons {
+    font-size: 20px;
+    color: #757575;
+}
+
+.user-dropdown-item:hover {
+    background-color: #FFF3E0;
+}
+
+.user-dropdown-item-logout {
+    color: #D32F2F;
+}
+
+.user-dropdown-item-logout .material-icons {
+    color: #D32F2F;
+}
