@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 public class EmailService {
-
     private final Session session;
     private final String mittente;
     private final String nomeMittente = "Foundly";

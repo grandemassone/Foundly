@@ -25,7 +25,6 @@ public class RecuperoPasswordServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        // Step iniziale: pagina per inserire email
         request.getRequestDispatcher("/WEB-INF/jsp/recupero_password_email.jsp")
                 .forward(request, response);
     }
@@ -57,7 +56,7 @@ public class RecuperoPasswordServlet extends HttpServlet {
         // Non riveliamo se l'email esiste o meno:
         // ma se esiste, generiamo codice e inviamo mail.
 
-        Utente utente = utenteService.trovaPerEmail(email); // implementa questo metodo nel service
+        Utente utente = utenteService.trovaPerEmail(email);
         if (utente != null) {
             // genera codice 6 cifre
             String codice = generaCodiceSeiCifre();
