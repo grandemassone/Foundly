@@ -5,17 +5,18 @@ import model.bean.enums.StatoDropPoint;
 import model.dao.DropPointDAO;
 import model.utils.PasswordUtils;
 
+import java.util.List;
+
 public class DropPointService {
 
     private final DropPointDAO dropPointDAO = new DropPointDAO();
 
-    // NOTA: Ho corretto l'ordine: prima latitudine, poi longitudine (come nella Servlet)
     public boolean registraDropPoint(String nomeAttivita, String email, String password,
                                      String indirizzo, String citta, String provincia,
                                      String telefono, String orari,
                                      Double latitudine, Double longitudine) {
 
-        if(dropPointDAO.doRetrieveByEmail(email) != null) return false;
+        if (dropPointDAO.doRetrieveByEmail(email) != null) return false;
 
         DropPoint dp = new DropPoint();
         dp.setNomeAttivita(nomeAttivita);
@@ -27,11 +28,9 @@ public class DropPointService {
         dp.setTelefono(telefono);
         dp.setOrariApertura(orari);
 
-        // CORRETTO: Uso dei setter
         dp.setLatitudine(latitudine);
         dp.setLongitudine(longitudine);
 
-        // CORRETTO: Uso Enum e valori default obbligatori nel DB
         dp.setStato(StatoDropPoint.IN_ATTESA);
         dp.setRitiriEffettuati(0);
         dp.setImmagine("default.png");
@@ -41,15 +40,28 @@ public class DropPointService {
 
     public DropPoint login(String email, String password) {
         DropPoint dp = dropPointDAO.doRetrieveByEmail(email);
-        if(dp == null) return null;
-        if(PasswordUtils.checkPassword(password, dp.getPasswordHash())) return dp;
+        if (dp == null) return null;
+        if (PasswordUtils.checkPassword(password, dp.getPasswordHash())) return dp;
         return null;
     }
 
-     /**
-      * Recupera la lista di tutti i Drop-Point approvati.
-     */
-    public java.util.List<DropPoint> findAllApprovati() {
+    /** Drop-Point approvati per la mappa/pubblico. */
+    public List<DropPoint> findAllApprovati() {
         return dropPointDAO.doRetrieveAllApprovati();
+    }
+
+    /** NUOVO: Drop-Point in attesa per l’area admin. */
+    public List<DropPoint> findAllInAttesa() {
+        return dropPointDAO.doRetrieveByStato(StatoDropPoint.IN_ATTESA);
+    }
+
+    /** NUOVO: approvazione da Area Admin. */
+    public boolean approvaDropPoint(long id) {
+        return dropPointDAO.updateStato(id, StatoDropPoint.APPROVATO);
+    }
+
+    /** NUOVO: rifiuto da Area Admin. */
+    public boolean rifiutaDropPoint(long id) {
+        return dropPointDAO.updateStato(id, StatoDropPoint.RIFIUTATO);
     }
 }

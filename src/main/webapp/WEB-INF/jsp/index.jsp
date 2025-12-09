@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="model.bean.Utente" %>
+<%@ page import="model.bean.enums.Ruolo" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
@@ -90,6 +91,19 @@
                 <span class="material-icons">person</span>
                 <span>Profilo</span>
             </a>
+
+            <%-- Link Area Admin solo se ruolo = ADMIN --%>
+            <%
+                if (utenteLoggato.getRuolo() == Ruolo.ADMIN) {
+            %>
+            <a href="${pageContext.request.contextPath}/admin" class="user-dropdown-item">
+                <span class="material-icons">admin_panel_settings</span>
+                <span>Area Admin</span>
+            </a>
+            <%
+                }
+            %>
+
             <a href="${pageContext.request.contextPath}/logout" class="user-dropdown-item user-dropdown-item-logout">
                 <span class="material-icons">logout</span>
                 <span>Logout</span>

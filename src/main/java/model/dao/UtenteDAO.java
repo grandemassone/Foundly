@@ -104,9 +104,6 @@ public class UtenteDAO {
         return utenti;
     }
 
-    /**
-     * Recupera un utente per id.
-     */
     public Utente doRetrieveById(Long id) {
         String query = "SELECT * FROM utente WHERE id = ?";
 
@@ -127,9 +124,6 @@ public class UtenteDAO {
         return null;
     }
 
-    /**
-     * Aggiorna i dati base del profilo (username, nome, cognome).
-     */
     public boolean updateProfilo(Utente utente) {
         String query = "UPDATE utente SET username = ?, nome = ?, cognome = ?, immagine_profilo = ? WHERE id = ?";
 
@@ -172,13 +166,6 @@ public class UtenteDAO {
         return u;
     }
 
-    /**
-     * Aggiorna l'hash della password per l'utente con la email specificata.
-     *
-     * @param email     email dell'utente
-     * @param nuovoHash nuovo valore di password_hash (già hashato)
-     * @return true se è stata aggiornata almeno una riga, false altrimenti
-     */
     public boolean updatePasswordByEmail(String email, String nuovoHash) {
         String query = "UPDATE utente SET password_hash = ? WHERE email = ?";
 
@@ -197,9 +184,7 @@ public class UtenteDAO {
 
         return false;
     }
-    /**
-     * Aggiorna punteggio e badge per un utente.
-     */
+
     public boolean updatePunteggioEBadge(Utente utente) {
         String sql = "UPDATE utente SET punteggio = ?, badge = ? WHERE id = ?";
 
@@ -218,5 +203,19 @@ public class UtenteDAO {
         return false;
     }
 
+    /** NUOVO: cancella un utente (ban = delete). */
+    public boolean deleteById(long id) {
+        String sql = "DELETE FROM utente WHERE id = ?";
 
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setLong(1, id);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

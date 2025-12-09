@@ -185,4 +185,17 @@ public class UtenteService {
 
         return utenteDAO.updatePunteggioEBadge(utente);
     }
+    // =========================================================
+    // METODI AREA ADMIN
+    // =========================================================
+
+    /** Tutti gli utenti, usato in Area Admin. */
+    public java.util.List<Utente> trovaTutti() {
+        return utenteDAO.doRetrieveAll();
+    }
+
+    /** Ban = cancellazione account. */
+    public boolean cancellaUtente(long id) {
+        return utenteDAO.deleteById(id);
+    }
 }
