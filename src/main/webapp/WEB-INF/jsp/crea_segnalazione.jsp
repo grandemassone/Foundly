@@ -1,5 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="model.bean.enums.CategoriaOggetto" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -109,12 +111,25 @@
                     <div id="dropPointSelection" class="hidden" style="margin-top: 15px;">
                         <div class="input-group">
                             <label>Scegli il Drop-Point più vicino</label>
-                            <select name="idDropPoint" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ccc;">
+                            <select name="idDropPoint" id="selectDropPoint" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ccc;" onchange="showDropPointDetails()">
                                 <option value="">-- Seleziona un negozio --</option>
                                 <c:forEach var="dp" items="${listaDropPoint}">
-                                    <option value="${dp.id}">${dp.nomeAttivita} - ${dp.indirizzo}, ${dp.citta}</option>
+                                    <option value="${dp.id}"
+                                            data-indirizzo="${dp.indirizzo}, ${dp.citta} (${dp.provincia})"
+                                            data-orari="${dp.orariApertura}"
+                                            data-tel="${dp.telefono}">
+                                            ${dp.nomeAttivita} - ${dp.citta}
+                                    </option>
                                 </c:forEach>
                             </select>
+
+                            <div id="dropPointDetails" style="display:none; margin-top:15px; padding:15px; background:#f9f9f9; border-radius:8px; border-left: 4px solid #FB8C00;">
+                                <h4 style="margin:0 0 5px 0; color:#E65100;">Dettagli Punto di Ritiro</h4>
+                                <p style="margin:5px 0; font-size:0.9rem;"><strong>📍 Indirizzo:</strong> <span id="dpAddr"></span></p>
+                                <p style="margin:5px 0; font-size:0.9rem;"><strong>🕒 Orari:</strong> <span id="dpTime"></span></p>
+                                <p style="margin:5px 0; font-size:0.9rem;"><strong>📞 Contatto:</strong> <span id="dpTel"></span></p>
+                            </div>
+
                             <small style="color: #666;">Lasciando l'oggetto qui, il proprietario potrà ritirarlo con un codice sicuro.</small>
                         </div>
                     </div>
@@ -232,6 +247,32 @@
             toggleDropPointList(false);
         }
     });
+
+    function showDropPointDetails() {
+        const select = document.getElementById("selectDropPoint");
+        const detailsDiv = document.getElementById("dropPointDetails");
+
+        // Prendi l'opzione selezionata
+        const selectedOption = select.options[select.selectedIndex];
+
+        // Se non ha valore (es. "-- Seleziona --"), nascondi tutto
+        if (!select.value) {
+            detailsDiv.style.display = "none";
+            return;
+        }
+
+        // Recupera i dati dagli attributi data-...
+        const indirizzo = selectedOption.getAttribute("data-indirizzo");
+        const orari = selectedOption.getAttribute("data-orari");
+        const tel = selectedOption.getAttribute("data-tel");
+
+        // Riempi il box e mostralo
+        document.getElementById("dpAddr").textContent = indirizzo;
+        document.getElementById("dpTime").textContent = orari;
+        document.getElementById("dpTel").textContent = tel;
+
+        detailsDiv.style.display = "block";
+    }
 </script>
 
 </body>

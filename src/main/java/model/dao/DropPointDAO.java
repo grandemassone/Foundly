@@ -100,6 +100,10 @@ public class DropPointDAO {
                 dp.setNomeAttivita(rs.getString("nome_attivita"));
                 dp.setIndirizzo(rs.getString("indirizzo"));
                 dp.setCitta(rs.getString("citta"));
+                dp.setProvincia(rs.getString("provincia"));
+                dp.setTelefono(rs.getString("telefono"));
+                dp.setOrariApertura(rs.getString("orari_apertura"));
+
                 list.add(dp);
             }
         } catch (SQLException e) {
