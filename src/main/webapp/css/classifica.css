@@ -1,0 +1,234 @@
+/* Layout generale */
+.classifica-main {
+    max-width: 1000px;
+    margin: 32px auto 60px;
+    padding: 0 24px;
+}
+
+/* Header pagina */
+.classifica-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.classifica-header h1 {
+    font-size: 2.2rem;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.classifica-header p {
+    color: var(--text-grey);
+    font-size: 1.1rem;
+}
+
+/* Card Classifica */
+.classifica-card {
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    overflow: hidden; /* Per i bordi della tabella */
+    margin-bottom: 40px;
+}
+
+/* Tabella */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.ranking-table th {
+    background-color: #FFF3E0; /* Arancione chiarissimo */
+    color: #E65100;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    padding: 16px 20px;
+    text-align: left;
+}
+
+.ranking-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #F5F5F5;
+    color: var(--text-dark);
+    vertical-align: middle;
+}
+
+.ranking-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Righe interattive */
+.user-row {
+    transition: background-color 0.2s ease;
+}
+
+.user-row:hover {
+    background-color: #FAFAFA;
+}
+
+/* Evidenzia utente loggato */
+.highlight-me {
+    background-color: #FFF8E1 !important;
+    border-left: 4px solid #FFAB00;
+}
+
+/* Colonne specifiche */
+.col-rank {
+    width: 60px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #9E9E9E;
+}
+
+.rank-icon {
+    font-size: 28px;
+}
+.gold { color: #FFD700; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.silver { color: #C0C0C0; text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+.bronze { color: #CD7F32; text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+
+.col-user {
+    width: 40%;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.table-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFE0B2, #FB8C00);
+}
+
+.user-names {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-fullname {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #202124;
+}
+
+.user-username {
+    font-size: 0.85rem;
+    color: #757575;
+}
+
+.col-badge {
+    width: 25%;
+}
+
+.badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background-color: #FFF3E0;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #E65100;
+    font-weight: 500;
+}
+
+.badge-mini-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.col-points {
+    text-align: right;
+    font-size: 1.2rem;
+    color: #E65100;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px !important;
+    color: #9E9E9E;
+    font-style: italic;
+}
+
+/* --- LEGENDA BADGE --- */
+.badges-legend {
+    background-color: #FAFAFA;
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px dashed #E0E0E0;
+}
+
+.badges-legend h3 {
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    color: #424242;
+}
+
+.badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.badge-item {
+    background-color: #FFFFFF;
+    padding: 20px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+}
+
+.badge-item:hover {
+    transform: translateY(-5px);
+}
+
+.badge-item img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+}
+
+.badge-item h4 {
+    font-size: 1rem;
+    color: #202124;
+    margin-bottom: 4px;
+}
+
+.badge-item p {
+    font-size: 0.9rem;
+    color: #757575;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .classifica-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .ranking-table th,
+    .ranking-table td {
+        padding: 12px;
+    }
+
+    .col-badge {
+        display: none; /* Nascondi badge su mobile se stretto */
+    }
+
+    .user-fullname {
+        font-size: 0.95rem;
+    }
+}
