@@ -42,12 +42,39 @@
 
     <%
         Utente utenteLoggato = (Utente) session.getAttribute("utente");
+
+        String navAvatarPath = null;
+        boolean navHasAvatar = false;
+
+        if (utenteLoggato != null) {
+            navAvatarPath = utenteLoggato.getImmagineProfilo();
+            if (navAvatarPath != null && !navAvatarPath.trim().isEmpty()) {
+                try {
+                    java.io.File navFile = new java.io.File(
+                            application.getRealPath("/" + navAvatarPath)
+                    );
+                    navHasAvatar = navFile.exists();
+                    if (!navHasAvatar) {
+                        navAvatarPath = null;
+                    }
+                } catch (Exception e) {
+                    navHasAvatar = false;
+                    navAvatarPath = null;
+                }
+            }
+        }
+
         if (utenteLoggato != null) {
     %>
-    <!-- Utente loggato: avatar + dropdown -->
     <div class="user-menu">
         <button type="button" class="user-avatar-btn">
-            <div class="user-avatar"></div>
+            <% if (navHasAvatar) { %>
+            <img src="<%= request.getContextPath() + "/" + navAvatarPath %>"
+                 alt=""
+                 class="user-avatar-img">
+            <% } else { %>
+            <div class="user-avatar-placeholder"></div>
+            <% } %>
         </button>
 
         <div class="user-dropdown">
@@ -72,7 +99,6 @@
     <%
     } else {
     %>
-    <!-- Utente NON loggato: mostra bottone Login/Registrati -->
     <a href="${pageContext.request.contextPath}/login" class="btn-login-nav">
         <span class="material-icons">login</span>
         <span>Accedi</span>

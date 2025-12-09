@@ -50,7 +50,7 @@ public class UtenteService {
         nuovoUtente.setRuolo(Ruolo.UTENTE_BASE);
         nuovoUtente.setPunteggio(0);
         nuovoUtente.setBadge("OCCHIO_DI_FALCO");
-        nuovoUtente.setImmagineProfilo("img/default-avatar.png");
+        nuovoUtente.setImmagineProfilo(null);
 
         boolean salvato = utenteDAO.doSave(nuovoUtente);
         System.out.println("DEBUG: Risultato salvataggio DAO: " + salvato);

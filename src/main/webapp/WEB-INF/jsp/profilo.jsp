@@ -8,10 +8,9 @@
         return;
     }
 
-    // Valore grezzo dal DB (ENUM)
+    // ===== BADGE =====
     String rawBadge = utente.getBadge(); // OCCHIO_DI_FALCO / DETECTIVE / SHERLOCK_HOLMES
 
-    // Nome “bello” da mostrare
     String badgeDisplay = "";
     if (rawBadge != null) {
         String[] parts = rawBadge.toLowerCase().split("_");
@@ -22,12 +21,10 @@
             sb.append(Character.toUpperCase(p.charAt(0)));
             if (p.length() > 1) sb.append(p.substring(1));
         }
-        badgeDisplay = sb.toString();    // es. "Occhio Di Falco"
+        badgeDisplay = sb.toString();
     }
 
-    // Immagine del badge in base all'ENUM
-    String badgeImg = "badge_default.png"; // fallback
-
+    String badgeImg = "badge_default.png";
     if ("OCCHIO_DI_FALCO".equals(rawBadge)) {
         badgeImg = "badge_occhio_di_falco.png";
     } else if ("DETECTIVE".equals(rawBadge)) {
@@ -35,8 +32,26 @@
     } else if ("SHERLOCK_HOLMES".equals(rawBadge)) {
         badgeImg = "badge_sherlock_holmes.png";
     }
-%>
 
+    // ===== AVATAR ===== (di default nessuna immagine)
+    String avatarPath = utente.getImmagineProfilo();
+    boolean hasAvatar = false;
+
+    if (avatarPath != null && !avatarPath.trim().isEmpty()) {
+        try {
+            java.io.File avatarFile = new java.io.File(
+                    application.getRealPath("/" + avatarPath)
+            );
+            hasAvatar = avatarFile.exists();
+            if (!hasAvatar) {
+                avatarPath = null;
+            }
+        } catch (Exception e) {
+            hasAvatar = false;
+            avatarPath = null;
+        }
+    }
+%>
 
 <!DOCTYPE html>
 <html lang="it">
@@ -79,11 +94,39 @@
 
     <%
         Utente utenteLoggato = (Utente) session.getAttribute("utente");
+
+        String navAvatarPath = null;
+        boolean navHasAvatar = false;
+
+        if (utenteLoggato != null) {
+            navAvatarPath = utenteLoggato.getImmagineProfilo();
+            if (navAvatarPath != null && !navAvatarPath.trim().isEmpty()) {
+                try {
+                    java.io.File navFile = new java.io.File(
+                            application.getRealPath("/" + navAvatarPath)
+                    );
+                    navHasAvatar = navFile.exists();
+                    if (!navHasAvatar) {
+                        navAvatarPath = null;
+                    }
+                } catch (Exception e) {
+                    navHasAvatar = false;
+                    navAvatarPath = null;
+                }
+            }
+        }
+
         if (utenteLoggato != null) {
     %>
     <div class="user-menu">
         <button type="button" class="user-avatar-btn">
-            <div class="user-avatar"></div>
+            <% if (navHasAvatar) { %>
+            <img src="<%= request.getContextPath() + "/" + navAvatarPath %>"
+                 alt=""
+                 class="user-avatar-img">
+            <% } else { %>
+            <div class="user-avatar-placeholder"></div>
+            <% } %>
         </button>
 
         <div class="user-dropdown">
@@ -115,13 +158,38 @@
     <%
         }
     %>
+
 </nav>
 
 <main class="profile-main">
     <section class="profile-card">
         <!-- HEADER: avatar + nome + email -->
         <div class="profile-header">
-            <div class="profile-avatar-large"></div>
+            <div class="profile-avatar-wrapper <%= hasAvatar ? "has-avatar" : "" %>" id="avatarWrapper">
+                <div class="profile-avatar-large">
+                    <% if (hasAvatar) { %>
+                    <img
+                            src="<%= request.getContextPath() + "/" + avatarPath %>"
+                            alt=""
+                            id="profileAvatarImg">
+                    <% } else { %>
+                    <img
+                            alt=""
+                            id="profileAvatarImg"
+                            style="display:none;">
+                    <% } %>
+                </div>
+
+                <!-- overlay rosso con cestino -->
+                <div class="avatar-remove-overlay" id="avatarRemoveOverlay">
+                    <span class="material-icons">delete</span>
+                </div>
+
+                <button type="button" class="avatar-edit-btn" id="avatarEditBtn" title="Cambia foto profilo">
+                    <span class="material-icons">edit</span>
+                </button>
+            </div>
+
             <div>
                 <h1 class="profile-title">
                     <%= utente.getNome() %> <%= utente.getCognome() %>
@@ -158,11 +226,25 @@
             </div>
         </div>
 
-        <!-- BOX MODIFICA DATI (form) -->
+        <!-- FORM PROFILO (testo + avatar) -->
         <form method="post"
               action="${pageContext.request.contextPath}/profilo"
               id="profileEditForm"
-              class="profile-edit-form">
+              class="profile-edit-form"
+              enctype="multipart/form-data">
+
+            <!-- input file nascosto per l'avatar -->
+            <input type="file"
+                   name="avatar"
+                   id="avatarInput"
+                   accept="image/*"
+                   class="avatar-file-input">
+
+            <!-- flag rimozione avatar -->
+            <input type="hidden"
+                   name="removeAvatar"
+                   id="removeAvatarField"
+                   value="false">
 
             <section class="profile-edit-card" id="profileEditCard">
                 <div class="profile-edit-header">
@@ -181,8 +263,8 @@
                     <div class="edit-field-text">
                         <span class="field-label">Username</span>
                         <span class="field-value view-mode" id="usernameView">
-                    <%= utente.getUsername() %>
-                </span>
+                            <%= utente.getUsername() %>
+                        </span>
                         <input type="text"
                                class="field-input edit-mode"
                                name="username"
@@ -196,8 +278,8 @@
                     <div class="edit-field-text">
                         <span class="field-label">Nome</span>
                         <span class="field-value view-mode" id="nomeView">
-                    <%= utente.getNome() %>
-                </span>
+                            <%= utente.getNome() %>
+                        </span>
                         <input type="text"
                                class="field-input edit-mode"
                                name="nome"
@@ -211,8 +293,8 @@
                     <div class="edit-field-text">
                         <span class="field-label">Cognome</span>
                         <span class="field-value view-mode" id="cognomeView">
-                    <%= utente.getCognome() %>
-                </span>
+                            <%= utente.getCognome() %>
+                        </span>
                         <input type="text"
                                class="field-input edit-mode"
                                name="cognome"
@@ -233,20 +315,19 @@
             </div>
         </form>
 
-
         <div class="profile-grid">
-            <!-- altri campi se servono -->
+            <!-- altri campi in futuro -->
         </div>
     </section>
 </main>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // dropdown utente
+        // ===== dropdown utente in navbar =====
         const userMenu = document.querySelector(".user-menu");
         if (userMenu) {
-            const btnAvatar = userMenu.querySelector(".user-avatar-btn");
-            btnAvatar.addEventListener("click", function (e) {
+            const btnAvatarMenu = userMenu.querySelector(".user-avatar-btn");
+            btnAvatarMenu.addEventListener("click", function (e) {
                 e.stopPropagation();
                 userMenu.classList.toggle("open");
             });
@@ -255,24 +336,83 @@
             });
         }
 
-        // logica modifica profilo
-        const editForm = document.getElementById("profileEditForm");
-        const editToggleBtn = document.getElementById("editToggleBtn");
-        const cancelEditBtn = document.getElementById("cancelEditBtn");
+        const editForm          = document.getElementById("profileEditForm");
+        const editToggleBtn     = document.getElementById("editToggleBtn");
+        const cancelEditBtn     = document.getElementById("cancelEditBtn");
 
+        const avatarWrapper     = document.getElementById("avatarWrapper");
+        const avatarEditBtn     = document.getElementById("avatarEditBtn");
+        const avatarRemoveOv    = document.getElementById("avatarRemoveOverlay");
+        const avatarInput       = document.getElementById("avatarInput");
+        const avatarImg         = document.getElementById("profileAvatarImg");
+        const removeAvatarField = document.getElementById("removeAvatarField");
+
+        // attiva/disattiva modalità editing per i campi testo
         if (editForm && editToggleBtn && cancelEditBtn) {
             editToggleBtn.addEventListener("click", function () {
                 editForm.classList.add("editing");
             });
 
             cancelEditBtn.addEventListener("click", function () {
-                // torna ai valori originali
                 window.location.reload();
+            });
+        }
+
+        // click sulla matita -> selezione file
+        if (avatarEditBtn && avatarInput && avatarImg) {
+            avatarEditBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (!editForm.classList.contains("editing")) {
+                    editForm.classList.add("editing");
+                }
+                avatarInput.click();
+            });
+
+            avatarInput.addEventListener("change", function () {
+                const file = avatarInput.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (ev) {
+                    avatarImg.src = ev.target.result;
+                    avatarImg.style.display = "block";
+                    if (avatarWrapper) {
+                        avatarWrapper.classList.add("has-avatar");
+                    }
+                    if (removeAvatarField) {
+                        removeAvatarField.value = "false"; // stiamo caricando una nuova immagine
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // click sul cestino -> rimozione avatar (UI + flag per il server)
+        if (avatarRemoveOv && avatarWrapper && avatarImg && avatarInput && removeAvatarField) {
+            avatarRemoveOv.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (!editForm.classList.contains("editing")) {
+                    editForm.classList.add("editing");
+                }
+
+                // segna la rimozione per il backend
+                removeAvatarField.value = "true";
+
+                // svuota eventuale file scelto
+                avatarInput.value = "";
+
+                // nasconde subito l'immagine
+                avatarImg.src = "";
+                avatarImg.style.display = "none";
+                avatarWrapper.classList.remove("has-avatar");
             });
         }
     });
 </script>
-
 
 </body>
 </html>

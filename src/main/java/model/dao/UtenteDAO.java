@@ -131,7 +131,7 @@ public class UtenteDAO {
      * Aggiorna i dati base del profilo (username, nome, cognome).
      */
     public boolean updateProfilo(Utente utente) {
-        String query = "UPDATE utente SET username = ?, nome = ?, cognome = ? WHERE id = ?";
+        String query = "UPDATE utente SET username = ?, nome = ?, cognome = ?, immagine_profilo = ? WHERE id = ?";
 
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
@@ -139,7 +139,8 @@ public class UtenteDAO {
             ps.setString(1, utente.getUsername());
             ps.setString(2, utente.getNome());
             ps.setString(3, utente.getCognome());
-            ps.setLong(4, utente.getId());
+            ps.setString(4, utente.getImmagineProfilo());
+            ps.setLong(5, utente.getId());
 
             int updated = ps.executeUpdate();
             return updated > 0;
@@ -216,5 +217,6 @@ public class UtenteDAO {
         }
         return false;
     }
+
 
 }

@@ -81,12 +81,32 @@ body {
 
 /* Avatar utente (se loggato) */
 
-.user-avatar {
+/* Bottone avatar nella navbar */
+.user-avatar-btn {
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+}
+
+/* Immagine profilo / placeholder nella navbar */
+.user-avatar-img,
+.user-avatar-placeholder {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #FFE0B2, #FB8C00);
+    display: block;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Foto reale */
+.user-avatar-img {
+    object-fit: cover;
+}
+
+/* Cerchio arancione di default */
+.user-avatar-placeholder {
+    background: linear-gradient(135deg, #FFE0B2, #FB8C00);
 }
 
 /* Bottone Login / Registrati (se NON loggato) */
