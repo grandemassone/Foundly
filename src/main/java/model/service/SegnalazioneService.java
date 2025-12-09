@@ -33,4 +33,17 @@ public class SegnalazioneService {
         // Recuperiamo ad esempio le ultime 8 per la Home Page
         return segnalazioneDAO.doRetrieveLatest(8);
     }
+
+    public Segnalazione trovaPerId(long id) {
+        return segnalazioneDAO.doRetrieveById(id);
+    }
+
+    public java.util.List<Segnalazione> trovaPerUtente(long idUtente) {
+        return segnalazioneDAO.doRetrieveByUtente(idUtente);
+    }
+
+    public boolean eliminaSegnalazione(long id) {
+        // Qui si potrebbe aggiungere controllo se l'utente è il proprietario
+        return segnalazioneDAO.doDelete(id);
+    }
 }

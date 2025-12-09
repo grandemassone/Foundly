@@ -648,3 +648,21 @@ body {
 .user-dropdown-item-logout .material-icons {
     color: #D32F2F;
 }
+
+/* Rende il link della card invisibile esteticamente ma funzionale */
+.card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block; /* Importante per avvolgere la card */
+    transition: transform 0.2s ease;
+}
+
+.card-link:hover {
+    transform: translateY(-5px); /* Effetto sollevamento al passaggio del mouse */
+}
+
+/* Rimuoviamo l'animazione dalla card interna e la mettiamo sul link wrapper per fluidità */
+.card-link .card {
+    /* Reset animazione se necessario, o lascia com'è */
+    height: 100%;
+}

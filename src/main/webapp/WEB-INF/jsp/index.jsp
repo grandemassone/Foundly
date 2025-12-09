@@ -1,6 +1,4 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="model.bean.Utente" %>
-<%@ page import="model.bean.enums.Ruolo" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
@@ -16,111 +14,7 @@
 </head>
 <body class="page-enter">
 
-<nav class="navbar">
-    <a href="${pageContext.request.contextPath}/index" class="brand">
-        <div class="brand-icon">
-            <img src="<%= request.getContextPath() %>/assets/images/logo.png" alt="logo_foundly">
-        </div>
-    </a>
-
-    <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/index" class="nav-item">
-            <span class="material-icons">home</span> Home
-        </a>
-        <a href="crea-segnalazione" class="nav-item">
-            <span class="material-icons">add_circle_outline</span> Crea Segnalazione
-        </a>
-        <a href="#" class="nav-item">
-            <span class="material-icons">inventory</span> Segnalazioni
-        </a>
-        <a href="#" class="nav-item">
-            <span class="material-icons">place</span> Drop-Point
-        </a>
-        <a href="#" class="nav-item">
-            <span class="material-icons">emoji_events</span> Classifica
-        </a>
-    </div>
-
-    <%
-        Utente utenteLoggato = (Utente) session.getAttribute("utente");
-
-        String navAvatarPath = null;
-        boolean navHasAvatar = false;
-
-        if (utenteLoggato != null) {
-            navAvatarPath = utenteLoggato.getImmagineProfilo();
-            if (navAvatarPath != null && !navAvatarPath.trim().isEmpty()) {
-                try {
-                    java.io.File navFile = new java.io.File(
-                            application.getRealPath("/" + navAvatarPath)
-                    );
-                    navHasAvatar = navFile.exists();
-                    if (!navHasAvatar) {
-                        navAvatarPath = null;
-                    }
-                } catch (Exception e) {
-                    navHasAvatar = false;
-                    navAvatarPath = null;
-                }
-            }
-        }
-
-        if (utenteLoggato != null) {
-    %>
-    <div class="user-menu">
-        <button type="button" class="user-avatar-btn">
-            <% if (navHasAvatar) { %>
-            <img src="<%= request.getContextPath() + "/" + navAvatarPath %>"
-                 alt=""
-                 class="user-avatar-img">
-            <% } else { %>
-            <div class="user-avatar-placeholder"></div>
-            <% } %>
-        </button>
-
-        <div class="user-dropdown">
-            <div class="user-dropdown-header">
-                <div class="user-email"><%= utenteLoggato.getEmail() %></div>
-                <div class="user-points-row">
-                    <span class="points-label">punti</span>
-                    <span class="points-value"><%= utenteLoggato.getPunteggio() %></span>
-                </div>
-            </div>
-
-            <a href="${pageContext.request.contextPath}/profilo" class="user-dropdown-item">
-                <span class="material-icons">person</span>
-                <span>Profilo</span>
-            </a>
-
-            <%-- Link Area Admin solo se ruolo = ADMIN --%>
-            <%
-                if (utenteLoggato.getRuolo() == Ruolo.ADMIN) {
-            %>
-            <a href="${pageContext.request.contextPath}/admin" class="user-dropdown-item">
-                <span class="material-icons">admin_panel_settings</span>
-                <span>Area Admin</span>
-            </a>
-            <%
-                }
-            %>
-
-            <a href="${pageContext.request.contextPath}/logout" class="user-dropdown-item user-dropdown-item-logout">
-                <span class="material-icons">logout</span>
-                <span>Logout</span>
-            </a>
-        </div>
-    </div>
-    <%
-    } else {
-    %>
-    <a href="${pageContext.request.contextPath}/login" class="btn-login-nav">
-        <span class="material-icons">login</span>
-        <span>Accedi</span>
-    </a>
-    <%
-        }
-    %>
-</nav>
+<jsp:include page="navbar.jsp" />
 
 <header class="hero">
     <h1>Hai perso qualcosa?</h1>
@@ -203,51 +97,34 @@
 
         <%-- Ciclo sulle segnalazioni reali --%>
         <c:forEach var="s" items="${segnalazioni}">
-            <article class="card">
-                <div class="card-badges">
-                    <span class="badge badge-active">${s.stato}</span>
-                    <span class="badge badge-type">${s.tipoSegnalazione}</span>
-                </div>
-
-                <div class="card-image-placeholder"
-                     style="${not empty s.immagine and s.immagine != 'default.png' ? 'background-image: url(' += pageContext.request.contextPath += '/' += s.immagine += '); background-size: cover; background-position: center;' : ''}">
-
-                    <c:if test="${empty s.immagine or s.immagine == 'default.png'}">
-                        <span class="material-icons">inventory_2</span>
-                    </c:if>
-                </div>
-
-                <div class="card-footer">
-                    <div class="card-title">${s.titolo}</div>
-                    <div class="card-info">
-                            ${s.citta} •
-                        <fmt:formatDate value="${s.dataRitrovamento}" pattern="dd MMM" />
+            <a href="dettaglio-segnalazione?id=${s.id}" class="card-link">
+                <article class="card">
+                    <div class="card-badges">
+                        <span class="badge badge-active">${s.stato}</span>
+                        <span class="badge badge-type">${s.tipoSegnalazione}</span>
                     </div>
-                </div>
-            </article>
+
+                    <div class="card-image-placeholder"
+                         style="${not empty s.immagine and s.immagine != 'default.png' ? 'background-image: url(' += pageContext.request.contextPath += '/' += s.immagine += '); background-size: cover; background-position: center;' : ''}">
+
+                        <c:if test="${empty s.immagine or s.immagine == 'default.png'}">
+                            <span class="material-icons">inventory_2</span>
+                        </c:if>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="card-title">${s.titolo}</div>
+                        <div class="card-info">
+                                ${s.citta} •
+                            <fmt:formatDate value="${s.dataRitrovamento}" pattern="dd MMM" />
+                        </div>
+                    </div>
+                </article>
+            </a>
         </c:forEach>
 
     </div>
 </section>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const userMenu = document.querySelector(".user-menu");
-        if (!userMenu) return;
-
-        const btn = userMenu.querySelector(".user-avatar-btn");
-
-        btn.addEventListener("click", function (e) {
-            e.stopPropagation();
-            userMenu.classList.toggle("open");
-        });
-
-        // chiude cliccando fuori
-        document.addEventListener("click", function () {
-            userMenu.classList.remove("open");
-        });
-    });
-</script>
 
 </body>
 </html>
