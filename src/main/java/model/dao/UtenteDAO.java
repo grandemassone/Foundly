@@ -139,7 +139,8 @@ public class UtenteDAO {
             e.printStackTrace();
         }
         return null;
-    }
+    }    //commento fico
+
 
     public boolean updateProfilo(Utente utente) {
         String query = "UPDATE utente SET username = ?, nome = ?, cognome = ?, immagine_profilo = ? WHERE id = ?";

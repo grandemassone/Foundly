@@ -62,6 +62,7 @@ public class UtenteService {
     public List<Utente> getClassificaUtenti() {
         return utenteDAO.doRetrieveAllByPunteggio();
     }
+    //commento fico
 
     /**
      * Login utente "cittadino" con email + password.
