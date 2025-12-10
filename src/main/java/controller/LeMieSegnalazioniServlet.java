@@ -32,6 +32,6 @@ public class LeMieSegnalazioniServlet extends HttpServlet {
         List<Segnalazione> mieSegnalazioni = segnalazioneService.trovaPerUtente(utente.getId());
         request.setAttribute("mieSegnalazioni", mieSegnalazioni);
 
-        request.getRequestDispatcher("/WEB-INF/jsp/le_mie_segnalazioni.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/jsp/segnalazioni_e_reclami.jsp").forward(request, response);
     }
 }
