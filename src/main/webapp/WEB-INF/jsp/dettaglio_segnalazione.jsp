@@ -313,33 +313,39 @@
                                             </div>
                                         </c:if>
 
+                                            <%-- BOX VINCITORE PER IL FINDER --%>
                                         <c:if test="${r.stato == 'ACCETTATO'}">
-                                            <div class="accepted-badge">
-                                                <span class="material-icons">check_circle</span> Accettato
+                                            <div class="status-box winner" style="margin-top: 15px;">
+                                                <div class="confetti-icon">🎉</div>
+                                                <h4>Accettato!</h4>
+
                                                 <c:if test="${not empty r.codiceConsegna}">
-                                                    <small>Codice: ${r.codiceConsegna}</small>
+                                                    <div class="code-display">
+                                                        <small>CODICE DI RITIRO</small>
+                                                        <div class="the-code">${r.codiceConsegna}</div>
+                                                    </div>
+                                                </c:if>
+
+                                                    <%-- DATI UTENTE CHE HA VINTO (Owner) visibili al Finder --%>
+                                                <c:set var="richiedente" value="${mappaRichiedenti[r.idUtenteRichiedente]}" />
+                                                <c:if test="${not empty richiedente}">
+                                                    <div class="contact-card owner-view">
+                                                        <div class="contact-header">
+                                                            <span class="material-icons">person</span>
+                                                            Contatti Proprietario
+                                                        </div>
+                                                        <div class="contact-row">
+                                                            <strong>Nome:</strong> ${richiedente.nome} ${richiedente.cognome}
+                                                        </div>
+                                                        <div class="contact-row">
+                                                            <strong>Email:</strong> <a href="mailto:${richiedente.email}">${richiedente.email}</a>
+                                                        </div>
+                                                        <div class="contact-row">
+                                                            <strong>Tel:</strong> <a href="tel:${richiedente.telefono}">${richiedente.telefono}</a>
+                                                        </div>
+                                                    </div>
                                                 </c:if>
                                             </div>
-
-                                            <%-- DATI UTENTE CHE HA VINTO (Owner) visibili al Finder --%>
-                                            <c:set var="richiedente" value="${mappaRichiedenti[r.idUtenteRichiedente]}" />
-                                            <c:if test="${not empty richiedente}">
-                                                <div class="contact-card owner-view">
-                                                    <div class="contact-header">
-                                                        <span class="material-icons">person</span>
-                                                        Contatti Proprietario
-                                                    </div>
-                                                    <div class="contact-row">
-                                                        <strong>Nome:</strong> ${richiedente.nome} ${richiedente.cognome}
-                                                    </div>
-                                                    <div class="contact-row">
-                                                        <strong>Email:</strong> <a href="mailto:${richiedente.email}">${richiedente.email}</a>
-                                                    </div>
-                                                    <div class="contact-row">
-                                                        <strong>Tel:</strong> <a href="tel:${richiedente.telefono}">${richiedente.telefono}</a>
-                                                    </div>
-                                                </div>
-                                            </c:if>
                                         </c:if>
 
                                         <c:if test="${r.stato == 'RIFIUTATO'}">
@@ -374,6 +380,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        // Inizializza mappa se ci sono le coordinate
         var lat = ${segnalazione.latitudine != null ? segnalazione.latitudine : 'null'};
         var lon = ${segnalazione.longitudine != null ? segnalazione.longitudine : 'null'};
 
@@ -387,6 +394,7 @@
                 .bindPopup("<b>${segnalazione.titolo}</b><br>${segnalazione.luogoRitrovamento}")
                 .openPopup();
         } else {
+            // Nascondi mappa se non ci sono coordinate
             document.getElementById('itemMap').style.display = 'none';
         }
     });

@@ -147,208 +147,6 @@ README.md
 <files>
 This section contains the contents of the repository's files.
 
-<file path="src/main/webapp/css/crea_segnalazione.css">
-/* --- OVERRIDE/ADATTAMENTO LAYOUT --- */
-
-/* Allarghiamo la card di destra rispetto al login standard */
-.auth-card.wide {
-    max-width: 850px; /* Più largo per contenere le due colonne del form */
-    width: 100%;
-}
-
-/* Titolo della pagina nel form */
-.form-page-title {
-    font-size: 2rem;
-    color: #202124;
-    margin-bottom: 10px;
-    font-weight: 800;
-}
-
-.form-page-subtitle {
-    color: #5F6368;
-    margin-bottom: 30px;
-    font-size: 1rem;
-}
-
-/* --- GRIGLIA DEL FORM --- */
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-/* Su mobile diventa una colonna sola */
-@media (max-width: 768px) {
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* --- STILI INPUT MODERNI (Mantenuti) --- */
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #5F6368;
-    font-size: 0.9rem;
-}
-
-/* Input, Select, Textarea */
-.form-input,
-.form-select,
-.form-textarea {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #EEEEEE;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    color: #333;
-    background-color: #FAFAFA;
-    transition: all 0.2s ease;
-    font-family: inherit;
-    box-sizing: border-box;
-}
-
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
-    border-color: #FB8C00;
-    background-color: #FFFFFF;
-    box-shadow: 0 0 0 4px rgba(251, 140, 0, 0.1);
-    outline: none;
-}
-
-/* Textarea specifica */
-.form-textarea {
-    resize: vertical;
-    min-height: 100px;
-    line-height: 1.5;
-}
-
-/* Select custom arrow */
-.form-select {
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235F6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
-    background-size: 1em;
-    padding-right: 2.5rem;
-    cursor: pointer;
-}
-
-/* --- FILE UPLOAD MODERNO --- */
-.file-input-hidden {
-    display: none;
-}
-
-.file-upload-label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 20px;
-    border: 2px dashed #E0E0E0;
-    border-radius: 12px;
-    background-color: #FAFAFA;
-    color: #757575;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: center;
-}
-
-.file-upload-label:hover {
-    border-color: #FB8C00;
-    background-color: #FFF8E1;
-    color: #E65100;
-}
-
-.file-upload-icon {
-    font-size: 32px;
-    color: #FB8C00;
-}
-
-#file-name-display {
-    margin-top: 8px;
-    font-size: 0.85rem;
-    color: #2E7D32;
-    font-weight: 600;
-    text-align: center;
-    min-height: 20px;
-}
-
-/* --- BOTTONE SUBMIT --- */
-.btn-submit-modern {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #FB8C00, #EF6C00);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(239, 108, 0, 0.25);
-    margin-top: 20px;
-}
-
-.btn-submit-modern:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(239, 108, 0, 0.35);
-    background: linear-gradient(135deg, #FFA726, #FB8C00);
-}
-
-/* Utilities */
-.hidden { display: none; }
-hr { border-color: #EEE; }
-
-/* --- BOX DETTAGLI DROP-POINT --- */
-.dp-details-box {
-    margin-top: 15px;
-    padding: 16px;
-    background-color: #FFF8E1; /* Giallo chiaro */
-    border: 1px solid #FFE0B2;
-    border-radius: 12px;
-    color: #333;
-    font-size: 0.9rem;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-.dp-details-title {
-    font-weight: 700;
-    color: #E65100; /* Arancione scuro */
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.dp-info-row {
-    margin-bottom: 4px;
-    display: flex;
-    gap: 8px;
-}
-
-.dp-icon-small {
-    font-size: 18px;
-    color: #FB8C00;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-</file>
-
 <file path=".mvn/wrapper/maven-wrapper.properties">
 distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.6/apache-maven-3.9.6-bin.zip
 wrapperUrl=https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.3.0/maven-wrapper-3.3.0.jar
@@ -583,277 +381,6 @@ public class ClassificaServlet extends HttpServlet {
 }
 </file>
 
-<file path="src/main/java/controller/CreaSegnalazioneServlet.java">
-package controller;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.Part;
-import model.bean.Segnalazione;
-import model.bean.SegnalazioneAnimale;
-import model.bean.SegnalazioneOggetto;
-import model.bean.Utente;
-import model.bean.enums.CategoriaOggetto;
-import model.bean.enums.ModalitaConsegna;
-import model.bean.enums.StatoSegnalazione;
-import model.service.DropPointService;
-import model.service.SegnalazioneService;
-
-import java.io.File;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.UUID;
-
-@WebServlet(name = "CreaSegnalazioneServlet", value = "/crea-segnalazione")
-@MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-        maxFileSize = 1024 * 1024 * 10,      // 10MB
-        maxRequestSize = 1024 * 1024 * 50    // 50MB
-)
-public class CreaSegnalazioneServlet extends HttpServlet {
-
-    private final DropPointService dropPointService = new DropPointService();
-    private final SegnalazioneService segnalazioneService = new SegnalazioneService();
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
-
-        if (utente == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        // Carica i drop point per la select
-        request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
-        request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
-
-        if (utente == null) {
-            response.sendRedirect("login");
-            return;
-        }
-
-        try {
-            // 1. RECUPERO PARAMETRI (Nomi allineati alla JSP moderna)
-            String tipo = request.getParameter("tipo_segnalazione"); // Era "tipo"
-            String titolo = request.getParameter("titolo");
-            String descrizione = request.getParameter("descrizione");
-            String dataStr = request.getParameter("dataRitrovamento");
-            String luogo = request.getParameter("luogo_ritrovamento"); // Era "luogo"
-            String citta = request.getParameter("citta");
-            String provincia = request.getParameter("provincia");
-            String domanda1 = request.getParameter("domanda1"); // Nella JSP è name="domanda1"
-            String domanda2 = request.getParameter("domanda2"); // Nella JSP è name="domanda2"
-
-            Segnalazione segnalazione;
-
-            // 2. Creazione Oggetto Polimorfico
-            if ("OGGETTO".equalsIgnoreCase(tipo)) {
-                SegnalazioneOggetto so = new SegnalazioneOggetto();
-
-                String categoriaStr = request.getParameter("categoria");
-                // Controllo per evitare errori se la categoria è vuota o non valida
-                if (categoriaStr != null && !categoriaStr.isEmpty()) {
-                    try {
-                        so.setCategoria(CategoriaOggetto.valueOf(categoriaStr));
-                    } catch (IllegalArgumentException e) {
-                        // Se la categoria non esiste (es. BORSE), fallback su ALTRO
-                        so.setCategoria(CategoriaOggetto.ALTRO);
-                    }
-                } else {
-                    so.setCategoria(CategoriaOggetto.ALTRO);
-                }
-
-                // Recupero modalità di consegna
-                String modalitaStr = request.getParameter("modalita_consegna"); // Era "modalita"
-
-                if ("DROP_POINT".equals(modalitaStr)) {
-                    so.setModalitaConsegna(ModalitaConsegna.DROP_POINT);
-                    String idDpStr = request.getParameter("idDropPoint");
-                    if (idDpStr != null && !idDpStr.isEmpty()) {
-                        so.setIdDropPoint(Long.parseLong(idDpStr));
-                    }
-                } else {
-                    so.setModalitaConsegna(ModalitaConsegna.DIRETTA);
-                    so.setIdDropPoint(null);
-                }
-
-                segnalazione = so;
-            } else {
-                // Caso ANIMALE
-                SegnalazioneAnimale sa = new SegnalazioneAnimale();
-                sa.setSpecie(request.getParameter("specie"));
-                sa.setRazza(request.getParameter("razza"));
-                segnalazione = sa;
-            }
-
-            // 3. Popolamento Dati Comuni
-            segnalazione.setIdUtente(utente.getId());
-            segnalazione.setTitolo(titolo);
-            segnalazione.setDescrizione(descrizione);
-            segnalazione.setLuogoRitrovamento(luogo);
-            segnalazione.setCitta(citta);
-            segnalazione.setProvincia(provincia);
-            segnalazione.setDomandaVerifica1(domanda1);
-            segnalazione.setDomandaVerifica2(domanda2);
-            segnalazione.setStato(StatoSegnalazione.APERTA);
-            segnalazione.setDataPubblicazione(new Timestamp(System.currentTimeMillis()));
-
-            // Gestione Data (Supporta sia 'date' che 'datetime-local')
-            if (dataStr != null && !dataStr.isEmpty()) {
-                if (dataStr.contains("T")) {
-                    // Formato datetime-local (yyyy-MM-ddTHH:mm)
-                    LocalDateTime dt = LocalDateTime.parse(dataStr);
-                    segnalazione.setDataRitrovamento(Timestamp.valueOf(dt));
-                } else {
-                    // Formato date (yyyy-MM-dd)
-                    LocalDate date = LocalDate.parse(dataStr);
-                    segnalazione.setDataRitrovamento(Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)));
-                }
-            }
-
-            // 4. Gestione Immagine
-            Part filePart = request.getPart("immagine");
-            if (filePart != null && filePart.getSize() > 0) {
-                String originalName = filePart.getSubmittedFileName();
-                String ext = ".jpg";
-                if(originalName.contains(".")) {
-                    ext = originalName.substring(originalName.lastIndexOf("."));
-                }
-                String fileName = UUID.randomUUID().toString() + ext;
-
-                String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) uploadDir.mkdir();
-
-                filePart.write(uploadPath + File.separator + fileName);
-                segnalazione.setImmagine("uploads/" + fileName);
-            } else {
-                segnalazione.setImmagine("assets/images/default-item.png");
-            }
-
-            // 5. Salvataggio
-            boolean successo = segnalazioneService.creaSegnalazione(segnalazione);
-
-            if (successo) {
-                response.sendRedirect(request.getContextPath() + "/index?msg=success_segnalazione");
-            } else {
-                request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
-                request.setAttribute("errore", "Errore nel salvataggio. Controlla i dati inseriti.");
-                request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp").forward(request, response);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
-            request.setAttribute("errore", "Errore tecnico: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp").forward(request, response);
-        }
-    }
-}
-</file>
-
-<file path="src/main/java/controller/DettaglioSegnalazioneServlet.java">
-package controller;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import model.bean.Reclamo;
-import model.bean.Segnalazione;
-import model.bean.Utente;
-import model.dao.ReclamoDAO;
-import model.dao.UtenteDAO;
-import model.service.SegnalazioneService;
-
-import java.io.IOException;
-import java.util.List;
-
-@WebServlet(name = "DettaglioSegnalazioneServlet", value = "/dettaglio-segnalazione")
-public class DettaglioSegnalazioneServlet extends HttpServlet {
-
-    private final SegnalazioneService segnalazioneService = new SegnalazioneService();
-    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
-    private final UtenteDAO utenteDAO = new UtenteDAO();
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String idStr = request.getParameter("id");
-        if (idStr == null) {
-            response.sendRedirect("index");
-            return;
-        }
-
-        long id = Long.parseLong(idStr);
-        Segnalazione s = segnalazioneService.trovaPerId(id);
-
-        if (s == null) {
-            response.sendRedirect("index");
-            return;
-        }
-
-        HttpSession session = request.getSession(false);
-        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
-
-        if (utente != null) {
-            if (utente.getId() == s.getIdUtente()) {
-                // CASO PROPRIETARIO: Carico tutti i reclami ricevuti
-                List<Reclamo> reclami = reclamoDAO.doRetrieveBySegnalazione(s.getId());
-                request.setAttribute("reclamiRicevuti", reclami);
-            } else {
-                // CASO UTENTE NORMALE: Controllo se HO GIÀ fatto un reclamo
-                Reclamo mioReclamo = reclamoDAO.doRetrieveBySegnalazioneAndUtente(s.getId(), utente.getId());
-                request.setAttribute("mioReclamo", mioReclamo);
-            }
-        }
-
-        // Recupero info del proprietario (opzionale, per mostrare chi l'ha trovato)
-        Utente proprietario = utenteDAO.doRetrieveById(s.getIdUtente());
-        request.setAttribute("proprietarioSegnalazione", proprietario);
-
-        request.setAttribute("segnalazione", s);
-        request.getRequestDispatcher("/WEB-INF/jsp/dettaglio_segnalazione.jsp").forward(request, response);
-    }
-
-    // doPost (Gestione eliminazione) rimane invariato...
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-        String idStr = request.getParameter("idSegnalazione");
-
-        if ("delete".equals(action) && idStr != null) {
-            long id = Long.parseLong(idStr);
-            HttpSession session = request.getSession(false);
-            Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
-            Segnalazione s = segnalazioneService.trovaPerId(id);
-
-            if (utente != null && s != null && s.getIdUtente() == utente.getId()) {
-                segnalazioneService.eliminaSegnalazione(id);
-            }
-            response.sendRedirect("le-mie-segnalazioni");
-        }
-    }
-}
-</file>
-
 <file path="src/main/java/controller/DropPointServlet.java">
 package controller;
 
@@ -883,83 +410,6 @@ public class DropPointServlet extends HttpServlet {
 
         request.getRequestDispatcher("/WEB-INF/jsp/drop_point.jsp")
                 .forward(request, response);
-    }
-}
-</file>
-
-<file path="src/main/java/controller/GestioneReclamoServlet.java">
-package controller;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import model.bean.Reclamo;
-import model.bean.Segnalazione;
-import model.bean.SegnalazioneOggetto;
-import model.bean.Utente;
-import model.bean.enums.ModalitaConsegna;
-import model.dao.ReclamoDAO;
-import model.service.SegnalazioneService;
-
-import java.io.IOException;
-import java.util.UUID;
-
-@WebServlet(name = "GestioneReclamoServlet", value = "/gestione-reclamo")
-public class GestioneReclamoServlet extends HttpServlet {
-
-    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
-    private final SegnalazioneService segnalazioneService = new SegnalazioneService();
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-        HttpSession session = request.getSession(false);
-        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
-
-        if (utente == null) {
-            response.sendRedirect("login");
-            return;
-        }
-
-        if ("invia".equals(action)) {
-            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
-
-            // CONTROLLO DUPLICATI: Se esiste già un reclamo, stop.
-            if (reclamoDAO.doRetrieveBySegnalazioneAndUtente(idSegnalazione, utente.getId()) != null) {
-                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_esistente");
-                return;
-            }
-
-            Reclamo r = new Reclamo();
-            r.setIdSegnalazione(idSegnalazione);
-            r.setIdUtenteRichiedente(utente.getId());
-            r.setRispostaVerifica1(request.getParameter("risposta1"));
-            r.setRispostaVerifica2(request.getParameter("risposta2"));
-
-            reclamoDAO.doSave(r);
-            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_inviato");
-
-        } else if ("accetta".equals(action)) {
-            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
-            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
-
-            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
-            String codice = null;
-            if (s instanceof SegnalazioneOggetto) {
-                SegnalazioneOggetto so = (SegnalazioneOggetto) s;
-                if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
-                    codice = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-                }
-            }
-
-            // Chiama il service che chiude la segnalazione e accetta il reclamo
-            segnalazioneService.accettaReclamoEChiudiSegnalazione(idReclamo, idSegnalazione, codice);
-
-            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_accettato");
-        }
     }
 }
 </file>
@@ -1347,101 +797,6 @@ public class Utente {
 }
 </file>
 
-<file path="src/main/java/model/dao/ReclamoDAO.java">
-package model.dao;
-
-import model.ConPool;
-import model.bean.Reclamo;
-import model.bean.enums.StatoReclamo;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-
-public class ReclamoDAO {
-
-    public boolean doSave(Reclamo r) {
-        String query = "INSERT INTO reclamo (id_segnalazione, id_utente_richiedente, risposta_verifica1, risposta_verifica2, stato, data_richiesta) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setLong(1, r.getIdSegnalazione());
-            ps.setLong(2, r.getIdUtenteRichiedente());
-            ps.setString(3, r.getRispostaVerifica1());
-            ps.setString(4, r.getRispostaVerifica2());
-            ps.setString(5, StatoReclamo.IN_ATTESA.toString());
-            ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
-    }
-
-    public List<Reclamo> doRetrieveBySegnalazione(long idSegnalazione) {
-        List<Reclamo> list = new ArrayList<>();
-        String query = "SELECT * FROM reclamo WHERE id_segnalazione = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setLong(1, idSegnalazione);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return list;
-    }
-
-    /**
-     * NUOVO METODO: Controlla se un utente ha già fatto reclamo per una segnalazione
-     */
-    public Reclamo doRetrieveBySegnalazioneAndUtente(long idSegnalazione, long idUtente) {
-        String query = "SELECT * FROM reclamo WHERE id_segnalazione = ? AND id_utente_richiedente = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setLong(1, idSegnalazione);
-            ps.setLong(2, idUtente);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return null;
-    }
-
-    public boolean accettaReclamo(long idReclamo, String codice) {
-        String query = "UPDATE reclamo SET stato = 'ACCETTATO', codice_consegna = ? WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setString(1, codice);
-            ps.setLong(2, idReclamo);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
-    }
-
-    public Reclamo doRetrieveById(long id) {
-        String query = "SELECT * FROM reclamo WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setLong(1, id);
-            try(ResultSet rs = ps.executeQuery()){
-                if(rs.next()) return mapRow(rs);
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return null;
-    }
-
-    private Reclamo mapRow(ResultSet rs) throws SQLException {
-        Reclamo r = new Reclamo();
-        r.setId(rs.getLong("id"));
-        r.setIdSegnalazione(rs.getLong("id_segnalazione"));
-        r.setIdUtenteRichiedente(rs.getLong("id_utente_richiedente"));
-        r.setRispostaVerifica1(rs.getString("risposta_verifica1"));
-        r.setRispostaVerifica2(rs.getString("risposta_verifica2"));
-        try {
-            r.setStato(StatoReclamo.valueOf(rs.getString("stato")));
-        } catch (Exception e) {}
-        r.setCodiceConsegna(rs.getString("codice_consegna"));
-        return r;
-    }
-}
-</file>
-
 <file path="src/main/java/model/service/RecuperoPasswordService.java">
 package model.service;
 
@@ -1657,266 +1012,204 @@ public class PasswordUtils {
 }
 </file>
 
-<file path="src/main/webapp/css/dettaglio_segnalazione.css">
-/* Contenitore principale centrato e limitato */
-.local-wrapper {
-    max-width: 1100px;
-    margin: 30px auto 60px auto;
-    padding: 0 20px;
+<file path="src/main/webapp/css/crea_segnalazione.css">
+/* --- OVERRIDE/ADATTAMENTO LAYOUT --- */
+
+/* Allarghiamo la card di destra rispetto al login standard */
+.auth-card.wide {
+    max-width: 850px; /* Più largo per contenere le due colonne del form */
     width: 100%;
-    box-sizing: border-box;
 }
 
-/* Link indietro */
-.local-back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: #5F6368;
-    text-decoration: none;
-    font-weight: 500;
-    margin-bottom: 20px;
-    font-size: 0.95rem;
-}
-.local-back-link:hover { color: #FB8C00; }
-
-/* Griglia Layout: 65% Contenuto - 35% Sidebar */
-.local-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 30px;
-    align-items: start;
-}
-
-/* Mobile: Colonna unica */
-@media (max-width: 900px) {
-    .local-grid { grid-template-columns: 1fr; }
-}
-
-/* --- CARD PRINCIPALE --- */
-.local-card {
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #e0e0e0;
-    overflow: hidden; /* Importante per non far uscire l'immagine */
-}
-
-/* Immagine */
-.local-hero-img {
-    width: 100%;
-    height: 400px;
-    object-fit: cover;
-    display: block;
-    background-color: #f5f5f5;
-}
-
-.local-hero-placeholder {
-    width: 100%;
-    height: 300px;
-    background: #f5f5f5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #bdbdbd;
-}
-
-/* Contenuto interno */
-.local-content { padding: 24px; }
-
-/* Badge in alto */
-.local-badges { display: flex; gap: 8px; margin-bottom: 12px; }
-.local-badge {
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-.bg-green { background: #E8F5E9; color: #2E7D32; }
-.bg-grey { background: #F5F5F5; color: #616161; border: 1px solid #eee; }
-
-/* Titolo e testi */
-.local-title {
-    font-size: 1.8rem;
-    margin: 0 0 20px 0;
+/* Titolo della pagina nel form */
+.form-page-title {
+    font-size: 2rem;
     color: #202124;
-    line-height: 1.2;
+    margin-bottom: 10px;
+    font-weight: 800;
 }
 
-.local-label { font-size: 0.95rem; font-weight: 700; color: #202124; display: block; margin-bottom: 6px; }
-.local-text { font-size: 1rem; color: #5F6368; line-height: 1.6; margin-bottom: 24px; }
+.form-page-subtitle {
+    color: #5F6368;
+    margin-bottom: 30px;
+    font-size: 1rem;
+}
 
-/* Meta Grid (Data/Luogo) */
-.local-meta-grid {
+/* --- GRIGLIA DEL FORM --- */
+.form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
-    padding: 16px 0;
-    margin-bottom: 24px;
 }
 
-.local-meta-item { display: flex; flex-direction: column; gap: 4px; }
-.local-meta-sub { font-size: 0.8rem; color: #9e9e9e; }
-.local-meta-val { display: flex; align-items: center; gap: 6px; font-weight: 600; color: #333; }
-.local-meta-val .material-icons { font-size: 18px; color: #757575; }
-
-/* Box Consegna (Viola/Verde) */
-.local-delivery-box {
-    padding: 20px;
-    border-radius: 12px;
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
+/* Su mobile diventa una colonna sola */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
-/* Tema Viola (DropPoint) */
-.theme-purple { background: #F3E5F5; border: 1px solid #E1BEE7; }
-.theme-purple .icon-circle { background: #E1BEE7; color: #7B1FA2; }
-.theme-purple h4 { color: #4A148C; }
-.theme-purple p { color: #6A1B9A; }
-.theme-purple .d-badge { border: 1px solid #E1BEE7; color: #7B1FA2; }
-
-/* Tema Verde (Diretta) */
-.theme-green { background: #E8F5E9; border: 1px solid #C8E6C9; }
-.theme-green .icon-circle { background: #C8E6C9; color: #1B5E20; }
-.theme-green h4 { color: #1B5E20; }
-.theme-green p { color: #2E7D32; }
-.theme-green .d-badge { border: 1px solid #C8E6C9; color: #2E7D32; }
-
-.icon-circle {
-    width: 40px; height: 40px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-}
-
-.delivery-info h4 { margin: 0 0 4px 0; font-size: 1rem; }
-.delivery-info p { margin: 0; font-size: 0.9rem; line-height: 1.4; }
-.d-badge {
-    display: inline-block; background: #fff; padding: 2px 8px;
-    border-radius: 4px; font-size: 0.7rem; font-weight: 700;
-    text-transform: uppercase; margin-bottom: 6px;
-}
-
-/* --- SIDEBAR / BOX AZIONI --- */
-.local-sidebar-box {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 24px;
+/* --- STILI INPUT MODERNI (Mantenuti) --- */
+.form-group {
     margin-bottom: 20px;
 }
 
-.sidebar-title { font-size: 1rem; font-weight: 700; margin-bottom: 12px; color: #202124; }
-
-/* Bottoni */
-.btn-full { width: 100%; display: block; text-align: center; }
-.btn-claim {
-    background: #E65100; color: white; border: none; padding: 12px;
-    border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;
-}
-.btn-claim:hover { background: #EF6C00; }
-
-.btn-outline-danger {
-    background: transparent; border: 1px solid #d32f2f; color: #d32f2f;
-    padding: 8px; border-radius: 6px; cursor: pointer; font-size: 0.9rem;
-}
-.btn-outline-danger:hover { background: #ffebee; }
-
-/* Input form reclamo */
-.claim-input {
-    width: 100%; padding: 10px; border: 1px solid #ccc;
-    border-radius: 6px; margin-bottom: 10px; font-size: 0.95rem;
-}
-
-/* Lista reclami owner */
-.claim-item {
-    background: #fafafa; border: 1px solid #eee; padding: 10px;
-    border-radius: 8px; margin-bottom: 8px; font-size: 0.9rem;
-}
-
-ds-badge-red {
-    background: #FFEBEE;
-    color: #C62828;
-    border: 1px solid #FFCDD2;
-}
-
-/* Box Codice Ritiro per il vincitore */
-.winner-code-box {
-    margin-top: 15px;
-    background: #FFFFFF;
-    border: 2px dashed #2E7D32; /* Bordo verde tratteggiato */
-    padding: 10px;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.winner-code-label {
-    font-size: 0.8rem;
-    color: #2E7D32;
-    text-transform: uppercase;
-    font-weight: 700;
+.form-label {
     display: block;
-    margin-bottom: 4px;
-}
-
-.winner-code-value {
-    font-family: 'Courier New', monospace;
-    font-size: 1.4rem;
-    font-weight: 900;
-    color: #202124;
-    letter-spacing: 2px;
-}
-/* --- NUOVI STILI PER STATO E CODICE --- */
-
-/* Badge Rosso per stato CHIUSA */
-.bg-red {
-    background: #FFEBEE;
-    color: #C62828;
-    border: 1px solid #FFCDD2;
-}
-
-/* Box per il vincitore */
-.winner-box {
-    background-color: #E8F5E9; /* Verde chiarissimo */
-    border: 2px dashed #43A047; /* Bordo tratteggiato */
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    margin-top: 20px;
-    animation: fadeIn 0.5s ease;
-}
-
-.winner-title {
-    color: #2E7D32;
-    font-weight: 700;
-    font-size: 1.1rem;
     margin-bottom: 8px;
-    display: block;
-}
-
-.winner-code {
-    display: block;
-    font-size: 2rem;
-    font-weight: 900;
-    color: #1B5E20;
-    letter-spacing: 4px;
-    font-family: 'Courier New', monospace;
-    background: #FFFFFF;
-    padding: 10px;
-    border-radius: 8px;
-    margin: 10px 0;
-    border: 1px solid #C8E6C9;
-}
-
-.winner-info {
+    font-weight: 600;
+    color: #5F6368;
     font-size: 0.9rem;
-    color: #388E3C;
+}
+
+/* Input, Select, Textarea */
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #EEEEEE;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    color: #333;
+    background-color: #FAFAFA;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    border-color: #FB8C00;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 4px rgba(251, 140, 0, 0.1);
+    outline: none;
+}
+
+/* Textarea specifica */
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.5;
+}
+
+/* Select custom arrow */
+.form-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235F6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+/* --- FILE UPLOAD MODERNO --- */
+.file-input-hidden {
+    display: none;
+}
+
+.file-upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    border: 2px dashed #E0E0E0;
+    border-radius: 12px;
+    background-color: #FAFAFA;
+    color: #757575;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.file-upload-label:hover {
+    border-color: #FB8C00;
+    background-color: #FFF8E1;
+    color: #E65100;
+}
+
+.file-upload-icon {
+    font-size: 32px;
+    color: #FB8C00;
+}
+
+#file-name-display {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #2E7D32;
+    font-weight: 600;
+    text-align: center;
+    min-height: 20px;
+}
+
+/* --- BOTTONE SUBMIT --- */
+.btn-submit-modern {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #FB8C00, #EF6C00);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(239, 108, 0, 0.25);
+    margin-top: 20px;
+}
+
+.btn-submit-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 108, 0, 0.35);
+    background: linear-gradient(135deg, #FFA726, #FB8C00);
+}
+
+/* Utilities */
+.hidden { display: none; }
+hr { border-color: #EEE; }
+
+/* --- BOX DETTAGLI DROP-POINT --- */
+.dp-details-box {
+    margin-top: 15px;
+    padding: 16px;
+    background-color: #FFF8E1; /* Giallo chiaro */
+    border: 1px solid #FFE0B2;
+    border-radius: 12px;
+    color: #333;
+    font-size: 0.9rem;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.dp-details-title {
+    font-weight: 700;
+    color: #E65100; /* Arancione scuro */
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dp-info-row {
+    margin-bottom: 4px;
+    display: flex;
+    gap: 8px;
+}
+
+.dp-icon-small {
+    font-size: 18px;
+    color: #FB8C00;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(-5px); }
     to { opacity: 1; transform: translateY(0); }
 }
 </file>
@@ -2671,281 +1964,6 @@ ds-badge-red {
 </html>
 </file>
 
-<file path="src/main/webapp/WEB-INF/jsp/dettaglio_segnalazione.jsp">
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%@ page import="model.bean.Utente" %>
-<%@ page import="model.bean.enums.ModalitaConsegna" %>
-<%@ page import="model.bean.SegnalazioneOggetto" %>
-<jsp:include page="navbar.jsp" />
-<%
-    Utente utente = (Utente) session.getAttribute("utente");
-    model.bean.Segnalazione s = (model.bean.Segnalazione) request.getAttribute("segnalazione");
-    boolean isLogged = (utente != null);
-    boolean isOwner = (isLogged && s != null && s.getIdUtente() == utente.getId());
-
-    boolean isDropPoint = false;
-    if (s instanceof SegnalazioneOggetto) {
-        SegnalazioneOggetto so = (SegnalazioneOggetto) s;
-        if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
-            isDropPoint = true;
-        }
-    }
-%>
-
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <title>${segnalazione.titolo != null ? segnalazione.titolo : "Dettaglio"} - Foundly</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-</head>
-
-<body>
-
-<div class="local-wrapper">
-
-    <a href="${pageContext.request.contextPath}/index" class="local-back-link">
-        <span class="material-icons" style="font-size:18px;">arrow_back</span>
-        Torna alla Home
-    </a>
-
-    <%-- Messaggio se non trovata --%>
-    <c:if test="${segnalazione == null}">
-        <div class="local-card" style="padding: 50px; text-align: center;">
-            <h2>Segnalazione non trovata</h2>
-            <p class="local-text" style="margin-top:10px;">Potrebbe essere stata rimossa o non esistere più.</p>
-            <a href="${pageContext.request.contextPath}/index" class="btn-claim" style="display:inline-block; width:auto; text-decoration:none;">Vai alla Home</a>
-        </div>
-    </c:if>
-
-    <%-- Contenuto se trovata --%>
-    <c:if test="${segnalazione != null}">
-        <div class="local-grid">
-
-            <div class="local-card">
-
-                <c:choose>
-                    <c:when test="${not empty segnalazione.immagine and segnalazione.immagine != 'default.png'}">
-                        <img src="${pageContext.request.contextPath}/${segnalazione.immagine}" alt="${segnalazione.titolo}" class="local-hero-img">
-                    </c:when>
-                    <c:otherwise>
-                        <div class="local-hero-placeholder">
-                            <span class="material-icons" style="font-size: 64px;">inventory_2</span>
-                        </div>
-                    </c:otherwise>
-                </c:choose>
-
-                <div class="local-content">
-                    <div class="local-badges">
-                            <%-- LOGICA COLORE BADGE: Rosso se CHIUSA, Verde se altro (APERTA) --%>
-                        <span class="local-badge ${segnalazione.stato == 'CHIUSA' ? 'bg-red' : 'bg-green'}">
-                                ${segnalazione.stato}
-                        </span>
-
-                        <span class="local-badge bg-grey">${segnalazione.tipoSegnalazione}</span>
-                        <span class="local-badge bg-grey" style="text-transform: capitalize;">
-                            <c:choose>
-                                <c:when test="${segnalazione.tipoSegnalazione == 'OGGETTO'}">${segnalazione.categoria}</c:when>
-                                <c:otherwise>Animale: ${segnalazione.specie}</c:otherwise>
-                            </c:choose>
-                        </span>
-                    </div>
-
-                    <h1 class="local-title">${segnalazione.titolo}</h1>
-
-                    <span class="local-label">Descrizione</span>
-                    <p class="local-text">${segnalazione.descrizione}</p>
-
-                    <div class="local-meta-grid">
-                        <div class="local-meta-item">
-                            <span class="local-meta-sub">Data ritrovamento</span>
-                            <div class="local-meta-val">
-                                <span class="material-icons">calendar_today</span>
-                                <fmt:formatDate value="${segnalazione.dataRitrovamento}" pattern="dd MMMM yyyy"/>
-                            </div>
-                        </div>
-                        <div class="local-meta-item">
-                            <span class="local-meta-sub">Luogo</span>
-                            <div class="local-meta-val">
-                                <span class="material-icons">location_on</span>
-                                <div>
-                                        ${segnalazione.luogoRitrovamento}<br>
-                                    <span style="font-weight:400; font-size:0.85rem; color:#757575;">${segnalazione.citta} (${segnalazione.provincia})</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <% if (isDropPoint) { %>
-                    <div class="local-delivery-box theme-purple">
-                        <div class="icon-circle">
-                            <span class="material-icons">store</span>
-                        </div>
-                        <div class="delivery-info">
-                            <span class="d-badge">Tramite Drop-Point</span>
-                            <h4>Modalità di Consegna: Drop-Point</h4>
-                            <p>L'oggetto sarà depositato presso un punto autorizzato. Il proprietario potrà ritirarlo presentando il codice di consegna.</p>
-                        </div>
-                    </div>
-                    <% } else { %>
-                    <div class="local-delivery-box theme-green">
-                        <div class="icon-circle">
-                            <span class="material-icons">handshake</span>
-                        </div>
-                        <div class="delivery-info">
-                            <span class="d-badge">Consegna Diretta</span>
-                            <h4>Modalità di Consegna: A mano</h4>
-                            <p>La restituzione avverrà tramite incontro diretto tra Finder e Proprietario. Accordatevi in un luogo sicuro.</p>
-                        </div>
-                    </div>
-                    <% } %>
-
-                </div>
-            </div>
-
-            <aside>
-
-                <c:if test="<%= !isOwner %>">
-                    <div class="local-sidebar-box">
-                        <h4 class="sidebar-title">È tuo questo oggetto?</h4>
-
-                        <c:if test="<%= !isLogged %>">
-                            <p class="local-text" style="font-size:0.9rem; margin-bottom:15px;">Accedi per inviare un reclamo e dimostrare di essere il proprietario.</p>
-                            <a href="login" class="btn-claim btn-full" style="text-decoration:none;">Accedi per Reclamare</a>
-                        </c:if>
-
-                        <c:if test="<%= isLogged %>">
-
-                            <c:choose>
-                                <c:when test="${not empty mioReclamo}">
-
-                                    <div style="text-align:center;">
-
-                                        <c:if test="${mioReclamo.stato == 'IN_ATTESA'}">
-                                            <div style="background:#FFF3E0; border:1px solid #FFE0B2; padding:15px; border-radius:8px;">
-                                                <span style="color:#E65100; font-weight:700; display:block; margin-bottom:5px;">
-                                                    <span class="material-icons" style="vertical-align:middle;">hourglass_top</span> Richiesta Inviata
-                                                </span>
-                                                <p style="font-size:0.9rem; color:#666; margin:0;">Il finder sta valutando le tue risposte. Riceverai una notifica se verrà accettata.</p>
-                                            </div>
-                                        </c:if>
-
-                                        <c:if test="${mioReclamo.stato == 'RIFIUTATO'}">
-                                            <div style="background:#FFEBEE; border:1px solid #FFCDD2; padding:15px; border-radius:8px;">
-                                                <span style="color:#C62828; font-weight:700; display:block; margin-bottom:5px;">
-                                                    <span class="material-icons" style="vertical-align:middle;">cancel</span> Richiesta Rifiutata
-                                                </span>
-                                                <p style="font-size:0.9rem; color:#666; margin:0;">Le risposte fornite non erano corrette o sufficienti.</p>
-                                            </div>
-                                        </c:if>
-
-                                        <c:if test="${mioReclamo.stato == 'ACCETTATO'}">
-                                            <div class="winner-box">
-                                                <span class="winner-title">🎉 Congratulazioni!</span>
-                                                <p class="winner-info">Il Finder ha confermato che l'oggetto è tuo.</p>
-
-                                                <c:if test="${not empty mioReclamo.codiceConsegna}">
-                                                    <span class="winner-title" style="font-size:0.9rem; margin-top:10px;">CODICE DI RITIRO</span>
-                                                    <span class="winner-code">${mioReclamo.codiceConsegna}</span>
-                                                    <p class="winner-info">Mostra questo codice al Drop-Point per ritirare il tuo oggetto.</p>
-                                                </c:if>
-
-                                                <c:if test="${empty mioReclamo.codiceConsegna}">
-                                                    <div style="margin-top:10px; padding:10px; background:#fff; border-radius:8px;">
-                                                        <strong>Scambio Diretto</strong>
-                                                        <p style="font-size:0.9rem; margin-top:5px;">Contatta il Finder tramite email per organizzare l'incontro.</p>
-                                                    </div>
-                                                </c:if>
-                                            </div>
-                                        </c:if>
-
-                                    </div>
-
-                                </c:when>
-                                <c:otherwise>
-                                    <p class="local-text" style="font-size:0.9rem; margin-bottom:15px;">Invia un reclamo per dimostrare di essere il proprietario rispondendo alle domande di sicurezza.</p>
-
-                                    <button onclick="document.getElementById('claimForm').style.display='block'; this.style.display='none'" class="btn-claim btn-full">
-                                        Invia Reclamo
-                                    </button>
-
-                                    <form id="claimForm" action="gestione-reclamo" method="post" style="display:none; margin-top:15px;">
-                                        <input type="hidden" name="action" value="invia">
-                                        <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-
-                                        <label class="local-label" style="font-size:0.85rem;">1. ${segnalazione.domandaVerifica1}</label>
-                                        <input type="text" name="risposta1" required class="claim-input">
-
-                                        <label class="local-label" style="font-size:0.85rem;">2. ${segnalazione.domandaVerifica2}</label>
-                                        <input type="text" name="risposta2" required class="claim-input">
-
-                                        <button class="btn-claim btn-full">Conferma Invio</button>
-                                    </form>
-                                </c:otherwise>
-                            </c:choose>
-                        </c:if>
-                    </div>
-                </c:if>
-
-                <c:if test="<%= isOwner %>">
-                    <div class="local-sidebar-box">
-                        <h4 class="sidebar-title" style="color:#E65100;">Gestione Proprietario</h4>
-
-                        <form action="dettaglio-segnalazione" method="post" onsubmit="return confirm('Eliminare definitivamente?');" style="margin-bottom:20px;">
-                            <input type="hidden" name="action" value="delete">
-                            <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-                            <button class="btn-outline-danger btn-full">
-                                <span class="material-icons" style="vertical-align:middle; font-size:18px;">delete</span> Elimina Segnalazione
-                            </button>
-                        </form>
-
-                        <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-
-                        <h5 style="margin-bottom:10px; color:#5f6368;">Reclami Ricevuti</h5>
-                        <c:if test="${empty reclamiRicevuti}">
-                            <p style="font-size:0.85rem; color:#999; font-style:italic;">Nessun reclamo ricevuto.</p>
-                        </c:if>
-
-                        <c:forEach var="r" items="${reclamiRicevuti}">
-                            <div class="claim-item">
-                                <strong>Utente #${r.idUtenteRichiedente}</strong>
-                                <div style="font-size:0.85rem; color:#555; margin-top:4px;">
-                                    R1: ${r.rispostaVerifica1}<br>
-                                    R2: ${r.rispostaVerifica2}
-                                </div>
-
-                                <c:if test="${r.stato == 'IN_ATTESA'}">
-                                    <form action="gestione-reclamo" method="post" style="margin-top:8px;">
-                                        <input type="hidden" name="action" value="accetta">
-                                        <input type="hidden" name="idReclamo" value="${r.id}">
-                                        <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-                                        <button style="width:100%; background:#2E7D32; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer;">Accetta</button>
-                                    </form>
-                                </c:if>
-                                <c:if test="${r.stato == 'ACCETTATO'}">
-                                    <div style="margin-top:6px; color:#2E7D32; font-weight:bold; font-size:0.8rem;">
-                                        <span class="material-icons" style="font-size:14px; vertical-align:middle;">check_circle</span> Accettato
-                                        <br>Codice: ${r.codiceConsegna}
-                                    </div>
-                                </c:if>
-                            </div>
-                        </c:forEach>
-                    </div>
-                </c:if>
-
-            </aside>
-        </div>
-    </c:if>
-</div>
-
-</body>
-</html>
-</file>
-
 <file path="src/main/webapp/WEB-INF/jsp/le_mie_segnalazioni.jsp">
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
@@ -3506,6 +2524,401 @@ if "%MAVEN_TERMINATE_CMD%"=="on" exit %ERROR_CODE%
 cmd /C exit /B %ERROR_CODE%
 </file>
 
+<file path="src/main/java/controller/CreaSegnalazioneServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneAnimale;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.CategoriaOggetto;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoSegnalazione;
+import model.service.DropPointService;
+import model.service.SegnalazioneService;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.UUID;
+
+@WebServlet(name = "CreaSegnalazioneServlet", value = "/crea-segnalazione")
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 10,      // 10MB
+        maxRequestSize = 1024 * 1024 * 50    // 50MB
+)
+public class CreaSegnalazioneServlet extends HttpServlet {
+
+    private final DropPointService dropPointService = new DropPointService();
+    private final SegnalazioneService segnalazioneService = new SegnalazioneService();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
+
+        if (utente == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        // Carica i drop point per la select
+        request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
+        request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
+
+        if (utente == null) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        try {
+            // 1. RECUPERO PARAMETRI (Nomi allineati alla JSP moderna)
+            String tipo = request.getParameter("tipo_segnalazione"); // Era "tipo"
+            String titolo = request.getParameter("titolo");
+            String descrizione = request.getParameter("descrizione");
+            String dataStr = request.getParameter("dataRitrovamento");
+            String luogo = request.getParameter("luogo_ritrovamento"); // Era "luogo"
+            String citta = request.getParameter("citta");
+            String provincia = request.getParameter("provincia");
+            String domanda1 = request.getParameter("domanda1"); // Nella JSP è name="domanda1"
+            String domanda2 = request.getParameter("domanda2"); // Nella JSP è name="domanda2"
+
+            Segnalazione segnalazione;
+
+            // 2. Creazione Oggetto Polimorfico
+            if ("OGGETTO".equalsIgnoreCase(tipo)) {
+                SegnalazioneOggetto so = new SegnalazioneOggetto();
+
+                String categoriaStr = request.getParameter("categoria");
+                // Controllo per evitare errori se la categoria è vuota o non valida
+                if (categoriaStr != null && !categoriaStr.isEmpty()) {
+                    try {
+                        so.setCategoria(CategoriaOggetto.valueOf(categoriaStr));
+                    } catch (IllegalArgumentException e) {
+                        // Se la categoria non esiste (es. BORSE), fallback su ALTRO
+                        so.setCategoria(CategoriaOggetto.ALTRO);
+                    }
+                } else {
+                    so.setCategoria(CategoriaOggetto.ALTRO);
+                }
+
+                // Recupero modalità di consegna
+                String modalitaStr = request.getParameter("modalita_consegna"); // Era "modalita"
+
+                if ("DROP_POINT".equals(modalitaStr)) {
+                    so.setModalitaConsegna(ModalitaConsegna.DROP_POINT);
+                    String idDpStr = request.getParameter("idDropPoint");
+                    if (idDpStr != null && !idDpStr.isEmpty()) {
+                        so.setIdDropPoint(Long.parseLong(idDpStr));
+                    }
+                } else {
+                    so.setModalitaConsegna(ModalitaConsegna.DIRETTA);
+                    so.setIdDropPoint(null);
+                }
+
+                segnalazione = so;
+            } else {
+                // Caso ANIMALE
+                SegnalazioneAnimale sa = new SegnalazioneAnimale();
+                sa.setSpecie(request.getParameter("specie"));
+                sa.setRazza(request.getParameter("razza"));
+                segnalazione = sa;
+            }
+
+            // 3. Popolamento Dati Comuni
+            segnalazione.setIdUtente(utente.getId());
+            segnalazione.setTitolo(titolo);
+            segnalazione.setDescrizione(descrizione);
+            segnalazione.setLuogoRitrovamento(luogo);
+            segnalazione.setCitta(citta);
+            segnalazione.setProvincia(provincia);
+            segnalazione.setDomandaVerifica1(domanda1);
+            segnalazione.setDomandaVerifica2(domanda2);
+            segnalazione.setStato(StatoSegnalazione.APERTA);
+            segnalazione.setDataPubblicazione(new Timestamp(System.currentTimeMillis()));
+
+            // Gestione Data (Supporta sia 'date' che 'datetime-local')
+            if (dataStr != null && !dataStr.isEmpty()) {
+                if (dataStr.contains("T")) {
+                    // Formato datetime-local (yyyy-MM-ddTHH:mm)
+                    LocalDateTime dt = LocalDateTime.parse(dataStr);
+                    segnalazione.setDataRitrovamento(Timestamp.valueOf(dt));
+                } else {
+                    // Formato date (yyyy-MM-dd)
+                    LocalDate date = LocalDate.parse(dataStr);
+                    segnalazione.setDataRitrovamento(Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)));
+                }
+            }
+
+            // 4. Gestione Immagine
+            Part filePart = request.getPart("immagine");
+            if (filePart != null && filePart.getSize() > 0) {
+                String originalName = filePart.getSubmittedFileName();
+                String ext = ".jpg";
+                if(originalName.contains(".")) {
+                    ext = originalName.substring(originalName.lastIndexOf("."));
+                }
+                String fileName = UUID.randomUUID().toString() + ext;
+
+                String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) uploadDir.mkdir();
+
+                filePart.write(uploadPath + File.separator + fileName);
+                segnalazione.setImmagine("uploads/" + fileName);
+            } else {
+                segnalazione.setImmagine("assets/images/default-item.png");
+            }
+
+            // 5. Salvataggio
+            boolean successo = segnalazioneService.creaSegnalazione(segnalazione);
+
+            if (successo) {
+                response.sendRedirect(request.getContextPath() + "/index?msg=success_segnalazione");
+            } else {
+                request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
+                request.setAttribute("errore", "Errore nel salvataggio. Controlla i dati inseriti.");
+                request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp").forward(request, response);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
+            request.setAttribute("errore", "Errore tecnico: " + e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp").forward(request, response);
+        }
+    }
+}
+</file>
+
+<file path="src/main/java/controller/DettaglioSegnalazioneServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.DropPoint;
+import model.bean.Reclamo;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.ModalitaConsegna;
+import model.dao.ReclamoDAO;
+import model.dao.UtenteDAO;
+import model.service.DropPointService;
+import model.service.SegnalazioneService;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@WebServlet(name = "DettaglioSegnalazioneServlet", value = "/dettaglio-segnalazione")
+public class DettaglioSegnalazioneServlet extends HttpServlet {
+
+    private final SegnalazioneService segnalazioneService = new SegnalazioneService();
+    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
+    private final UtenteDAO utenteDAO = new UtenteDAO();
+    private final DropPointService dropPointService = new DropPointService();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String idStr = request.getParameter("id");
+        if (idStr == null) {
+            response.sendRedirect("index");
+            return;
+        }
+
+        long id = Long.parseLong(idStr);
+        Segnalazione s = segnalazioneService.trovaPerId(id);
+
+        if (s == null) {
+            response.sendRedirect("index");
+            return;
+        }
+
+        // --- Recupero Drop-Point per la consegna (se applicabile) ---
+        if (s instanceof SegnalazioneOggetto) {
+            SegnalazioneOggetto so = (SegnalazioneOggetto) s;
+            if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT && so.getIdDropPoint() != null) {
+                DropPoint dp = dropPointService.trovaPerId(so.getIdDropPoint());
+                request.setAttribute("dropPointRitiro", dp);
+            }
+        }
+
+        HttpSession session = request.getSession(false);
+        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
+
+        if (utente != null) {
+            if (utente.getId() == s.getIdUtente()) {
+                // CASO PROPRIETARIO (Finder)
+                List<Reclamo> reclami = reclamoDAO.doRetrieveBySegnalazione(s.getId());
+                request.setAttribute("reclamiRicevuti", reclami);
+
+                // --- NUOVO: Mappa per associare ID Utente -> Oggetto Utente (Richiedente) ---
+                // Serve per mostrare i dati di chi ha fatto reclamo al Finder
+                Map<Long, Utente> mappaRichiedenti = new HashMap<>();
+                for (Reclamo r : reclami) {
+                    if (!mappaRichiedenti.containsKey(r.getIdUtenteRichiedente())) {
+                        Utente richiedente = utenteDAO.doRetrieveById(r.getIdUtenteRichiedente());
+                        mappaRichiedenti.put(r.getIdUtenteRichiedente(), richiedente);
+                    }
+                }
+                request.setAttribute("mappaRichiedenti", mappaRichiedenti);
+                // ----------------------------------------------------------------------------
+
+            } else {
+                // CASO UTENTE CHE CERCA (Owner)
+                Reclamo mioReclamo = reclamoDAO.doRetrieveBySegnalazioneAndUtente(s.getId(), utente.getId());
+                request.setAttribute("mioReclamo", mioReclamo);
+            }
+        }
+
+        // Recupero info del proprietario (Finder) per mostrarle all'Owner in caso di vittoria
+        Utente proprietario = utenteDAO.doRetrieveById(s.getIdUtente());
+        request.setAttribute("proprietarioSegnalazione", proprietario);
+
+        request.setAttribute("segnalazione", s);
+        request.getRequestDispatcher("/WEB-INF/jsp/dettaglio_segnalazione.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        String idStr = request.getParameter("idSegnalazione");
+
+        if ("delete".equals(action) && idStr != null) {
+            long id = Long.parseLong(idStr);
+            HttpSession session = request.getSession(false);
+            Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
+            Segnalazione s = segnalazioneService.trovaPerId(id);
+
+            if (utente != null && s != null && s.getIdUtente() == utente.getId()) {
+                segnalazioneService.eliminaSegnalazione(id);
+            }
+            response.sendRedirect("le-mie-segnalazioni");
+        }
+    }
+}
+</file>
+
+<file path="src/main/java/controller/GestioneReclamoServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.Reclamo;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.ModalitaConsegna;
+import model.dao.ReclamoDAO;
+import model.service.SegnalazioneService;
+
+import java.io.IOException;
+import java.util.UUID;
+
+@WebServlet(name = "GestioneReclamoServlet", value = "/gestione-reclamo")
+public class GestioneReclamoServlet extends HttpServlet {
+
+    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
+    private final SegnalazioneService segnalazioneService = new SegnalazioneService();
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        HttpSession session = request.getSession(false);
+        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
+
+        if (utente == null) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        if ("invia".equals(action)) {
+            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+
+            // 1. Recupero la segnalazione per verificare lo stato
+            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
+
+            // CONTROLLO STATO: Se non è APERTA, blocco tutto.
+            if (s == null || s.getStato() != model.bean.enums.StatoSegnalazione.APERTA) {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=segnalazione_chiusa");
+                return;
+            }
+
+            // 2. CONTROLLO DUPLICATI: Se esiste già un reclamo mio, stop.
+            if (reclamoDAO.doRetrieveBySegnalazioneAndUtente(idSegnalazione, utente.getId()) != null) {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_esistente");
+                return;
+            }
+
+            Reclamo r = new Reclamo();
+            r.setIdSegnalazione(idSegnalazione);
+            r.setIdUtenteRichiedente(utente.getId());
+            r.setRispostaVerifica1(request.getParameter("risposta1"));
+            r.setRispostaVerifica2(request.getParameter("risposta2"));
+
+            reclamoDAO.doSave(r);
+            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_inviato");
+
+        } else if ("accetta".equals(action)) {
+            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
+            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+
+            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
+            String codice = null;
+            if (s instanceof SegnalazioneOggetto) {
+                SegnalazioneOggetto so = (SegnalazioneOggetto) s;
+                if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
+                    codice = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+                }
+            }
+
+            // Chiama il service che chiude la segnalazione e accetta il reclamo
+            segnalazioneService.accettaReclamoEChiudiSegnalazione(idReclamo, idSegnalazione, codice);
+
+            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_accettato");
+
+        } else if ("rifiuta".equals(action)) {
+            // --- NUOVA LOGICA DI RIFIUTO ---
+            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
+            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+
+            // Chiama il service per aggiornare lo stato del reclamo a RIFIUTATO
+            segnalazioneService.rifiutaReclamo(idReclamo);
+
+            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_rifiutato");
+        }
+    }
+}
+</file>
+
 <file path="src/main/java/controller/IndexServlet.java">
 package controller;
 
@@ -3887,130 +3300,56 @@ public class DropPoint {
 }
 </file>
 
-<file path="src/main/java/model/dao/SegnalazioneDAO.java">
+<file path="src/main/java/model/dao/ReclamoDAO.java">
 package model.dao;
 
 import model.ConPool;
-import model.bean.Segnalazione;
-import model.bean.SegnalazioneAnimale;
-import model.bean.SegnalazioneOggetto;
-import model.bean.enums.StatoSegnalazione; // Importante
-import model.bean.enums.TipoSegnalazione;
-
+import model.bean.Reclamo;
+import model.bean.enums.StatoReclamo;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class SegnalazioneDAO {
+public class ReclamoDAO {
 
-    /**
-     * NUOVO METODO: Aggiorna lo stato (es. da APERTA a CHIUSA)
-     */
-    public boolean updateStato(long id, StatoSegnalazione nuovoStato) {
-        String query = "UPDATE segnalazione SET stato = ? WHERE id = ?";
+    public boolean doSave(Reclamo r) {
+        String query = "INSERT INTO reclamo (id_segnalazione, id_utente_richiedente, risposta_verifica1, risposta_verifica2, stato, data_richiesta) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setString(1, nuovoStato.toString());
-            ps.setLong(2, id);
+            ps.setLong(1, r.getIdSegnalazione());
+            ps.setLong(2, r.getIdUtenteRichiedente());
+            ps.setString(3, r.getRispostaVerifica1());
+            ps.setString(4, r.getRispostaVerifica2());
+            ps.setString(5, StatoReclamo.IN_ATTESA.toString());
+            ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 
-    public boolean doSave(Segnalazione s) {
-        String sqlPadre = "INSERT INTO segnalazione (id_utente, titolo, descrizione, data_ritrovamento, " +
-                "luogo_ritrovamento, citta, provincia, latitudine, longitudine, immagine, " +
-                "domanda_verifica1, domanda_verifica2, stato, tipo_segnalazione) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement psPadre = con.prepareStatement(sqlPadre, Statement.RETURN_GENERATED_KEYS)) {
-
-            con.setAutoCommit(false);
-            psPadre.setLong(1, s.getIdUtente());
-            psPadre.setString(2, s.getTitolo());
-            psPadre.setString(3, s.getDescrizione());
-            psPadre.setTimestamp(4, s.getDataRitrovamento());
-            psPadre.setString(5, s.getLuogoRitrovamento());
-            psPadre.setString(6, s.getCitta());
-            psPadre.setString(7, s.getProvincia());
-            psPadre.setObject(8, s.getLatitudine());
-            psPadre.setObject(9, s.getLongitudine());
-            psPadre.setString(10, s.getImmagine());
-            psPadre.setString(11, s.getDomandaVerifica1());
-            psPadre.setString(12, s.getDomandaVerifica2());
-            psPadre.setString(13, s.getStato().toString());
-            psPadre.setString(14, s.getTipoSegnalazione().toString());
-
-            int result = psPadre.executeUpdate();
-
-            if (result > 0) {
-                try (ResultSet generatedKeys = psPadre.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        long id = generatedKeys.getLong(1);
-                        s.setId(id);
-                        if (s instanceof SegnalazioneOggetto) saveOggetto(con, (SegnalazioneOggetto) s);
-                        else if (s instanceof SegnalazioneAnimale) saveAnimale(con, (SegnalazioneAnimale) s);
-                        con.commit();
-                        return true;
-                    }
-                }
-            }
-            con.rollback();
-        } catch (SQLException e) { e.printStackTrace(); }
-        return false;
-    }
-
-    private void saveOggetto(Connection con, SegnalazioneOggetto so) throws SQLException {
-        String sql = "INSERT INTO segnalazione_oggetto (id_segnalazione, categoria, modalita_consegna, id_drop_point) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setLong(1, so.getId());
-            ps.setString(2, so.getCategoria().toString());
-            ps.setString(3, so.getModalitaConsegna().toString());
-            ps.setObject(4, so.getIdDropPoint());
-            ps.executeUpdate();
-        }
-    }
-
-    private void saveAnimale(Connection con, SegnalazioneAnimale sa) throws SQLException {
-        String sql = "INSERT INTO segnalazione_animale (id_segnalazione, specie, razza) VALUES (?, ?, ?)";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setLong(1, sa.getId());
-            ps.setString(2, sa.getSpecie());
-            ps.setString(3, sa.getRazza());
-            ps.executeUpdate();
-        }
-    }
-
-    // HOME PAGE: Mostra APERTA e CHIUSA
-    public java.util.List<Segnalazione> doRetrieveLatest(int limit) {
-        java.util.List<Segnalazione> list = new java.util.ArrayList<>();
-        String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
-                "FROM segnalazione s " +
-                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
-                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
-                "WHERE s.stato IN ('APERTA', 'CHIUSA') " +
-                "ORDER BY s.data_pubblicazione DESC LIMIT ?";
-
+    public List<Reclamo> doRetrieveBySegnalazione(long idSegnalazione) {
+        List<Reclamo> list = new ArrayList<>();
+        String query = "SELECT * FROM reclamo WHERE id_segnalazione = ?";
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setInt(1, limit);
+            ps.setLong(1, idSegnalazione);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) list.add(mapRow(rs));
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return list;
     }
 
-    public Segnalazione doRetrieveById(long id) {
-        String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
-                "FROM segnalazione s " +
-                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
-                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
-                "WHERE s.id = ?";
+    /**
+     * NUOVO METODO: Controlla se un utente ha già fatto reclamo per una segnalazione
+     */
+    public Reclamo doRetrieveBySegnalazioneAndUtente(long idSegnalazione, long idUtente) {
+        String query = "SELECT * FROM reclamo WHERE id_segnalazione = ? AND id_utente_richiedente = ?";
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setLong(1, id);
+            ps.setLong(1, idSegnalazione);
+            ps.setLong(2, idUtente);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapRow(rs);
             }
@@ -4018,126 +3357,52 @@ public class SegnalazioneDAO {
         return null;
     }
 
-    public java.util.List<Segnalazione> doRetrieveByUtente(long idUtente) {
-        java.util.List<Segnalazione> list = new java.util.ArrayList<>();
-        String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
-                "FROM segnalazione s " +
-                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
-                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
-                "WHERE s.id_utente = ? ORDER BY s.data_pubblicazione DESC";
+    public boolean accettaReclamo(long idReclamo, String codice) {
+        String query = "UPDATE reclamo SET stato = 'ACCETTATO', codice_consegna = ? WHERE id = ?";
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setLong(1, idUtente);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) list.add(mapRow(rs));
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return list;
-    }
-
-    public boolean doDelete(long id) {
-        String query = "DELETE FROM segnalazione WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setLong(1, id);
+            ps.setString(1, codice);
+            ps.setLong(2, idReclamo);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 
-    private Segnalazione mapRow(ResultSet rs) throws SQLException {
-        Segnalazione s;
-        String tipo = rs.getString("tipo_segnalazione");
-        if ("OGGETTO".equals(tipo)) {
-            SegnalazioneOggetto so = new SegnalazioneOggetto();
-            try {
-                so.setCategoria(model.bean.enums.CategoriaOggetto.valueOf(rs.getString("categoria")));
-                so.setModalitaConsegna(model.bean.enums.ModalitaConsegna.valueOf(rs.getString("modalita_consegna")));
-            } catch (Exception e) {}
-            so.setIdDropPoint(rs.getObject("id_drop_point", Long.class));
-            s = so;
-        } else {
-            SegnalazioneAnimale sa = new SegnalazioneAnimale();
-            sa.setSpecie(rs.getString("specie"));
-            sa.setRazza(rs.getString("razza"));
-            s = sa;
-        }
-        s.setId(rs.getLong("id"));
-        s.setIdUtente(rs.getLong("id_utente"));
-        s.setTitolo(rs.getString("titolo"));
-        s.setDescrizione(rs.getString("descrizione"));
-        s.setDataRitrovamento(rs.getTimestamp("data_ritrovamento"));
-        s.setLuogoRitrovamento(rs.getString("luogo_ritrovamento"));
-        s.setCitta(rs.getString("citta"));
-        s.setProvincia(rs.getString("provincia"));
-        s.setLatitudine(rs.getObject("latitudine", Double.class));
-        s.setLongitudine(rs.getObject("longitudine", Double.class));
-        s.setImmagine(rs.getString("immagine"));
-        s.setDomandaVerifica1(rs.getString("domanda_verifica1"));
-        s.setDomandaVerifica2(rs.getString("domanda_verifica2"));
-        s.setDataPubblicazione(rs.getTimestamp("data_pubblicazione"));
+    public Reclamo doRetrieveById(long id) {
+        String query = "SELECT * FROM reclamo WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setLong(1, id);
+            try(ResultSet rs = ps.executeQuery()){
+                if(rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
+    }
+
+    private Reclamo mapRow(ResultSet rs) throws SQLException {
+        Reclamo r = new Reclamo();
+        r.setId(rs.getLong("id"));
+        r.setIdSegnalazione(rs.getLong("id_segnalazione"));
+        r.setIdUtenteRichiedente(rs.getLong("id_utente_richiedente"));
+        r.setRispostaVerifica1(rs.getString("risposta_verifica1"));
+        r.setRispostaVerifica2(rs.getString("risposta_verifica2"));
         try {
-            s.setStato(model.bean.enums.StatoSegnalazione.valueOf(rs.getString("stato")));
-            s.setTipoSegnalazione(model.bean.enums.TipoSegnalazione.valueOf(tipo));
+            r.setStato(StatoReclamo.valueOf(rs.getString("stato")));
         } catch (Exception e) {}
-        return s;
+        r.setCodiceConsegna(rs.getString("codice_consegna"));
+        return r;
     }
-}
-</file>
 
-<file path="src/main/java/model/service/SegnalazioneService.java">
-package model.service;
-
-import model.bean.Segnalazione;
-import model.bean.enums.StatoSegnalazione;
-import model.dao.ReclamoDAO;
-import model.dao.SegnalazioneDAO;
-import model.utils.GeocodingUtils;
-
-public class SegnalazioneService {
-
-    private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
-    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
-
-    public boolean creaSegnalazione(Segnalazione segnalazione) {
-        if (segnalazione.getLuogoRitrovamento() != null && !segnalazione.getLuogoRitrovamento().isEmpty() &&
-                segnalazione.getCitta() != null && !segnalazione.getCitta().isEmpty()) {
-            double[] coords = GeocodingUtils.getCoordinates(
-                    segnalazione.getLuogoRitrovamento(),
-                    segnalazione.getCitta(),
-                    segnalazione.getProvincia()
-            );
-            segnalazione.setLatitudine(coords[0]);
-            segnalazione.setLongitudine(coords[1]);
+    public boolean rifiutaReclamo(long idReclamo) {
+        String query = "UPDATE reclamo SET stato = 'RIFIUTATO' WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
-        return segnalazioneDAO.doSave(segnalazione);
-    }
-
-    public java.util.List<Segnalazione> getUltimeSegnalazioni() {
-        return segnalazioneDAO.doRetrieveLatest(8);
-    }
-
-    public Segnalazione trovaPerId(long id) {
-        return segnalazioneDAO.doRetrieveById(id);
-    }
-
-    public java.util.List<Segnalazione> trovaPerUtente(long idUtente) {
-        return segnalazioneDAO.doRetrieveByUtente(idUtente);
-    }
-
-    public boolean eliminaSegnalazione(long id) {
-        return segnalazioneDAO.doDelete(id);
-    }
-
-    /**
-     * NUOVO METODO: Accetta reclamo e chiude la segnalazione.
-     */
-    public boolean accettaReclamoEChiudiSegnalazione(long idReclamo, long idSegnalazione, String codice) {
-        boolean successo = reclamoDAO.accettaReclamo(idReclamo, codice);
-        if (successo) {
-            // Se accetto il reclamo, la segnalazione diventa CHIUSA
-            return segnalazioneDAO.updateStato(idSegnalazione, StatoSegnalazione.CHIUSA);
-        }
-        return false;
     }
 }
 </file>
@@ -4447,6 +3712,525 @@ public class SegnalazioneService {
     .podium-base { height: 60px !important; border-radius: 12px; }
 
     .col-badge { display: none; }
+}
+</file>
+
+<file path="src/main/webapp/css/dettaglio_segnalazione.css">
+/* --- LAYOUT GENERALE --- */
+:root {
+    --primary-orange: #FB8C00;
+    --primary-dark: #E65100;
+    --bg-light: #F5F7FA;
+    --text-dark: #202124;
+    --text-grey: #5F6368;
+    --success-green: #2E7D32;
+    --bg-green-light: #E8F5E9;
+    --error-red: #C62828;
+    --bg-red-light: #FFEBEE;
+    --purple-main: #7B1FA2;
+    --bg-purple-light: #F3E5F5;
+    --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+body {
+    background-color: var(--bg-light);
+}
+
+.local-wrapper {
+    max-width: 1150px;
+    margin: 30px auto 60px auto;
+    padding: 0 20px;
+}
+
+.local-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-grey);
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 24px;
+    transition: color 0.2s;
+}
+.local-back-link:hover { color: var(--primary-orange); }
+
+/* --- GRIGLIA PRINCIPALE --- */
+.local-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 32px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .local-grid { grid-template-columns: 1fr; }
+}
+
+/* --- CARD GENERICHE --- */
+.local-card, .sidebar-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #E0E0E0;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+/* --- COLONNA SINISTRA (HERO) --- */
+.hero-card { border: none; }
+
+.image-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background-color: #eee;
+}
+
+.local-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.local-hero-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #bdbdbd;
+}
+.local-hero-placeholder span { font-size: 80px; }
+
+/* Status Badge sovrapposto all'immagine */
+.status-overlay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.status-open { background: white; color: var(--success-green); }
+.status-closed { background: #424242; color: white; }
+
+/* Content Area */
+.local-content { padding: 32px; }
+
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.category-tags { display: flex; gap: 8px; }
+
+.tag-pill {
+    background: var(--bg-light);
+    color: var(--text-dark);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+.tag-pill.outline { border: 1px solid #ddd; background: transparent; }
+
+.date-text { font-size: 0.85rem; color: var(--text-grey); }
+
+.local-title {
+    font-size: 2rem;
+    color: var(--text-dark);
+    margin: 0 0 20px 0;
+    line-height: 1.2;
+}
+
+.local-text {
+    font-size: 1.05rem;
+    color: #4a4a4a;
+    line-height: 1.7;
+}
+
+/* Info Grid (Data e Luogo) */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 30px 0;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.info-item {
+    display: flex;
+    gap: 12px;
+}
+
+.info-item .material-icons {
+    color: var(--primary-orange);
+    background: #FFF3E0;
+    padding: 8px;
+    border-radius: 10px;
+    height: 40px;
+    width: 40px;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.info-item .label {
+    font-size: 0.8rem;
+    color: var(--text-grey);
+    text-transform: uppercase;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.info-item .value { font-weight: 600; color: var(--text-dark); font-size: 1rem; }
+.info-item .sub-value { display: block; font-size: 0.85rem; color: var(--text-grey); }
+
+/* Mini Map */
+.mini-map {
+    width: 100%;
+    height: 200px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border: 1px solid #ddd;
+    z-index: 1; /* Fix per leaflet */
+}
+
+/* Box Modalità Consegna */
+.delivery-box {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 12px;
+    align-items: center;
+}
+
+.delivery-box.purple { background: var(--bg-purple-light); border: 1px solid #E1BEE7; }
+.delivery-box.purple .icon-box { background: white; color: var(--purple-main); }
+.delivery-box.purple h4 { color: var(--purple-main); }
+
+.delivery-box.green { background: var(--bg-green-light); border: 1px solid #C8E6C9; }
+.delivery-box.green .icon-box { background: white; color: var(--success-green); }
+.delivery-box.green h4 { color: var(--success-green); }
+
+.delivery-box .icon-box {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.delivery-box h4 { margin: 0 0 4px 0; font-size: 1rem; }
+.delivery-box p { margin: 0; font-size: 0.9rem; opacity: 0.9; }
+
+/* --- SIDEBAR (COLONNA DESTRA) --- */
+.sidebar { position: sticky; top: 100px; }
+
+.sidebar-card { padding: 24px; }
+.sidebar-title { font-size: 1.1rem; margin-bottom: 16px; color: var(--text-dark); }
+
+/* Bottoni */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-orange), var(--primary-dark));
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.2s;
+    display: inline-block;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(251, 140, 0, 0.3); }
+.full-width { width: 100%; display: block; }
+
+/* Form Reclamo */
+.claim-intro { font-size: 0.9rem; color: var(--text-grey); margin-bottom: 20px; }
+.q-label { font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; display: block; color: var(--text-dark); }
+.form-input {
+    width: 100%; padding: 10px; border: 2px solid #eee;
+    border-radius: 8px; margin-bottom: 16px; transition: border 0.2s;
+}
+.form-input:focus { border-color: var(--primary-orange); outline: none; }
+
+/* Stati Reclamo (Non-Owner) */
+.status-box {
+    text-align: center; padding: 20px; border-radius: 12px;
+}
+.status-box .material-icons { font-size: 32px; margin-bottom: 8px; }
+.status-box h4 { margin: 0 0 6px 0; }
+.status-box p { font-size: 0.9rem; margin: 0; }
+
+.status-box.pending { background: #FFF3E0; color: #E65100; border: 1px solid #FFE0B2; }
+.status-box.rejected { background: #FFEBEE; color: #C62828; border: 1px solid #FFCDD2; }
+
+/* Winner Box */
+.status-box.winner {
+    background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+    border: 2px dashed var(--success-green);
+    color: var(--success-green);
+}
+.confetti-icon { font-size: 40px; margin-bottom: 10px; }
+.code-display {
+    background: white; padding: 10px; border-radius: 8px;
+    margin: 15px 0; border: 1px solid #A5D6A7;
+}
+.the-code {
+    font-family: 'Courier New', monospace; font-size: 1.8rem;
+    font-weight: 800; letter-spacing: 3px; color: #1B5E20;
+}
+
+/* --- OWNER VIEW (Gestione) --- */
+.owner-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 20px; color: var(--primary-dark);
+}
+
+.claims-section h4 { font-size: 0.9rem; color: var(--text-grey); margin-bottom: 12px; }
+
+.empty-claims {
+    text-align: center; padding: 20px; color: #ccc;
+    border: 1px dashed #ddd; border-radius: 8px;
+}
+.empty-claims .material-icons { font-size: 32px; margin-bottom: 4px; }
+
+.claim-card {
+    background: #FAFAFA; border: 1px solid #eee;
+    padding: 12px; border-radius: 8px; margin-bottom: 12px;
+}
+.claim-header {
+    display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px;
+}
+.date { color: var(--text-grey); font-weight: 400; }
+
+.qa-pair { margin-bottom: 4px; font-size: 0.9rem; }
+.qa-pair small { font-weight: 700; color: var(--text-grey); margin-right: 4px; }
+
+/* ================================================= */
+/* === BOTTONI ACCETTA/RIFIUTA (Allineamento Flex) === */
+/* ================================================= */
+
+.action-buttons-row {
+    display: flex;       /* Forza i bottoni sulla stessa riga */
+    gap: 10px;           /* Spazio tra i bottoni */
+    margin-top: 12px;
+    width: 100%;
+}
+
+.action-form {
+    flex: 1;             /* Ogni form occupa il 50% dello spazio */
+    margin: 0;           /* Rimuove margini default */
+}
+
+/* Bottone ACCETTA (Verde) */
+.btn-accept {
+    width: 100%;
+    background-color: var(--success-green);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.btn-accept:hover {
+    background-color: #1B5E20;
+}
+
+/* Bottone RIFIUTA (Rosso) */
+.btn-reject {
+    width: 100%;
+    background-color: #FFEBEE;
+    color: #C62828;
+    border: 1px solid #FFCDD2;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.btn-reject:hover {
+    background-color: #FFCDD2;
+    border-color: #E57373;
+}
+
+/* ================================================= */
+
+.accepted-badge {
+    margin-top: 8px; color: var(--success-green); font-weight: 700;
+    font-size: 0.9rem; display: flex; flex-direction: column; align-items: center;
+}
+
+.rejected-badge {
+    margin-top: 8px; color: var(--error-red); font-weight: 700;
+    font-size: 0.9rem; text-align: center;
+}
+.rejected-badge span { margin-right: 4px; }
+
+.danger-zone {
+    margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;
+}
+.btn-danger {
+    background: white; border: 1px solid #e57373; color: #d32f2f;
+    padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.2s;
+}
+.btn-danger:hover { background: #FFEBEE; }
+
+/* --- STILE BOX RITIRO DROP-POINT --- */
+.dp-pickup-info {
+    margin-top: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: left;
+    border: 1px solid rgba(46, 125, 50, 0.3);
+}
+
+.pickup-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--success-green);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dp-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #1B5E20; /* Verde scuro */
+    margin-bottom: 2px;
+}
+
+.dp-address {
+    font-size: 0.95rem;
+    color: #388E3C;
+    margin-bottom: 8px;
+}
+
+.dp-hours {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.85rem;
+    color: #558B2F;
+    background: rgba(232, 245, 233, 0.7);
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.dp-hours .material-icons { font-size: 14px; }
+
+.btn-map-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: var(--success-green);
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.2s, transform 0.1s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-map-nav:hover {
+    background-color: #1B5E20;
+    transform: translateY(-1px);
+}
+
+/* Box per segnalazione chiusa vista dagli altri utenti */
+.status-box.closed-public {
+    background-color: #F5F5F5;
+    border: 1px solid #BDBDBD;
+    color: #616161;
+}
+
+.status-box.closed-public .material-icons {
+    color: #757575;
+    font-size: 36px;
+}
+
+.status-box.closed-public h4 {
+    color: #424242;
+    margin-top: 8px;
+}
+
+/* --- BOX CONTATTI (Scambio diretto) --- */
+.contact-card {
+    background-color: #FFFFFF;
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 15px;
+    text-align: left;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.contact-card.owner-view {
+    margin-top: 10px;
+    background-color: #F1F8E9; /* Verde chiaro per distinguere */
+    border-color: #C5E1A5;
+}
+
+.contact-header {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.contact-row {
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    color: var(--text-dark);
+    word-break: break-all;
+}
+
+.contact-row a {
+    color: var(--primary-orange);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.contact-row a:hover {
+    text-decoration: underline;
+}
+
+.contact-note {
+    font-size: 0.8rem;
+    color: var(--text-grey);
+    font-style: italic;
+    margin-top: 8px;
 }
 </file>
 
@@ -4894,277 +4678,399 @@ public class SegnalazioneService {
 }
 </file>
 
-<file path="src/main/webapp/WEB-INF/jsp/crea_segnalazione.jsp">
+<file path="src/main/webapp/WEB-INF/jsp/dettaglio_segnalazione.jsp">
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="model.bean.enums.CategoriaOggetto" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ page import="model.bean.Utente" %>
+<%@ page import="model.bean.enums.ModalitaConsegna" %>
+<%@ page import="model.bean.SegnalazioneOggetto" %>
+<jsp:include page="navbar.jsp" />
 <%
-    if (session.getAttribute("utente") == null) {
-        response.sendRedirect("login");
-        return;
+    Utente utente = (Utente) session.getAttribute("utente");
+    model.bean.Segnalazione s = (model.bean.Segnalazione) request.getAttribute("segnalazione");
+    boolean isLogged = (utente != null);
+    boolean isOwner = (isLogged && s != null && s.getIdUtente() == utente.getId());
+
+    boolean isDropPoint = false;
+    if (s instanceof SegnalazioneOggetto) {
+        SegnalazioneOggetto so = (SegnalazioneOggetto) s;
+        if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
+            isDropPoint = true;
+        }
     }
 %>
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <title>Crea Segnalazione - Foundly</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>${segnalazione.titolo != null ? segnalazione.titolo : "Dettaglio"} - Foundly</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/crea_segnalazione.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
+
 <body>
 
-<div class="main-container">
+<div class="local-wrapper">
 
-    <div class="info-section">
-        <div class="brand-header">
-            <div class="brand-icon">
-                <a href="${pageContext.request.contextPath}/index">
-                    <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="logo_foundly">
-                </a>
-            </div>
+    <a href="${pageContext.request.contextPath}/index" class="local-back-link">
+        <span class="material-icons">arrow_back</span>
+        Torna alla Home
+    </a>
+
+    <%-- Messaggio se non trovata --%>
+    <c:if test="${segnalazione == null}">
+        <div class="local-card empty-card">
+            <h2>Segnalazione non trovata</h2>
+            <p>Potrebbe essere stata rimossa o non esistere più.</p>
+            <a href="${pageContext.request.contextPath}/index" class="btn-primary">Vai alla Home</a>
         </div>
+    </c:if>
 
-        <div class="hero-text">
-            <h1>Nuova Segnalazione</h1>
-            <p>
-                Hai trovato qualcosa? Compila il modulo dettagliato qui a fianco.
-                Più informazioni fornisci, più facile sarà il ritrovamento.
-            </p>
+    <%-- Contenuto se trovata --%>
+    <c:if test="${segnalazione != null}">
+        <div class="local-grid">
 
-            <div style="margin-top: 40px;">
-                <a href="${pageContext.request.contextPath}/index" style="color: #E65100; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 500;">
-                    <span class="material-icons">arrow_back</span> Torna alla Home
-                </a>
-            </div>
-        </div>
-    </div>
+            <div class="main-content">
+                <div class="local-card hero-card">
+                    <div class="image-container">
+                        <c:choose>
+                            <c:when test="${not empty segnalazione.immagine and segnalazione.immagine != 'default.png'}">
+                                <img src="${pageContext.request.contextPath}/${segnalazione.immagine}" alt="${segnalazione.titolo}" class="local-hero-img">
+                            </c:when>
+                            <c:otherwise>
+                                <div class="local-hero-placeholder">
+                                    <span class="material-icons">image_not_supported</span>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
 
-    <div class="auth-section">
-        <div class="auth-card wide">
+                        <div class="status-overlay">
+                            <span class="status-badge ${segnalazione.stato == 'CHIUSA' ? 'status-closed' : 'status-open'}">
+                                    ${segnalazione.stato}
+                            </span>
+                        </div>
+                    </div>
 
-            <h2 class="form-page-title">Dettagli Ritrovamento</h2>
-            <p class="form-page-subtitle">Inserisci le informazioni principali</p>
-
-            <% if (request.getAttribute("errore") != null) { %>
-            <div style="background:#ffebee; color:#c62828; padding:12px; border-radius:12px; margin-bottom:20px; display:flex; align-items:center; gap:10px;">
-                <span class="material-icons">error_outline</span>
-                <%= request.getAttribute("errore") %>
-            </div>
-            <% } %>
-
-            <form action="${pageContext.request.contextPath}/crea-segnalazione" method="post" enctype="multipart/form-data">
-
-                <div class="form-grid">
-                    <div>
-                        <div class="form-group">
-                            <label for="titolo" class="form-label">Titolo Annuncio</label>
-                            <input type="text" id="titolo" name="titolo" class="form-input" required placeholder="Es. Trovato mazzo di chiavi">
+                    <div class="local-content">
+                        <div class="header-row">
+                            <div class="category-tags">
+                                <span class="tag-pill">${segnalazione.tipoSegnalazione}</span>
+                                <span class="tag-pill outline">
+                                    <c:choose>
+                                        <c:when test="${segnalazione.tipoSegnalazione == 'OGGETTO'}">${segnalazione.categoria}</c:when>
+                                        <c:otherwise>${segnalazione.specie}</c:otherwise>
+                                    </c:choose>
+                                </span>
+                            </div>
+                            <span class="date-text">
+                                Pubblicato il <fmt:formatDate value="${segnalazione.dataPubblicazione}" pattern="dd MMM yyyy"/>
+                            </span>
                         </div>
 
-                        <div class="form-group">
-                            <label for="tipo_segnalazione" class="form-label">Cosa hai trovato?</label>
-                            <select id="tipo_segnalazione" name="tipo_segnalazione" class="form-select" required onchange="toggleCampi()">
-                                <option value="OGGETTO">Un Oggetto</option>
-                                <option value="ANIMALE">Un Animale</option>
-                            </select>
+                        <h1 class="local-title">${segnalazione.titolo}</h1>
+
+                        <div class="description-box">
+                            <p class="local-text">${segnalazione.descrizione}</p>
                         </div>
 
-                        <div id="campi-oggetto">
-                            <div class="form-group">
-                                <label for="categoria" class="form-label">Categoria</label>
-                                <select id="categoria" name="categoria" class="form-select">
-                                    <% for(CategoriaOggetto c : CategoriaOggetto.values()) { %>
-                                    <option value="<%= c %>"><%= c %></option>
-                                    <% } %>
-                                </select>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="material-icons">event</span>
+                                <div>
+                                    <span class="label">Data Ritrovamento</span>
+                                    <span class="value"><fmt:formatDate value="${segnalazione.dataRitrovamento}" pattern="dd MMMM yyyy"/></span>
+                                </div>
                             </div>
-
-                            <div class="form-group">
-                                <label for="modalita_consegna" class="form-label">Modalità Restituzione</label>
-                                <select id="modalita_consegna" name="modalita_consegna" class="form-select" onchange="toggleCampi()">
-                                    <option value="DIRETTA">Consegna a mano (Diretta)</option>
-                                    <option value="DROP_POINT">Lascia a un Drop-Point (Negozio)</option>
-                                </select>
-                            </div>
-
-                            <div id="container-drop-point" class="hidden">
-                                <div class="form-group" style="background: #FFFDE7; padding: 15px; border-radius: 12px; border: 1px dashed #FBC02D;">
-                                    <label for="idDropPoint" class="form-label" style="color: #F57F17;">Seleziona il Drop-Point</label>
-                                    <select id="idDropPoint" name="idDropPoint" class="form-select" onchange="showDropPointDetails()">
-                                        <option value="">-- Scegli un negozio --</option>
-                                        <c:forEach var="dp" items="${listaDropPoint}">
-                                            <option value="${dp.id}"
-                                                    data-indirizzo="${dp.indirizzo}, ${dp.citta}"
-                                                    data-orari="${dp.orariApertura}"
-                                                    data-tel="${dp.telefono}">
-                                                    ${dp.nomeAttivita} - ${dp.citta}
-                                            </option>
-                                        </c:forEach>
-                                    </select>
-
-                                    <div id="dp-details-box" class="dp-details-box hidden">
-                                        <div class="dp-details-title">
-                                            <span class="material-icons">store</span> Dettagli Punto
-                                        </div>
-                                        <div class="dp-info-row">
-                                            <span class="material-icons dp-icon-small">place</span>
-                                            <span id="dp-addr">Indirizzo...</span>
-                                        </div>
-                                        <div class="dp-info-row">
-                                            <span class="material-icons dp-icon-small">schedule</span>
-                                            <span id="dp-time">Orari...</span>
-                                        </div>
-                                    </div>
+                            <div class="info-item">
+                                <span class="material-icons">location_on</span>
+                                <div>
+                                    <span class="label">Luogo</span>
+                                    <span class="value">${segnalazione.luogoRitrovamento}</span>
+                                    <span class="sub-value">${segnalazione.citta} (${segnalazione.provincia})</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div id="campi-animale" class="hidden">
-                            <div class="form-group">
-                                <label for="specie" class="form-label">Specie</label>
-                                <input type="text" id="specie" name="specie" class="form-input" placeholder="Es. Cane">
+                        <div id="itemMap" class="mini-map"></div>
+
+                        <% if (isDropPoint) { %>
+                        <div class="delivery-box purple">
+                            <div class="icon-box"><span class="material-icons">store</span></div>
+                            <div>
+                                <h4>Consegna tramite Drop-Point</h4>
+                                <p>L'oggetto si trova in un negozio partner. Richiedi il claim per ottenere il codice di ritiro.</p>
                             </div>
-                            <div class="form-group">
-                                <label for="razza" class="form-label">Razza (Opzionale)</label>
-                                <input type="text" id="razza" name="razza" class="form-input" placeholder="Es. Labrador">
+                        </div>
+                        <% } else { %>
+                        <div class="delivery-box green">
+                            <div class="icon-box"><span class="material-icons">handshake</span></div>
+                            <div>
+                                <h4>Consegna Diretta</h4>
+                                <p>Incontro diretto tra Finder e Proprietario. Accordatevi in un luogo sicuro.</p>
                             </div>
                         </div>
+                        <% } %>
                     </div>
+                </div>
+            </div>
 
-                    <div>
-                        <div class="form-group">
-                            <label for="descrizione" class="form-label">Descrizione Dettagliata</label>
-                            <textarea id="descrizione" name="descrizione" class="form-textarea" required placeholder="Descrivi colore, marca, segni particolari..."></textarea>
+            <aside class="sidebar">
+
+                <c:if test="<%= !isOwner %>">
+                    <div class="sidebar-card action-card">
+                        <h3 class="sidebar-title">È tuo questo oggetto?</h3>
+
+                        <c:if test="<%= !isLogged %>">
+                            <div class="login-prompt">
+                                <p>Accedi per dimostrare di essere il proprietario.</p>
+                                <a href="login" class="btn-primary full-width">Accedi per Reclamare</a>
+                            </div>
+                        </c:if>
+
+                        <c:if test="<%= isLogged %>">
+                            <c:choose>
+                                <c:when test="${not empty mioReclamo}">
+
+                                    <c:if test="${mioReclamo.stato == 'IN_ATTESA'}">
+                                        <div class="status-box pending">
+                                            <span class="material-icons">hourglass_top</span>
+                                            <h4>Richiesta Inviata</h4>
+                                            <p>Il finder sta valutando le tue risposte.</p>
+                                        </div>
+                                    </c:if>
+
+                                    <c:if test="${mioReclamo.stato == 'RIFIUTATO'}">
+                                        <div class="status-box rejected">
+                                            <span class="material-icons">error_outline</span>
+                                            <h4>Richiesta Rifiutata</h4>
+                                            <p>Le risposte non erano corrette.</p>
+                                        </div>
+                                    </c:if>
+
+                                    <c:if test="${mioReclamo.stato == 'ACCETTATO'}">
+                                        <div class="status-box winner">
+                                            <div class="confetti-icon">🎉</div>
+                                            <h4>Congratulazioni!</h4>
+                                            <p>L'oggetto è tuo.</p>
+
+                                            <c:if test="${not empty mioReclamo.codiceConsegna}">
+                                                <div class="code-display">
+                                                    <small>CODICE DI RITIRO</small>
+                                                    <div class="the-code">${mioReclamo.codiceConsegna}</div>
+                                                </div>
+
+                                                <c:if test="${not empty dropPointRitiro}">
+                                                    <div class="dp-pickup-info">
+                                                        <div class="pickup-header">
+                                                            <span class="material-icons">store</span>
+                                                            <strong>Ritira presso:</strong>
+                                                        </div>
+                                                        <div class="dp-name">${dropPointRitiro.nomeAttivita}</div>
+                                                        <div class="dp-address">
+                                                                ${dropPointRitiro.indirizzo}, ${dropPointRitiro.citta}
+                                                        </div>
+                                                        <div class="dp-hours">
+                                                            <span class="material-icons">schedule</span>
+                                                                ${dropPointRitiro.orariApertura}
+                                                        </div>
+                                                        <a href="https://www.google.com/maps/search/?api=1&query=${dropPointRitiro.latitudine},${dropPointRitiro.longitudine}"
+                                                           target="_blank" class="btn-map-nav">
+                                                            <span class="material-icons">directions</span> Naviga al Drop-Point
+                                                        </a>
+                                                    </div>
+                                                </c:if>
+                                            </c:if>
+
+                                            <c:if test="${empty mioReclamo.codiceConsegna}">
+                                                <div class="contact-card">
+                                                    <div class="contact-header">
+                                                        <span class="material-icons">person</span>
+                                                        Contatti del Finder
+                                                    </div>
+                                                    <div class="contact-row">
+                                                        <strong>Nome:</strong> ${proprietarioSegnalazione.nome} ${proprietarioSegnalazione.cognome}
+                                                    </div>
+                                                    <div class="contact-row">
+                                                        <strong>Email:</strong> <a href="mailto:${proprietarioSegnalazione.email}">${proprietarioSegnalazione.email}</a>
+                                                    </div>
+                                                    <div class="contact-row">
+                                                        <strong>Tel:</strong> <a href="tel:${proprietarioSegnalazione.telefono}">${proprietarioSegnalazione.telefono}</a>
+                                                    </div>
+                                                    <p class="contact-note">Contattalo per accordarvi sulla restituzione.</p>
+                                                </div>
+                                            </c:if>
+                                        </div>
+                                    </c:if>
+
+                                </c:when>
+                                <c:otherwise>
+                                    <%-- L'utente è loggato e NON ha ancora fatto reclami --%>
+                                    <c:choose>
+                                        <%-- CASO 1: APERTA -> Mostro form --%>
+                                        <c:when test="${segnalazione.stato == 'APERTA'}">
+                                            <p class="claim-intro">Rispondi alle domande di sicurezza impostate dal Finder.</p>
+                                            <form action="gestione-reclamo" method="post" class="claim-form">
+                                                <input type="hidden" name="action" value="invia">
+                                                <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
+                                                <div class="form-group">
+                                                    <label class="q-label">1. ${segnalazione.domandaVerifica1}</label>
+                                                    <input type="text" name="risposta1" required class="form-input" placeholder="La tua risposta...">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="q-label">2. ${segnalazione.domandaVerifica2}</label>
+                                                    <input type="text" name="risposta2" required class="form-input" placeholder="La tua risposta...">
+                                                </div>
+                                                <button class="btn-primary full-width">Invia Reclamo</button>
+                                            </form>
+                                        </c:when>
+                                        <%-- CASO 2: CHIUSA -> Mostro avviso --%>
+                                        <c:otherwise>
+                                            <div class="status-box closed-public">
+                                                <span class="material-icons">lock</span>
+                                                <h4>Segnalazione Chiusa</h4>
+                                                <p>Questo oggetto è stato già assegnato al legittimo proprietario.</p>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:if>
+                    </div>
+                </c:if>
+
+                <c:if test="<%= isOwner %>">
+                    <div class="sidebar-card owner-card">
+                        <div class="owner-header">
+                            <span class="material-icons">admin_panel_settings</span>
+                            <h3>Gestione Finder</h3>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Foto (Opzionale)</label>
-                            <label for="immagine" class="file-upload-label">
-                                <span class="material-icons file-upload-icon">cloud_upload</span>
-                                <span>Carica un'immagine</span>
-                            </label>
-                            <input type="file" id="immagine" name="immagine" class="file-input-hidden" accept="image/*" onchange="showFileName(this)">
-                            <div id="file-name-display"></div>
+                        <div class="claims-section">
+                            <h4>Reclami Ricevuti (${reclamiRicevuti != null ? reclamiRicevuti.size() : 0})</h4>
+
+                            <c:if test="${empty reclamiRicevuti}">
+                                <div class="empty-claims">
+                                    <span class="material-icons">inbox</span>
+                                    <p>Nessun reclamo ricevuto ancora.</p>
+                                </div>
+                            </c:if>
+
+                            <div class="claims-list">
+                                <c:forEach var="r" items="${reclamiRicevuti}">
+                                    <div class="claim-card">
+                                        <div class="claim-header">
+                                            <strong>Utente #${r.idUtenteRichiedente}</strong>
+                                            <span class="date"><fmt:formatDate value="${r.dataRichiesta}" pattern="dd/MM"/></span>
+                                        </div>
+
+                                        <div class="claim-answers">
+                                            <div class="qa-pair">
+                                                <small>R1:</small> <span>${r.rispostaVerifica1}</span>
+                                            </div>
+                                            <div class="qa-pair">
+                                                <small>R2:</small> <span>${r.rispostaVerifica2}</span>
+                                            </div>
+                                        </div>
+
+                                        <c:if test="${r.stato == 'IN_ATTESA'}">
+                                            <div class="action-buttons-row">
+                                                <form action="gestione-reclamo" method="post" class="action-form">
+                                                    <input type="hidden" name="action" value="accetta">
+                                                    <input type="hidden" name="idReclamo" value="${r.id}">
+                                                    <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
+                                                    <button class="btn-accept">Accetta</button>
+                                                </form>
+                                                <form action="gestione-reclamo" method="post" class="action-form" onsubmit="return confirm('Sei sicuro di voler rifiutare questa richiesta?');">
+                                                    <input type="hidden" name="action" value="rifiuta">
+                                                    <input type="hidden" name="idReclamo" value="${r.id}">
+                                                    <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
+                                                    <button class="btn-reject">Rifiuta</button>
+                                                </form>
+                                            </div>
+                                        </c:if>
+
+                                        <c:if test="${r.stato == 'ACCETTATO'}">
+                                            <div class="accepted-badge">
+                                                <span class="material-icons">check_circle</span> Accettato
+                                                <c:if test="${not empty r.codiceConsegna}">
+                                                    <small>Codice: ${r.codiceConsegna}</small>
+                                                </c:if>
+                                            </div>
+
+                                            <%-- DATI UTENTE CHE HA VINTO (Owner) visibili al Finder --%>
+                                            <c:set var="richiedente" value="${mappaRichiedenti[r.idUtenteRichiedente]}" />
+                                            <c:if test="${not empty richiedente}">
+                                                <div class="contact-card owner-view">
+                                                    <div class="contact-header">
+                                                        <span class="material-icons">person</span>
+                                                        Contatti Proprietario
+                                                    </div>
+                                                    <div class="contact-row">
+                                                        <strong>Nome:</strong> ${richiedente.nome} ${richiedente.cognome}
+                                                    </div>
+                                                    <div class="contact-row">
+                                                        <strong>Email:</strong> <a href="mailto:${richiedente.email}">${richiedente.email}</a>
+                                                    </div>
+                                                    <div class="contact-row">
+                                                        <strong>Tel:</strong> <a href="tel:${richiedente.telefono}">${richiedente.telefono}</a>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+                                        </c:if>
+
+                                        <c:if test="${r.stato == 'RIFIUTATO'}">
+                                            <div class="rejected-badge" style="margin-top: 8px; color: #C62828; font-weight: 700; font-size: 0.9rem; text-align: center;">
+                                                <span class="material-icons" style="font-size: 16px; vertical-align: middle;">cancel</span> Rifiutato
+                                            </div>
+                                        </c:if>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                        </div>
+
+                        <div class="danger-zone">
+                            <form action="dettaglio-segnalazione" method="post" onsubmit="return confirm('Eliminare definitivamente questa segnalazione?');">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
+                                <button class="btn-danger full-width">
+                                    <span class="material-icons">delete</span> Elimina Segnalazione
+                                </button>
+                            </form>
                         </div>
                     </div>
-                </div>
+                </c:if>
 
-                <hr style="margin: 25px 0;">
-
-                <h3 style="font-size:1.1rem; color:#E65100; margin-bottom:15px;">📍 Dove e Quando</h3>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="luogo_ritrovamento" class="form-label">Indirizzo / Luogo</label>
-                        <input type="text" id="luogo_ritrovamento" name="luogo_ritrovamento" class="form-input" required placeholder="Es. Via Roma 10">
-                    </div>
-                    <div class="form-group">
-                        <label for="citta" class="form-label">Città</label>
-                        <input type="text" id="citta" name="citta" class="form-input" required placeholder="Es. Milano">
-                    </div>
-                    <div class="form-group">
-                        <label for="provincia" class="form-label">Provincia (Sigla)</label>
-                        <input type="text" id="provincia" name="provincia" class="form-input" maxlength="2" style="text-transform:uppercase;" required placeholder="MI">
-                    </div>
-                    <div class="form-group">
-                        <label for="data_ritrovamento" class="form-label">Data Ritrovamento</label>
-                        <input type="date" id="data_ritrovamento" name="dataRitrovamento" class="form-input" required>
-                    </div>
-                </div>
-
-                <hr style="margin: 25px 0;">
-
-                <h3 style="font-size:1.1rem; color:#E65100; margin-bottom:10px;">🔒 Sicurezza (Secure Claim)</h3>
-                <p style="font-size:0.85rem; color:#757575; margin-bottom:20px;">Imposta due domande a cui solo il vero proprietario può rispondere.</p>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="domanda1" class="form-label">Domanda 1</label>
-                        <input type="text" id="domanda1" name="domanda1" class="form-input" required placeholder="Es. Di che colore è il portachiavi?">
-                    </div>
-                    <div class="form-group">
-                        <label for="domanda2" class="form-label">Domanda 2</label>
-                        <input type="text" id="domanda2" name="domanda2" class="form-input" required placeholder="Es. C'è un graffio sul retro?">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-submit-modern">Pubblica Segnalazione</button>
-
-            </form>
+            </aside>
         </div>
-    </div>
+    </c:if>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
 <script>
-    function toggleCampi() {
-        const tipo = document.getElementById("tipo_segnalazione").value;
-        const campiOggetto = document.getElementById("campi-oggetto");
-        const campiAnimale = document.getElementById("campi-animale");
+    document.addEventListener("DOMContentLoaded", function() {
+        var lat = ${segnalazione.latitudine != null ? segnalazione.latitudine : 'null'};
+        var lon = ${segnalazione.longitudine != null ? segnalazione.longitudine : 'null'};
 
-        // Nuova logica per Drop-Point
-        const modalita = document.getElementById("modalita_consegna").value;
-        const containerDP = document.getElementById("container-drop-point");
-        const selectDP = document.getElementById("idDropPoint");
+        if (lat && lon) {
+            var map = L.map('itemMap').setView([lat, lon], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
 
-        if (tipo === "OGGETTO") {
-            campiOggetto.classList.remove("hidden");
-            campiAnimale.classList.add("hidden");
-
-            // Gestione Drop-Point visibile solo se è Oggetto AND modalità è Drop-Point
-            if (modalita === "DROP_POINT") {
-                containerDP.classList.remove("hidden");
-                selectDP.setAttribute("required", "required"); // Rende obbligatorio selezionare il negozio
-            } else {
-                containerDP.classList.add("hidden");
-                selectDP.removeAttribute("required");
-            }
-
+            L.marker([lat, lon]).addTo(map)
+                .bindPopup("<b>${segnalazione.titolo}</b><br>${segnalazione.luogoRitrovamento}")
+                .openPopup();
         } else {
-            // Se è ANIMALE
-            campiOggetto.classList.add("hidden");
-            campiAnimale.classList.remove("hidden");
-            // Gli animali non usano drop point nel nostro caso d'uso base
-            containerDP.classList.add("hidden");
-            selectDP.removeAttribute("required");
+            document.getElementById('itemMap').style.display = 'none';
         }
-    }
-
-    function showDropPointDetails() {
-        const select = document.getElementById("idDropPoint");
-        const detailsBox = document.getElementById("dp-details-box");
-
-        if (select.value === "") {
-            detailsBox.classList.add("hidden");
-            return;
-        }
-
-        const selectedOpt = select.options[select.selectedIndex];
-        const addr = selectedOpt.getAttribute("data-indirizzo");
-        const time = selectedOpt.getAttribute("data-orari");
-
-        document.getElementById("dp-addr").textContent = addr;
-        document.getElementById("dp-time").textContent = time;
-
-        detailsBox.classList.remove("hidden");
-    }
-
-    function showFileName(input) {
-        const display = document.getElementById('file-name-display');
-        if (input.files && input.files.length > 0) {
-            display.textContent = input.files[0].name;
-            display.style.color = "#2E7D32";
-        } else {
-            display.textContent = "";
-        }
-    }
-
-    // Init
-    document.addEventListener("DOMContentLoaded", toggleCampi);
+    });
 </script>
 
 </body>
@@ -5745,6 +5651,203 @@ TRUNCATE TABLE drop_point;
 SET FOREIGN_KEY_CHECKS = 1;
 </file>
 
+<file path="src/main/java/model/dao/SegnalazioneDAO.java">
+package model.dao;
+
+import model.ConPool;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneAnimale;
+import model.bean.SegnalazioneOggetto;
+import model.bean.enums.StatoSegnalazione; // Importante
+import model.bean.enums.TipoSegnalazione;
+
+import java.sql.*;
+
+public class SegnalazioneDAO {
+
+    /**
+     * NUOVO METODO: Aggiorna lo stato (es. da APERTA a CHIUSA)
+     */
+    public boolean updateStato(long id, StatoSegnalazione nuovoStato) {
+        String query = "UPDATE segnalazione SET stato = ? WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setString(1, nuovoStato.toString());
+            ps.setLong(2, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean doSave(Segnalazione s) {
+        String sqlPadre = "INSERT INTO segnalazione (id_utente, titolo, descrizione, data_ritrovamento, " +
+                "luogo_ritrovamento, citta, provincia, latitudine, longitudine, immagine, " +
+                "domanda_verifica1, domanda_verifica2, stato, tipo_segnalazione) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement psPadre = con.prepareStatement(sqlPadre, Statement.RETURN_GENERATED_KEYS)) {
+
+            con.setAutoCommit(false);
+            psPadre.setLong(1, s.getIdUtente());
+            psPadre.setString(2, s.getTitolo());
+            psPadre.setString(3, s.getDescrizione());
+            psPadre.setTimestamp(4, s.getDataRitrovamento());
+            psPadre.setString(5, s.getLuogoRitrovamento());
+            psPadre.setString(6, s.getCitta());
+            psPadre.setString(7, s.getProvincia());
+            psPadre.setObject(8, s.getLatitudine());
+            psPadre.setObject(9, s.getLongitudine());
+            psPadre.setString(10, s.getImmagine());
+            psPadre.setString(11, s.getDomandaVerifica1());
+            psPadre.setString(12, s.getDomandaVerifica2());
+            psPadre.setString(13, s.getStato().toString());
+            psPadre.setString(14, s.getTipoSegnalazione().toString());
+
+            int result = psPadre.executeUpdate();
+
+            if (result > 0) {
+                try (ResultSet generatedKeys = psPadre.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        long id = generatedKeys.getLong(1);
+                        s.setId(id);
+                        if (s instanceof SegnalazioneOggetto) saveOggetto(con, (SegnalazioneOggetto) s);
+                        else if (s instanceof SegnalazioneAnimale) saveAnimale(con, (SegnalazioneAnimale) s);
+                        con.commit();
+                        return true;
+                    }
+                }
+            }
+            con.rollback();
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
+
+    private void saveOggetto(Connection con, SegnalazioneOggetto so) throws SQLException {
+        String sql = "INSERT INTO segnalazione_oggetto (id_segnalazione, categoria, modalita_consegna, id_drop_point) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, so.getId());
+            ps.setString(2, so.getCategoria().toString());
+            ps.setString(3, so.getModalitaConsegna().toString());
+            ps.setObject(4, so.getIdDropPoint());
+            ps.executeUpdate();
+        }
+    }
+
+    private void saveAnimale(Connection con, SegnalazioneAnimale sa) throws SQLException {
+        String sql = "INSERT INTO segnalazione_animale (id_segnalazione, specie, razza) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, sa.getId());
+            ps.setString(2, sa.getSpecie());
+            ps.setString(3, sa.getRazza());
+            ps.executeUpdate();
+        }
+    }
+
+    // HOME PAGE: Mostra APERTA e CHIUSA
+    public java.util.List<Segnalazione> doRetrieveLatest(int limit) {
+        java.util.List<Segnalazione> list = new java.util.ArrayList<>();
+        String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
+                "FROM segnalazione s " +
+                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
+                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
+                "WHERE s.stato IN ('APERTA', 'CHIUSA') " +
+                "ORDER BY s.data_pubblicazione DESC LIMIT ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapRow(rs));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    public Segnalazione doRetrieveById(long id) {
+        String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
+                "FROM segnalazione s " +
+                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
+                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
+                "WHERE s.id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
+    }
+
+    public java.util.List<Segnalazione> doRetrieveByUtente(long idUtente) {
+        java.util.List<Segnalazione> list = new java.util.ArrayList<>();
+        String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
+                "FROM segnalazione s " +
+                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
+                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
+                "WHERE s.id_utente = ? ORDER BY s.data_pubblicazione DESC";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setLong(1, idUtente);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapRow(rs));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    public boolean doDelete(long id) {
+        String query = "DELETE FROM segnalazione WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setLong(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); return false; }
+    }
+
+    private Segnalazione mapRow(ResultSet rs) throws SQLException {
+        Segnalazione s;
+        String tipo = rs.getString("tipo_segnalazione");
+        if ("OGGETTO".equals(tipo)) {
+            SegnalazioneOggetto so = new SegnalazioneOggetto();
+            try {
+                so.setCategoria(model.bean.enums.CategoriaOggetto.valueOf(rs.getString("categoria")));
+                so.setModalitaConsegna(model.bean.enums.ModalitaConsegna.valueOf(rs.getString("modalita_consegna")));
+            } catch (Exception e) {}
+            so.setIdDropPoint(rs.getObject("id_drop_point", Long.class));
+            s = so;
+        } else {
+            SegnalazioneAnimale sa = new SegnalazioneAnimale();
+            sa.setSpecie(rs.getString("specie"));
+            sa.setRazza(rs.getString("razza"));
+            s = sa;
+        }
+        s.setId(rs.getLong("id"));
+        s.setIdUtente(rs.getLong("id_utente"));
+        s.setTitolo(rs.getString("titolo"));
+        s.setDescrizione(rs.getString("descrizione"));
+        s.setDataRitrovamento(rs.getTimestamp("data_ritrovamento"));
+        s.setLuogoRitrovamento(rs.getString("luogo_ritrovamento"));
+        s.setCitta(rs.getString("citta"));
+        s.setProvincia(rs.getString("provincia"));
+        s.setLatitudine(rs.getObject("latitudine", Double.class));
+        s.setLongitudine(rs.getObject("longitudine", Double.class));
+        s.setImmagine(rs.getString("immagine"));
+        s.setDomandaVerifica1(rs.getString("domanda_verifica1"));
+        s.setDomandaVerifica2(rs.getString("domanda_verifica2"));
+        s.setDataPubblicazione(rs.getTimestamp("data_pubblicazione"));
+        try {
+            s.setStato(model.bean.enums.StatoSegnalazione.valueOf(rs.getString("stato")));
+            s.setTipoSegnalazione(model.bean.enums.TipoSegnalazione.valueOf(tipo));
+        } catch (Exception e) {}
+        return s;
+    }
+}
+</file>
+
 <file path="src/main/java/model/service/EmailService.java">
 package model.service;
 
@@ -5900,6 +6003,68 @@ public class EmailService {
         message.setHeader("Content-Transfer-Encoding", "8bit");
 
         Transport.send(message);
+    }
+}
+</file>
+
+<file path="src/main/java/model/service/SegnalazioneService.java">
+package model.service;
+
+import model.bean.Segnalazione;
+import model.bean.enums.StatoSegnalazione;
+import model.dao.ReclamoDAO;
+import model.dao.SegnalazioneDAO;
+import model.utils.GeocodingUtils;
+
+public class SegnalazioneService {
+
+    private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
+    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
+
+    public boolean creaSegnalazione(Segnalazione segnalazione) {
+        if (segnalazione.getLuogoRitrovamento() != null && !segnalazione.getLuogoRitrovamento().isEmpty() &&
+                segnalazione.getCitta() != null && !segnalazione.getCitta().isEmpty()) {
+            double[] coords = GeocodingUtils.getCoordinates(
+                    segnalazione.getLuogoRitrovamento(),
+                    segnalazione.getCitta(),
+                    segnalazione.getProvincia()
+            );
+            segnalazione.setLatitudine(coords[0]);
+            segnalazione.setLongitudine(coords[1]);
+        }
+        return segnalazioneDAO.doSave(segnalazione);
+    }
+
+    public java.util.List<Segnalazione> getUltimeSegnalazioni() {
+        return segnalazioneDAO.doRetrieveLatest(8);
+    }
+
+    public Segnalazione trovaPerId(long id) {
+        return segnalazioneDAO.doRetrieveById(id);
+    }
+
+    public java.util.List<Segnalazione> trovaPerUtente(long idUtente) {
+        return segnalazioneDAO.doRetrieveByUtente(idUtente);
+    }
+
+    public boolean eliminaSegnalazione(long id) {
+        return segnalazioneDAO.doDelete(id);
+    }
+
+    /**
+     * NUOVO METODO: Accetta reclamo e chiude la segnalazione.
+     */
+    public boolean accettaReclamoEChiudiSegnalazione(long idReclamo, long idSegnalazione, String codice) {
+        boolean successo = reclamoDAO.accettaReclamo(idReclamo, codice);
+        if (successo) {
+            // Se accetto il reclamo, la segnalazione diventa CHIUSA
+            return segnalazioneDAO.updateStato(idSegnalazione, StatoSegnalazione.CHIUSA);
+        }
+        return false;
+    }
+
+    public boolean rifiutaReclamo(long idReclamo) {
+        return reclamoDAO.rifiutaReclamo(idReclamo);
     }
 }
 </file>
@@ -6367,127 +6532,281 @@ body {
 }
 </file>
 
-<file path="src/main/webapp/WEB-INF/jsp/navbar.jsp">
+<file path="src/main/webapp/WEB-INF/jsp/crea_segnalazione.jsp">
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="model.bean.Utente" %>
-<%@ page import="model.bean.enums.Ruolo" %>
-
+<%@ page import="model.bean.enums.CategoriaOggetto" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%
-    // Recupero Utente dalla sessione
-    Utente utenteLoggatoNav = (Utente) session.getAttribute("utente");
-
-    // Logica Avatar
-    String navAvatarPath = null;
-    boolean navHasAvatar = false;
-
-    if (utenteLoggatoNav != null) {
-        navAvatarPath = utenteLoggatoNav.getImmagineProfilo();
-        if (navAvatarPath != null && !navAvatarPath.trim().isEmpty()) {
-            try {
-                // Controllo se il file esiste fisicamente
-                java.io.File navFile = new java.io.File(
-                        application.getRealPath("/" + navAvatarPath)
-                );
-                navHasAvatar = navFile.exists();
-                if (!navHasAvatar) {
-                    navAvatarPath = null;
-                }
-            } catch (Exception e) {
-                navHasAvatar = false;
-                navAvatarPath = null;
-            }
-        }
+    if (session.getAttribute("utente") == null) {
+        response.sendRedirect("login");
+        return;
     }
 %>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Crea Segnalazione - Foundly</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-<nav class="navbar">
-    <a href="${pageContext.request.contextPath}/index" class="brand">
-        <div class="brand-icon">
-            <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="logo_foundly">
-        </div>
-    </a>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/crea_segnalazione.css">
+</head>
+<body>
 
-    <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/index" class="nav-item">
-            <span class="material-icons">home</span> Home
-        </a>
-        <a href="${pageContext.request.contextPath}/crea-segnalazione" class="nav-item">
-            <span class="material-icons">add_circle_outline</span> Crea Segnalazione
-        </a>
-        <a href="${pageContext.request.contextPath}/le-mie-segnalazioni" class="nav-item">
-            <span class="material-icons">inventory</span> Le mie Segnalazioni
-        </a>
-        <a href="${pageContext.request.contextPath}/drop-point" class="nav-item">
-            <span class="material-icons">place</span> Drop-Point
-        </a>
-        <a href="${pageContext.request.contextPath}/classifica" class="nav-item">
-            <span class="material-icons">emoji_events</span> Classifica
-        </a>
-    </div>
+<div class="main-container">
 
-    <% if (utenteLoggatoNav != null) { %>
-    <div class="user-menu">
-        <button type="button" class="user-avatar-btn">
-            <% if (navHasAvatar) { %>
-            <img src="${pageContext.request.contextPath}/<%= navAvatarPath %>" alt="" class="user-avatar-img">
-            <% } else { %>
-            <div class="user-avatar-placeholder"></div>
-            <% } %>
-        </button>
-
-        <div class="user-dropdown">
-            <div class="user-dropdown-header">
-                <div class="user-email"><%= utenteLoggatoNav.getEmail() %></div>
-                <div class="user-points-row">
-                    <span class="points-label">punti</span>
-                    <span class="points-value"><%= utenteLoggatoNav.getPunteggio() %></span>
-                </div>
+    <div class="info-section">
+        <div class="brand-header">
+            <div class="brand-icon">
+                <a href="${pageContext.request.contextPath}/index">
+                    <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="logo_foundly">
+                </a>
             </div>
+        </div>
 
-            <a href="${pageContext.request.contextPath}/profilo" class="user-dropdown-item">
-                <span class="material-icons">person</span>
-                <span>Profilo</span>
-            </a>
+        <div class="hero-text">
+            <h1>Nuova Segnalazione</h1>
+            <p>
+                Hai trovato qualcosa? Compila il modulo dettagliato qui a fianco.
+                Più informazioni fornisci, più facile sarà il ritrovamento.
+            </p>
 
-            <% if (utenteLoggatoNav.getRuolo() == Ruolo.ADMIN) { %>
-            <a href="${pageContext.request.contextPath}/admin" class="user-dropdown-item">
-                <span class="material-icons">admin_panel_settings</span>
-                <span>Area Admin</span>
-            </a>
-            <% } %>
-
-            <a href="${pageContext.request.contextPath}/logout" class="user-dropdown-item user-dropdown-item-logout">
-                <span class="material-icons">logout</span>
-                <span>Logout</span>
-            </a>
+            <div style="margin-top: 40px;">
+                <a href="${pageContext.request.contextPath}/index" style="color: #E65100; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 500;">
+                    <span class="material-icons">arrow_back</span> Torna alla Home
+                </a>
+            </div>
         </div>
     </div>
-    <% } else { %>
-    <a href="${pageContext.request.contextPath}/login" class="btn-login-nav">
-        <span class="material-icons">login</span>
-        <span>Accedi</span>
-    </a>
-    <% } %>
-</nav>
+
+    <div class="auth-section">
+        <div class="auth-card wide">
+
+            <h2 class="form-page-title">Dettagli Ritrovamento</h2>
+            <p class="form-page-subtitle">Inserisci le informazioni principali</p>
+
+            <% if (request.getAttribute("errore") != null) { %>
+            <div style="background:#ffebee; color:#c62828; padding:12px; border-radius:12px; margin-bottom:20px; display:flex; align-items:center; gap:10px;">
+                <span class="material-icons">error_outline</span>
+                <%= request.getAttribute("errore") %>
+            </div>
+            <% } %>
+
+            <form action="${pageContext.request.contextPath}/crea-segnalazione" method="post" enctype="multipart/form-data">
+
+                <div class="form-grid">
+                    <div>
+                        <div class="form-group">
+                            <label for="titolo" class="form-label">Titolo Annuncio</label>
+                            <input type="text" id="titolo" name="titolo" class="form-input" required placeholder="Es. Trovato mazzo di chiavi">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tipo_segnalazione" class="form-label">Cosa hai trovato?</label>
+                            <select id="tipo_segnalazione" name="tipo_segnalazione" class="form-select" required onchange="toggleCampi()">
+                                <option value="OGGETTO">Un Oggetto</option>
+                                <option value="ANIMALE">Un Animale</option>
+                            </select>
+                        </div>
+
+                        <div id="campi-oggetto">
+                            <div class="form-group">
+                                <label for="categoria" class="form-label">Categoria</label>
+                                <select id="categoria" name="categoria" class="form-select">
+                                    <% for(CategoriaOggetto c : CategoriaOggetto.values()) { %>
+                                    <option value="<%= c %>"><%= c %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="modalita_consegna" class="form-label">Modalità Restituzione</label>
+                                <select id="modalita_consegna" name="modalita_consegna" class="form-select" onchange="toggleCampi()">
+                                    <option value="DIRETTA">Consegna a mano (Diretta)</option>
+                                    <option value="DROP_POINT">Lascia a un Drop-Point (Negozio)</option>
+                                </select>
+                            </div>
+
+                            <div id="container-drop-point" class="hidden">
+                                <div class="form-group" style="background: #FFFDE7; padding: 15px; border-radius: 12px; border: 1px dashed #FBC02D;">
+                                    <label for="idDropPoint" class="form-label" style="color: #F57F17;">Seleziona il Drop-Point</label>
+                                    <select id="idDropPoint" name="idDropPoint" class="form-select" onchange="showDropPointDetails()">
+                                        <option value="">-- Scegli un negozio --</option>
+                                        <c:forEach var="dp" items="${listaDropPoint}">
+                                            <option value="${dp.id}"
+                                                    data-indirizzo="${dp.indirizzo}, ${dp.citta}"
+                                                    data-orari="${dp.orariApertura}"
+                                                    data-tel="${dp.telefono}">
+                                                    ${dp.nomeAttivita} - ${dp.citta}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+
+                                    <div id="dp-details-box" class="dp-details-box hidden">
+                                        <div class="dp-details-title">
+                                            <span class="material-icons">store</span> Dettagli Punto
+                                        </div>
+                                        <div class="dp-info-row">
+                                            <span class="material-icons dp-icon-small">place</span>
+                                            <span id="dp-addr">Indirizzo...</span>
+                                        </div>
+                                        <div class="dp-info-row">
+                                            <span class="material-icons dp-icon-small">schedule</span>
+                                            <span id="dp-time">Orari...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="campi-animale" class="hidden">
+                            <div class="form-group">
+                                <label for="specie" class="form-label">Specie</label>
+                                <input type="text" id="specie" name="specie" class="form-input" placeholder="Es. Cane">
+                            </div>
+                            <div class="form-group">
+                                <label for="razza" class="form-label">Razza (Opzionale)</label>
+                                <input type="text" id="razza" name="razza" class="form-input" placeholder="Es. Labrador">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="form-group">
+                            <label for="descrizione" class="form-label">Descrizione Dettagliata</label>
+                            <textarea id="descrizione" name="descrizione" class="form-textarea" required placeholder="Descrivi colore, marca, segni particolari..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Foto (Opzionale)</label>
+                            <label for="immagine" class="file-upload-label">
+                                <span class="material-icons file-upload-icon">cloud_upload</span>
+                                <span>Carica un'immagine</span>
+                            </label>
+                            <input type="file" id="immagine" name="immagine" class="file-input-hidden" accept="image/*" onchange="showFileName(this)">
+                            <div id="file-name-display"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="margin: 25px 0;">
+
+                <h3 style="font-size:1.1rem; color:#E65100; margin-bottom:15px;">📍 Dove e Quando</h3>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="luogo_ritrovamento" class="form-label">Indirizzo / Luogo</label>
+                        <input type="text" id="luogo_ritrovamento" name="luogo_ritrovamento" class="form-input" required placeholder="Es. Via Roma 10">
+                    </div>
+                    <div class="form-group">
+                        <label for="citta" class="form-label">Città</label>
+                        <input type="text" id="citta" name="citta" class="form-input" required placeholder="Es. Milano">
+                    </div>
+                    <div class="form-group">
+                        <label for="provincia" class="form-label">Provincia (Sigla)</label>
+                        <input type="text" id="provincia" name="provincia" class="form-input" maxlength="2" style="text-transform:uppercase;" required placeholder="MI">
+                    </div>
+                    <div class="form-group">
+                        <label for="data_ritrovamento" class="form-label">Data Ritrovamento</label>
+                        <input type="date" id="data_ritrovamento" name="dataRitrovamento" class="form-input" required>
+                    </div>
+                </div>
+
+                <hr style="margin: 25px 0;">
+
+                <h3 style="font-size:1.1rem; color:#E65100; margin-bottom:10px;">🔒 Sicurezza (Secure Claim)</h3>
+                <p style="font-size:0.85rem; color:#757575; margin-bottom:20px;">Imposta due domande a cui solo il vero proprietario può rispondere.</p>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="domanda1" class="form-label">Domanda 1</label>
+                        <input type="text" id="domanda1" name="domanda1" class="form-input" required placeholder="Es. Di che colore è il portachiavi?">
+                    </div>
+                    <div class="form-group">
+                        <label for="domanda2" class="form-label">Domanda 2</label>
+                        <input type="text" id="domanda2" name="domanda2" class="form-input" required placeholder="Es. C'è un graffio sul retro?">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit-modern">Pubblica Segnalazione</button>
+
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const userMenu = document.querySelector(".user-menu");
-        if (!userMenu) return;
+    function toggleCampi() {
+        const tipo = document.getElementById("tipo_segnalazione").value;
+        const campiOggetto = document.getElementById("campi-oggetto");
+        const campiAnimale = document.getElementById("campi-animale");
 
-        const btn = userMenu.querySelector(".user-avatar-btn");
-        if(btn){
-            btn.addEventListener("click", function (e) {
-                e.stopPropagation();
-                userMenu.classList.toggle("open");
-            });
+        // Nuova logica per Drop-Point
+        const modalita = document.getElementById("modalita_consegna").value;
+        const containerDP = document.getElementById("container-drop-point");
+        const selectDP = document.getElementById("idDropPoint");
+
+        if (tipo === "OGGETTO") {
+            campiOggetto.classList.remove("hidden");
+            campiAnimale.classList.add("hidden");
+
+            // Gestione Drop-Point visibile solo se è Oggetto AND modalità è Drop-Point
+            if (modalita === "DROP_POINT") {
+                containerDP.classList.remove("hidden");
+                selectDP.setAttribute("required", "required"); // Rende obbligatorio selezionare il negozio
+            } else {
+                containerDP.classList.add("hidden");
+                selectDP.removeAttribute("required");
+            }
+
+        } else {
+            // Se è ANIMALE
+            campiOggetto.classList.add("hidden");
+            campiAnimale.classList.remove("hidden");
+            // Gli animali non usano drop point nel nostro caso d'uso base
+            containerDP.classList.add("hidden");
+            selectDP.removeAttribute("required");
+        }
+    }
+
+    function showDropPointDetails() {
+        const select = document.getElementById("idDropPoint");
+        const detailsBox = document.getElementById("dp-details-box");
+
+        if (select.value === "") {
+            detailsBox.classList.add("hidden");
+            return;
         }
 
-        document.addEventListener("click", function () {
-            userMenu.classList.remove("open");
-        });
-    });
+        const selectedOpt = select.options[select.selectedIndex];
+        const addr = selectedOpt.getAttribute("data-indirizzo");
+        const time = selectedOpt.getAttribute("data-orari");
+
+        document.getElementById("dp-addr").textContent = addr;
+        document.getElementById("dp-time").textContent = time;
+
+        detailsBox.classList.remove("hidden");
+    }
+
+    function showFileName(input) {
+        const display = document.getElementById('file-name-display');
+        if (input.files && input.files.length > 0) {
+            display.textContent = input.files[0].name;
+            display.style.color = "#2E7D32";
+        } else {
+            display.textContent = "";
+        }
+    }
+
+    // Init
+    document.addEventListener("DOMContentLoaded", toggleCampi);
 </script>
+
+</body>
+</html>
 </file>
 
 <file path="src/main/java/controller/RecuperoPasswordServlet.java">
@@ -6768,6 +7087,129 @@ public class RecuperoPasswordServlet extends HttpServlet {
 
 </body>
 </html>
+</file>
+
+<file path="src/main/webapp/WEB-INF/jsp/navbar.jsp">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="model.bean.Utente" %>
+<%@ page import="model.bean.enums.Ruolo" %>
+
+<%
+    // Recupero Utente dalla sessione
+    Utente utenteLoggatoNav = (Utente) session.getAttribute("utente");
+
+    // Logica Avatar
+    String navAvatarPath = null;
+    boolean navHasAvatar = false;
+
+    if (utenteLoggatoNav != null) {
+        navAvatarPath = utenteLoggatoNav.getImmagineProfilo();
+        if (navAvatarPath != null && !navAvatarPath.trim().isEmpty()) {
+            try {
+                // Controllo se il file esiste fisicamente
+                java.io.File navFile = new java.io.File(
+                        application.getRealPath("/" + navAvatarPath)
+                );
+                navHasAvatar = navFile.exists();
+                if (!navHasAvatar) {
+                    navAvatarPath = null;
+                }
+            } catch (Exception e) {
+                navHasAvatar = false;
+                navAvatarPath = null;
+            }
+        }
+    }
+%>
+
+<nav class="navbar">
+    <a href="${pageContext.request.contextPath}/index" class="brand">
+        <div class="brand-icon">
+            <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="logo_foundly">
+        </div>
+    </a>
+
+    <div class="nav-links">
+        <a href="${pageContext.request.contextPath}/index" class="nav-item">
+            <span class="material-icons">home</span> Home
+        </a>
+        <a href="${pageContext.request.contextPath}/crea-segnalazione" class="nav-item">
+            <span class="material-icons">add_circle_outline</span> Crea Segnalazione
+        </a>
+        <a href="${pageContext.request.contextPath}/le-mie-segnalazioni" class="nav-item">
+            <span class="material-icons">inventory</span> Segnalazioni e Reclami
+        </a>
+        <a href="${pageContext.request.contextPath}/drop-point" class="nav-item">
+            <span class="material-icons">place</span> Drop-Point
+        </a>
+        <a href="${pageContext.request.contextPath}/classifica" class="nav-item">
+            <span class="material-icons">emoji_events</span> Classifica
+        </a>
+    </div>
+
+    <% if (utenteLoggatoNav != null) { %>
+    <div class="user-menu">
+        <button type="button" class="user-avatar-btn">
+            <% if (navHasAvatar) { %>
+            <img src="${pageContext.request.contextPath}/<%= navAvatarPath %>" alt="" class="user-avatar-img">
+            <% } else { %>
+            <div class="user-avatar-placeholder"></div>
+            <% } %>
+        </button>
+
+        <div class="user-dropdown">
+            <div class="user-dropdown-header">
+                <div class="user-email"><%= utenteLoggatoNav.getEmail() %></div>
+                <div class="user-points-row">
+                    <span class="points-label">punti</span>
+                    <span class="points-value"><%= utenteLoggatoNav.getPunteggio() %></span>
+                </div>
+            </div>
+
+            <a href="${pageContext.request.contextPath}/profilo" class="user-dropdown-item">
+                <span class="material-icons">person</span>
+                <span>Profilo</span>
+            </a>
+
+            <% if (utenteLoggatoNav.getRuolo() == Ruolo.ADMIN) { %>
+            <a href="${pageContext.request.contextPath}/admin" class="user-dropdown-item">
+                <span class="material-icons">admin_panel_settings</span>
+                <span>Area Admin</span>
+            </a>
+            <% } %>
+
+            <a href="${pageContext.request.contextPath}/logout" class="user-dropdown-item user-dropdown-item-logout">
+                <span class="material-icons">logout</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+    <% } else { %>
+    <a href="${pageContext.request.contextPath}/login" class="btn-login-nav">
+        <span class="material-icons">login</span>
+        <span>Accedi</span>
+    </a>
+    <% } %>
+</nav>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const userMenu = document.querySelector(".user-menu");
+        if (!userMenu) return;
+
+        const btn = userMenu.querySelector(".user-avatar-btn");
+        if(btn){
+            btn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                userMenu.classList.toggle("open");
+            });
+        }
+
+        document.addEventListener("click", function () {
+            userMenu.classList.remove("open");
+        });
+    });
+</script>
 </file>
 
 <file path="src/main/webapp/WEB-INF/jsp/profilo.jsp">
@@ -7262,76 +7704,6 @@ public class RecuperoPasswordServlet extends HttpServlet {
 </html>
 </file>
 
-<file path="src/main/java/model/service/DropPointService.java">
-package model.service;
-
-import model.bean.DropPoint;
-import model.bean.enums.StatoDropPoint;
-import model.dao.DropPointDAO;
-import model.utils.PasswordUtils;
-
-import java.util.List;
-
-public class DropPointService {
-
-    private final DropPointDAO dropPointDAO = new DropPointDAO();
-
-    public boolean registraDropPoint(String nomeAttivita, String email, String password,
-                                     String indirizzo, String citta, String provincia,
-                                     String telefono, String orari,
-                                     Double latitudine, Double longitudine) {
-
-        if (dropPointDAO.doRetrieveByEmail(email) != null) return false;
-
-        DropPoint dp = new DropPoint();
-        dp.setNomeAttivita(nomeAttivita);
-        dp.setEmail(email);
-        dp.setPasswordHash(PasswordUtils.hashPassword(password));
-        dp.setIndirizzo(indirizzo);
-        dp.setCitta(citta);
-        dp.setProvincia(provincia);
-        dp.setTelefono(telefono);
-        dp.setOrariApertura(orari);
-
-        dp.setLatitudine(latitudine);
-        dp.setLongitudine(longitudine);
-
-        dp.setStato(StatoDropPoint.IN_ATTESA);
-        dp.setRitiriEffettuati(0);
-        dp.setImmagine("default.png");
-
-        return dropPointDAO.doSave(dp);
-    }
-
-    public DropPoint login(String email, String password) {
-        DropPoint dp = dropPointDAO.doRetrieveByEmail(email);
-        if (dp == null) return null;
-        if (PasswordUtils.checkPassword(password, dp.getPasswordHash())) return dp;
-        return null;
-    }
-
-    /** Drop-Point approvati per la mappa/pubblico. */
-    public List<DropPoint> findAllApprovati() {
-        return dropPointDAO.doRetrieveAllApprovati();
-    }
-
-    /** NUOVO: Drop-Point in attesa per l’area admin. */
-    public List<DropPoint> findAllInAttesa() {
-        return dropPointDAO.doRetrieveByStato(StatoDropPoint.IN_ATTESA);
-    }
-
-    /** NUOVO: approvazione da Area Admin. */
-    public boolean approvaDropPoint(long id) {
-        return dropPointDAO.updateStato(id, StatoDropPoint.APPROVATO);
-    }
-
-    /** NUOVO: rifiuto da Area Admin. */
-    public boolean rifiutaDropPoint(long id) {
-        return dropPointDAO.updateStato(id, StatoDropPoint.RIFIUTATO);
-    }
-}
-</file>
-
 <file path="pom.xml">
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -7423,6 +7795,81 @@ public class DropPointService {
         </plugins>
     </build>
 </project>
+</file>
+
+<file path="src/main/java/model/service/DropPointService.java">
+package model.service;
+
+import model.bean.DropPoint;
+import model.bean.enums.StatoDropPoint;
+import model.dao.DropPointDAO;
+import model.utils.PasswordUtils;
+
+import java.util.List;
+
+public class DropPointService {
+
+    private final DropPointDAO dropPointDAO = new DropPointDAO();
+
+    public boolean registraDropPoint(String nomeAttivita, String email, String password,
+                                     String indirizzo, String citta, String provincia,
+                                     String telefono, String orari,
+                                     Double latitudine, Double longitudine) {
+
+        if (dropPointDAO.doRetrieveByEmail(email) != null) return false;
+
+        DropPoint dp = new DropPoint();
+        dp.setNomeAttivita(nomeAttivita);
+        dp.setEmail(email);
+        dp.setPasswordHash(PasswordUtils.hashPassword(password));
+        dp.setIndirizzo(indirizzo);
+        dp.setCitta(citta);
+        dp.setProvincia(provincia);
+        dp.setTelefono(telefono);
+        dp.setOrariApertura(orari);
+
+        dp.setLatitudine(latitudine);
+        dp.setLongitudine(longitudine);
+
+        dp.setStato(StatoDropPoint.IN_ATTESA);
+        dp.setRitiriEffettuati(0);
+        dp.setImmagine("default.png");
+
+        return dropPointDAO.doSave(dp);
+    }
+
+    public DropPoint login(String email, String password) {
+        DropPoint dp = dropPointDAO.doRetrieveByEmail(email);
+        if (dp == null) return null;
+        if (PasswordUtils.checkPassword(password, dp.getPasswordHash())) return dp;
+        return null;
+    }
+
+    /** Drop-Point approvati per la mappa/pubblico. */
+    public List<DropPoint> findAllApprovati() {
+        return dropPointDAO.doRetrieveAllApprovati();
+    }
+
+    /** Drop-Point in attesa per l’area admin. */
+    public List<DropPoint> findAllInAttesa() {
+        return dropPointDAO.doRetrieveByStato(StatoDropPoint.IN_ATTESA);
+    }
+
+    /** Approvazione da Area Admin. */
+    public boolean approvaDropPoint(long id) {
+        return dropPointDAO.updateStato(id, StatoDropPoint.APPROVATO);
+    }
+
+    /** Rifiuto da Area Admin. */
+    public boolean rifiutaDropPoint(long id) {
+        return dropPointDAO.updateStato(id, StatoDropPoint.RIFIUTATO);
+    }
+
+    // --- Metodo corretto senza duplicati ---
+    public DropPoint trovaPerId(long id) {
+        return dropPointDAO.doRetrieveById(id);
+    }
+}
 </file>
 
 <file path="src/main/webapp/WEB-INF/jsp/registrazione_droppoint.jsp">
@@ -8058,162 +8505,6 @@ public class UtenteDAO {
 }
 </file>
 
-<file path="src/main/java/model/dao/DropPointDAO.java">
-package model.dao;
-
-import model.ConPool;
-import model.bean.DropPoint;
-import model.bean.enums.StatoDropPoint;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-
-public class DropPointDAO {
-
-    public boolean doSave(DropPoint dp) {
-        String query = "INSERT INTO drop_point (nome_attivita, email, password_hash, indirizzo, " +
-                "citta, provincia, telefono, orari_apertura, latitudine, longitudine, " +
-                "stato, ritiri_effettuati, immagine) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-
-            ps.setString(1, dp.getNomeAttivita());
-            ps.setString(2, dp.getEmail());
-            ps.setString(3, dp.getPasswordHash());
-            ps.setString(4, dp.getIndirizzo());
-            ps.setString(5, dp.getCitta());
-            ps.setString(6, dp.getProvincia());
-            ps.setString(7, dp.getTelefono());
-            ps.setString(8, dp.getOrariApertura());
-
-            ps.setObject(9, dp.getLatitudine());
-            ps.setObject(10, dp.getLongitudine());
-
-            ps.setString(11, dp.getStato().toString());
-            ps.setInt(12, dp.getRitiriEffettuati());
-            ps.setString(13, dp.getImmagine());
-
-            int result = ps.executeUpdate();
-            if (result > 0) {
-                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-                    if (generatedKeys.next()) dp.setId(generatedKeys.getLong(1));
-                }
-                return true;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public DropPoint doRetrieveByEmail(String email) {
-        String query = "SELECT * FROM drop_point WHERE email = ?";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setString(1, email);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return mapRowToDropPoint(rs);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public List<DropPoint> doRetrieveAllApprovati() {
-        List<DropPoint> list = new ArrayList<>();
-        String query = "SELECT * FROM drop_point WHERE stato = 'APPROVATO'";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                list.add(mapRowToDropPoint(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    /** NUOVO: tutti i Drop-Point con un certo stato (per l’admin). */
-    public List<DropPoint> doRetrieveByStato(StatoDropPoint stato) {
-        List<DropPoint> list = new ArrayList<>();
-        String query = "SELECT * FROM drop_point WHERE stato = ? ORDER BY id DESC";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setString(1, stato.toString());
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapRowToDropPoint(rs));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    /** NUOVO: cambia lo stato di un Drop-Point (IN_ATTESA → APPROVATO/RIFIUTATO). */
-    public boolean updateStato(long id, StatoDropPoint nuovoStato) {
-        String query = "UPDATE drop_point SET stato = ? WHERE id = ?";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setString(1, nuovoStato.toString());
-            ps.setLong(2, id);
-
-            int updated = ps.executeUpdate();
-            return updated > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    /** Helper per mappare una riga del ResultSet in un DropPoint. */
-    private DropPoint mapRowToDropPoint(ResultSet rs) throws SQLException {
-        DropPoint dp = new DropPoint();
-        dp.setId(rs.getLong("id"));
-        dp.setNomeAttivita(rs.getString("nome_attivita"));
-        dp.setEmail(rs.getString("email"));
-        dp.setPasswordHash(rs.getString("password_hash"));
-        dp.setIndirizzo(rs.getString("indirizzo"));
-        dp.setCitta(rs.getString("citta"));
-        dp.setProvincia(rs.getString("provincia"));
-        dp.setTelefono(rs.getString("telefono"));
-        dp.setOrariApertura(rs.getString("orari_apertura"));
-        dp.setImmagine(rs.getString("immagine"));
-
-        dp.setLatitudine(rs.getObject("latitudine", Double.class));
-        dp.setLongitudine(rs.getObject("longitudine", Double.class));
-        dp.setRitiriEffettuati(rs.getInt("ritiri_effettuati"));
-
-        try {
-            dp.setStato(StatoDropPoint.valueOf(rs.getString("stato")));
-        } catch (IllegalArgumentException | NullPointerException e) {
-            dp.setStato(StatoDropPoint.IN_ATTESA);
-        }
-
-        return dp;
-    }
-}
-</file>
-
 <file path="src/main/java/model/service/UtenteService.java">
 package model.service;
 
@@ -8420,6 +8711,178 @@ public class UtenteService {
     /** Ban = cancellazione account. */
     public boolean cancellaUtente(long id) {
         return utenteDAO.deleteById(id);
+    }
+}
+</file>
+
+<file path="src/main/java/model/dao/DropPointDAO.java">
+package model.dao;
+
+import model.ConPool;
+import model.bean.DropPoint;
+import model.bean.enums.StatoDropPoint;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DropPointDAO {
+
+    public boolean doSave(DropPoint dp) {
+        String query = "INSERT INTO drop_point (nome_attivita, email, password_hash, indirizzo, " +
+                "citta, provincia, telefono, orari_apertura, latitudine, longitudine, " +
+                "stato, ritiri_effettuati, immagine) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, dp.getNomeAttivita());
+            ps.setString(2, dp.getEmail());
+            ps.setString(3, dp.getPasswordHash());
+            ps.setString(4, dp.getIndirizzo());
+            ps.setString(5, dp.getCitta());
+            ps.setString(6, dp.getProvincia());
+            ps.setString(7, dp.getTelefono());
+            ps.setString(8, dp.getOrariApertura());
+
+            ps.setObject(9, dp.getLatitudine());
+            ps.setObject(10, dp.getLongitudine());
+
+            ps.setString(11, dp.getStato().toString());
+            ps.setInt(12, dp.getRitiriEffettuati());
+            ps.setString(13, dp.getImmagine());
+
+            int result = ps.executeUpdate();
+            if (result > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) dp.setId(generatedKeys.getLong(1));
+                }
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public DropPoint doRetrieveByEmail(String email) {
+        String query = "SELECT * FROM drop_point WHERE email = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToDropPoint(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<DropPoint> doRetrieveAllApprovati() {
+        List<DropPoint> list = new ArrayList<>();
+        String query = "SELECT * FROM drop_point WHERE stato = 'APPROVATO'";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(mapRowToDropPoint(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /** NUOVO: tutti i Drop-Point con un certo stato (per l’admin). */
+    public List<DropPoint> doRetrieveByStato(StatoDropPoint stato) {
+        List<DropPoint> list = new ArrayList<>();
+        String query = "SELECT * FROM drop_point WHERE stato = ? ORDER BY id DESC";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, stato.toString());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRowToDropPoint(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /** NUOVO: cambia lo stato di un Drop-Point (IN_ATTESA → APPROVATO/RIFIUTATO). */
+    public boolean updateStato(long id, StatoDropPoint nuovoStato) {
+        String query = "UPDATE drop_point SET stato = ? WHERE id = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, nuovoStato.toString());
+            ps.setLong(2, id);
+
+            int updated = ps.executeUpdate();
+            return updated > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /** Helper per mappare una riga del ResultSet in un DropPoint. */
+    private DropPoint mapRowToDropPoint(ResultSet rs) throws SQLException {
+        DropPoint dp = new DropPoint();
+        dp.setId(rs.getLong("id"));
+        dp.setNomeAttivita(rs.getString("nome_attivita"));
+        dp.setEmail(rs.getString("email"));
+        dp.setPasswordHash(rs.getString("password_hash"));
+        dp.setIndirizzo(rs.getString("indirizzo"));
+        dp.setCitta(rs.getString("citta"));
+        dp.setProvincia(rs.getString("provincia"));
+        dp.setTelefono(rs.getString("telefono"));
+        dp.setOrariApertura(rs.getString("orari_apertura"));
+        dp.setImmagine(rs.getString("immagine"));
+
+        dp.setLatitudine(rs.getObject("latitudine", Double.class));
+        dp.setLongitudine(rs.getObject("longitudine", Double.class));
+        dp.setRitiriEffettuati(rs.getInt("ritiri_effettuati"));
+
+        try {
+            dp.setStato(StatoDropPoint.valueOf(rs.getString("stato")));
+        } catch (IllegalArgumentException | NullPointerException e) {
+            dp.setStato(StatoDropPoint.IN_ATTESA);
+        }
+
+        return dp;
+    }
+
+    public DropPoint doRetrieveById(long id) {
+        String query = "SELECT * FROM drop_point WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToDropPoint(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
 </file>
