@@ -1,11 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <title>Segnalazioni e Reclami - Foundly</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/segnalazioni_reclami.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/segnalazioni_e_reclami.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
@@ -15,42 +17,36 @@
 <div class="page-wrapper">
 
     <header class="page-header">
-        <h1 class="page-title">Segnalazioni e Reclami</h1>
+        <h1 class="page-title">Gestione Attività</h1>
         <p class="page-subtitle">
-            Gestisci tutte le segnalazioni di oggetti o animali smarriti e i reclami inviati a Foundly.
+            Qui trovi le segnalazioni che hai pubblicato e i reclami che hai inviato.
         </p>
     </header>
 
-    <!-- Tabs -->
     <div class="tabs">
         <button class="tab-button active" data-target="tab-segnalazioni">
-            <span class="material-icons tab-icon">report</span>
-            Segnalazioni
+            <span class="material-icons tab-icon">campaign</span>
+            Le Mie Segnalazioni
         </button>
         <button class="tab-button" data-target="tab-reclami">
-            <span class="material-icons tab-icon">feedback</span>
-            Reclami
+            <span class="material-icons tab-icon">back_hand</span>
+            I Miei Reclami
         </button>
     </div>
 
-    <!-- TAB SEGNALAZIONI -->
     <section id="tab-segnalazioni" class="tab-content active">
         <div class="section-header">
-            <h2>Le mie segnalazioni</h2>
+            <h2>Oggetti che hai trovato</h2>
             <a href="${pageContext.request.contextPath}/crea-segnalazione" class="btn-primary">
-                <span class="material-icons">add</span>
-                Nuova segnalazione
+                <span class="material-icons">add</span> Nuova segnalazione
             </a>
         </div>
 
         <c:if test="${empty mieSegnalazioni}">
             <div class="empty-state">
                 <span class="material-icons empty-icon">search_off</span>
-                <h3>Nessuna segnalazione trovata</h3>
-                <p>Inizia creando una nuova segnalazione per un oggetto o animale smarrito.</p>
-                <a href="${pageContext.request.contextPath}/crea-segnalazione" class="btn-primary">
-                    Crea segnalazione
-                </a>
+                <h3>Nessuna segnalazione pubblicata</h3>
+                <p>Non hai ancora segnalato oggetti ritrovati.</p>
             </div>
         </c:if>
 
@@ -59,58 +55,44 @@
                 <c:forEach var="s" items="${mieSegnalazioni}">
                     <article class="card">
                         <div class="card-badges">
-                            <c:choose>
-                                <c:when test="${s.stato == 'CHIUSA'}">
-                                    <span class="badge badge-chiusa">Chiusa</span>
-                                </c:when>
-                                <c:when test="${s.stato == 'APERTA'}">
-                                    <span class="badge badge-aperta">Aperta</span>
-                                </c:when>
-                                <c:otherwise>
-                                    <span class="badge badge-default">${s.stato}</span>
-                                </c:otherwise>
-                            </c:choose>
+                            <span class="badge ${s.stato == 'CHIUSA' ? 'badge-closed' : 'badge-active'}">
+                                    ${s.stato}
+                            </span>
                         </div>
 
-                        <h3 class="card-title">${s.titolo}</h3>
-                        <p class="card-meta">
-                            <span class="material-icons card-meta-icon">place</span>
-                                ${s.citta}
-                            <span class="dot-separator">•</span>
-                            <span class="material-icons card-meta-icon">event</span>
-                                ${s.dataRitrovamento}
-                        </p>
+                        <div class="card-image-placeholder"
+                             style="${not empty s.immagine and s.immagine != 'default.png' ? 'background-image: url(' += pageContext.request.contextPath += '/' += s.immagine += '); background-size: cover;' : ''}">
+                            <c:if test="${empty s.immagine or s.immagine == 'default.png'}">
+                                <span class="material-icons">inventory_2</span>
+                            </c:if>
+                        </div>
 
-                        <footer class="card-footer">
-                            <a href="${pageContext.request.contextPath}/dettaglio-segnalazione?id=${s.id}"
-                               class="btn-secondary">
+                        <div class="card-footer">
+                            <h3 class="card-title">${s.titolo}</h3>
+                            <p class="card-info">
+                                <span class="material-icons" style="font-size:14px; vertical-align:middle">place</span> ${s.citta} •
+                                <fmt:formatDate value="${s.dataRitrovamento}" pattern="dd MMM" />
+                            </p>
+                            <a href="dettaglio-segnalazione?id=${s.id}" class="btn-secondary full-width" style="margin-top:10px; text-align:center;">
                                 Gestisci
                             </a>
-                        </footer>
+                        </div>
                     </article>
                 </c:forEach>
             </div>
         </c:if>
     </section>
 
-    <!-- TAB RECLAMI -->
     <section id="tab-reclami" class="tab-content">
         <div class="section-header">
-            <h2>I miei reclami</h2>
-            <a href="${pageContext.request.contextPath}/nuovo-reclamo" class="btn-primary">
-                <span class="material-icons">add_comment</span>
-                Nuovo reclamo
-            </a>
+            <h2>Oggetti che hai reclamato</h2>
         </div>
 
         <c:if test="${empty mieiReclami}">
             <div class="empty-state">
                 <span class="material-icons empty-icon">support_agent</span>
-                <h3>Nessun reclamo inviato</h3>
-                <p>Se hai riscontrato un problema con il servizio, puoi aprire un nuovo reclamo.</p>
-                <a href="${pageContext.request.contextPath}/nuovo-reclamo" class="btn-primary">
-                    Invia reclamo
-                </a>
+                <h3>Nessun reclamo attivo</h3>
+                <p>Non hai inviato richieste di restituzione per oggetti smarriti.</p>
             </div>
         </c:if>
 
@@ -119,29 +101,33 @@
                 <c:forEach var="r" items="${mieiReclami}">
                     <article class="card">
                         <div class="card-badges">
-                            <span class="badge badge-default">
+                            <span class="badge" style="background-color: #E3F2FD; color: #1565C0;">
+                                RECLAMO
+                            </span>
+                            <span class="badge ${r.stato == 'ACCETTATO' ? 'badge-active' : (r.stato == 'RIFIUTATO' ? 'badge-closed' : 'badge-type')}">
                                     ${r.stato}
                             </span>
                         </div>
 
-                        <h3 class="card-title">
-                                ${r.oggetto}
-                        </h3>
+                        <div class="card-image-placeholder"
+                             style="${not empty r.immagineSegnalazione and r.immagineSegnalazione != 'default.png' ? 'background-image: url(' += pageContext.request.contextPath += '/' += r.immagineSegnalazione += '); background-size: cover;' : ''}">
+                            <c:if test="${empty r.immagineSegnalazione or r.immagineSegnalazione == 'default.png'}">
+                                <span class="material-icons">help_outline</span>
+                            </c:if>
+                        </div>
 
-                        <p class="card-meta">
-                            <span class="material-icons card-meta-icon">label</span>
-                                ${r.categoria}
-                            <span class="dot-separator">•</span>
-                            <span class="material-icons card-meta-icon">event</span>
-                                ${r.dataCreazione}
-                        </p>
+                        <div class="card-footer">
+                            <h3 class="card-title">${r.titoloSegnalazione}</h3>
 
-                        <footer class="card-footer">
-                            <a href="${pageContext.request.contextPath}/dettaglio-reclamo?id=${r.id}"
-                               class="btn-secondary">
-                                Dettagli
+                            <p class="card-info">
+                                Richiesto il:
+                                <fmt:formatDate value="${r.dataRichiesta}" pattern="dd MMM yyyy" />
+                            </p>
+
+                            <a href="dettaglio-segnalazione?id=${r.idSegnalazione}" class="btn-secondary full-width" style="margin-top:10px; text-align:center;">
+                                Vedi Stato
                             </a>
-                        </footer>
+                        </div>
                     </article>
                 </c:forEach>
             </div>
@@ -157,15 +143,14 @@
 
         buttons.forEach(btn => {
             btn.addEventListener("click", () => {
+                // Rimuovi active da tutti
                 buttons.forEach(b => b.classList.remove("active"));
                 tabs.forEach(t => t.classList.remove("active"));
 
+                // Aggiungi active al corrente
                 btn.classList.add("active");
                 const targetId = btn.dataset.target;
-                const targetTab = document.getElementById(targetId);
-                if (targetTab) {
-                    targetTab.classList.add("active");
-                }
+                document.getElementById(targetId).classList.add("active");
             });
         });
     });

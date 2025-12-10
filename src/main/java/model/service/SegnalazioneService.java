@@ -1,5 +1,6 @@
 package model.service;
 
+import model.bean.Reclamo;
 import model.bean.Segnalazione;
 import model.bean.enums.StatoSegnalazione;
 import model.dao.ReclamoDAO;
@@ -57,5 +58,9 @@ public class SegnalazioneService {
 
     public List<Segnalazione> cercaSegnalazioni(String q, String tipo, String categoria) {
         return segnalazioneDAO.doRetrieveByFiltri(q, tipo, categoria);
+    }
+
+    public List<Reclamo> trovaReclamiFattiDaUtente(long idUtente) {
+        return reclamoDAO.doRetrieveByRichiedente(idUtente);
     }
 }

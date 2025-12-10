@@ -101,4 +101,53 @@ public class ReclamoDAO {
             return false;
         }
     }
+
+    public List<Reclamo> doRetrieveByRichiedente(long idUtenteRichiedente) {
+        List<Reclamo> list = new ArrayList<>();
+        // Query con JOIN per prendere i dati della segnalazione
+        String query = "SELECT r.*, s.titolo AS seg_titolo, s.immagine AS seg_immagine " +
+                "FROM reclamo r " +
+                "JOIN segnalazione s ON r.id_segnalazione = s.id " +
+                "WHERE r.id_utente_richiedente = ? " +
+                "ORDER BY r.data_richiesta DESC";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setLong(1, idUtenteRichiedente);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Reclamo r = new Reclamo();
+                    r.setId(rs.getLong("id"));
+                    r.setIdSegnalazione(rs.getLong("id_segnalazione"));
+                    r.setIdUtenteRichiedente(rs.getLong("id_utente_richiedente"));
+                    r.setRispostaVerifica1(rs.getString("risposta_verifica1"));
+                    r.setRispostaVerifica2(rs.getString("risposta_verifica2"));
+
+                    // --- CORREZIONE QUI ---
+                    // Passiamo direttamente il Timestamp al Bean
+                    r.setDataRichiesta(rs.getTimestamp("data_richiesta"));
+
+                    try {
+                        r.setStato(model.bean.enums.StatoReclamo.valueOf(rs.getString("stato")));
+                    } catch (Exception e) {
+                        r.setStato(model.bean.enums.StatoReclamo.IN_ATTESA);
+                    }
+
+                    r.setCodiceConsegna(rs.getString("codice_consegna"));
+
+                    // --- POPOLIAMO I DATI DELLA SEGNALAZIONE ---
+                    // Assicurati di usare gli alias corretti definiti nella query (AS seg_titolo)
+                    r.setTitoloSegnalazione(rs.getString("seg_titolo"));
+                    r.setImmagineSegnalazione(rs.getString("seg_immagine"));
+
+                    list.add(r);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

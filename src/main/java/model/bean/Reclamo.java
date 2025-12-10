@@ -18,8 +18,26 @@ public class Reclamo {
     private Timestamp dataRitiro;
     private boolean confermaFinder;
     private boolean confermaOwner;
+    private String titoloSegnalazione;
+    private String immagineSegnalazione;
 
     public Reclamo() {}
+
+    public String getTitoloSegnalazione() {
+        return titoloSegnalazione;
+    }
+
+    public void setTitoloSegnalazione(String titoloSegnalazione) {
+        this.titoloSegnalazione = titoloSegnalazione;
+    }
+
+    public String getImmagineSegnalazione() {
+        return immagineSegnalazione;
+    }
+
+    public void setImmagineSegnalazione(String immagineSegnalazione) {
+        this.immagineSegnalazione = immagineSegnalazione;
+    }
 
     // Getters e Setters
     public long getId() { return id; }
