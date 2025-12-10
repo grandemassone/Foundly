@@ -11,9 +11,11 @@ import java.util.List;
 public class UtenteDAO {
 
     public boolean doSave(Utente utente) {
-        String query = "INSERT INTO utente (username, email, password_hash, nome, cognome, " +
-                "telefono, immagine_profilo, punteggio, ruolo, badge) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO utente (" +
+                "username, email, password_hash, nome, cognome, " +
+                "telefono, immagine_profilo, immagine_profilo_content_type, " +
+                "punteggio, ruolo, badge" +
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -24,10 +26,19 @@ public class UtenteDAO {
             ps.setString(4, utente.getNome());
             ps.setString(5, utente.getCognome());
             ps.setString(6, utente.getTelefono());
-            ps.setString(7, utente.getImmagineProfilo());
-            ps.setInt(8, utente.getPunteggio());
-            ps.setString(9, utente.getRuolo().toString());
-            ps.setString(10, utente.getBadge());
+
+            // immagine BLOB + content-type
+            if (utente.getImmagineProfilo() != null && utente.getImmagineProfilo().length > 0) {
+                ps.setBytes(7, utente.getImmagineProfilo());
+                ps.setString(8, utente.getImmagineProfiloContentType());
+            } else {
+                ps.setNull(7, Types.BLOB);
+                ps.setNull(8, Types.VARCHAR);
+            }
+
+            ps.setInt(9, utente.getPunteggio());
+            ps.setString(10, utente.getRuolo().toString());
+            ps.setString(11, utente.getBadge());
 
             int result = ps.executeUpdate();
 
@@ -85,16 +96,17 @@ public class UtenteDAO {
         }
         return null;
     }
+
     public List<Utente> doRetrieveAllByPunteggio() {
         List<Utente> utenti = new ArrayList<>();
-        String query = "SELECT * FROM utente ORDER BY punteggio DESC LIMIT 50"; // Limitiamo ai primi 50 per performance
+        String query = "SELECT * FROM utente ORDER BY punteggio DESC LIMIT 50";
 
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                utenti.add(mapRowToUtente(rs)); // Usa il tuo metodo mapRowToUtente esistente
+                utenti.add(mapRowToUtente(rs));
             }
 
         } catch (SQLException e) {
@@ -139,11 +151,13 @@ public class UtenteDAO {
             e.printStackTrace();
         }
         return null;
-    }    //commento fico
-
+    }
 
     public boolean updateProfilo(Utente utente) {
-        String query = "UPDATE utente SET username = ?, nome = ?, cognome = ?, immagine_profilo = ? WHERE id = ?";
+        String query = "UPDATE utente SET " +
+                "username = ?, nome = ?, cognome = ?, " +
+                "immagine_profilo = ?, immagine_profilo_content_type = ? " +
+                "WHERE id = ?";
 
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
@@ -151,8 +165,16 @@ public class UtenteDAO {
             ps.setString(1, utente.getUsername());
             ps.setString(2, utente.getNome());
             ps.setString(3, utente.getCognome());
-            ps.setString(4, utente.getImmagineProfilo());
-            ps.setLong(5, utente.getId());
+
+            if (utente.getImmagineProfilo() != null && utente.getImmagineProfilo().length > 0) {
+                ps.setBytes(4, utente.getImmagineProfilo());
+                ps.setString(5, utente.getImmagineProfiloContentType());
+            } else {
+                ps.setNull(4, Types.BLOB);
+                ps.setNull(5, Types.VARCHAR);
+            }
+
+            ps.setLong(6, utente.getId());
 
             int updated = ps.executeUpdate();
             return updated > 0;
@@ -172,7 +194,11 @@ public class UtenteDAO {
         u.setNome(rs.getString("nome"));
         u.setCognome(rs.getString("cognome"));
         u.setTelefono(rs.getString("telefono"));
-        u.setImmagineProfilo(rs.getString("immagine_profilo"));
+
+        // BLOB + content-type
+        u.setImmagineProfilo(rs.getBytes("immagine_profilo"));
+        u.setImmagineProfiloContentType(rs.getString("immagine_profilo_content_type"));
+
         u.setPunteggio(rs.getInt("punteggio"));
 
         String ruoloStr = rs.getString("ruolo");
@@ -221,7 +247,7 @@ public class UtenteDAO {
         return false;
     }
 
-    /** NUOVO: cancella un utente (ban = delete). */
+    /** Cancella un utente (ban = delete). */
     public boolean deleteById(long id) {
         String sql = "DELETE FROM utente WHERE id = ?";
 

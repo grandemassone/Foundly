@@ -11,10 +11,12 @@ import java.util.List;
 public class DropPointDAO {
 
     public boolean doSave(DropPoint dp) {
-        String query = "INSERT INTO drop_point (nome_attivita, email, password_hash, indirizzo, " +
-                "citta, provincia, telefono, orari_apertura, latitudine, longitudine, " +
-                "stato, ritiri_effettuati, immagine) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO drop_point (" +
+                "nome_attivita, email, password_hash, indirizzo, " +
+                "citta, provincia, telefono, orari_apertura, descrizione, " +
+                "immagine, immagine_content_type, " +
+                "latitudine, longitudine, ritiri_effettuati, stato" +
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -27,18 +29,28 @@ public class DropPointDAO {
             ps.setString(6, dp.getProvincia());
             ps.setString(7, dp.getTelefono());
             ps.setString(8, dp.getOrariApertura());
+            ps.setString(9, dp.getDescrizione());
 
-            ps.setObject(9, dp.getLatitudine());
-            ps.setObject(10, dp.getLongitudine());
+            // immagine BLOB + content type
+            if (dp.getImmagine() != null && dp.getImmagine().length > 0) {
+                ps.setBytes(10, dp.getImmagine());
+                ps.setString(11, dp.getImmagineContentType());
+            } else {
+                ps.setNull(10, Types.BLOB);
+                ps.setNull(11, Types.VARCHAR);
+            }
 
-            ps.setString(11, dp.getStato().toString());
-            ps.setInt(12, dp.getRitiriEffettuati());
-            ps.setString(13, dp.getImmagine());
+            ps.setObject(12, dp.getLatitudine());
+            ps.setObject(13, dp.getLongitudine());
+            ps.setInt(14, dp.getRitiriEffettuati());
+            ps.setString(15, dp.getStato().toString());
 
             int result = ps.executeUpdate();
             if (result > 0) {
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-                    if (generatedKeys.next()) dp.setId(generatedKeys.getLong(1));
+                    if (generatedKeys.next()) {
+                        dp.setId(generatedKeys.getLong(1));
+                    }
                 }
                 return true;
             }
@@ -84,7 +96,7 @@ public class DropPointDAO {
         return list;
     }
 
-    /** NUOVO: tutti i Drop-Point con un certo stato (per l’admin). */
+    /** Tutti i Drop-Point con un certo stato (per l’admin). */
     public List<DropPoint> doRetrieveByStato(StatoDropPoint stato) {
         List<DropPoint> list = new ArrayList<>();
         String query = "SELECT * FROM drop_point WHERE stato = ? ORDER BY id DESC";
@@ -105,7 +117,7 @@ public class DropPointDAO {
         return list;
     }
 
-    /** NUOVO: cambia lo stato di un Drop-Point (IN_ATTESA → APPROVATO/RIFIUTATO). */
+    /** Cambia lo stato di un Drop-Point (IN_ATTESA → APPROVATO/RIFIUTATO). */
     public boolean updateStato(long id, StatoDropPoint nuovoStato) {
         String query = "UPDATE drop_point SET stato = ? WHERE id = ?";
 
@@ -124,7 +136,6 @@ public class DropPointDAO {
         return false;
     }
 
-    /** Helper per mappare una riga del ResultSet in un DropPoint. */
     private DropPoint mapRowToDropPoint(ResultSet rs) throws SQLException {
         DropPoint dp = new DropPoint();
         dp.setId(rs.getLong("id"));
@@ -136,7 +147,11 @@ public class DropPointDAO {
         dp.setProvincia(rs.getString("provincia"));
         dp.setTelefono(rs.getString("telefono"));
         dp.setOrariApertura(rs.getString("orari_apertura"));
-        dp.setImmagine(rs.getString("immagine"));
+        dp.setDescrizione(rs.getString("descrizione"));
+
+        // immagine BLOB + content-type
+        dp.setImmagine(rs.getBytes("immagine"));
+        dp.setImmagineContentType(rs.getString("immagine_content_type"));
 
         dp.setLatitudine(rs.getObject("latitudine", Double.class));
         dp.setLongitudine(rs.getObject("longitudine", Double.class));

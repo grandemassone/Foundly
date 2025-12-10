@@ -11,9 +11,8 @@ import jakarta.servlet.http.Part;
 import model.bean.Utente;
 import model.service.UtenteService;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.io.InputStream;
 
 @WebServlet(name = "ProfiloServlet", value = "/profilo")
 @MultipartConfig(
@@ -48,6 +47,8 @@ public class ProfiloServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response) throws ServletException, IOException {
 
+        request.setCharacterEncoding("UTF-8");
+
         HttpSession session = request.getSession(false);
         Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
 
@@ -58,8 +59,8 @@ public class ProfiloServlet extends HttpServlet {
 
         // campi testo
         String username = request.getParameter("username");
-        String nome = request.getParameter("nome");
-        String cognome = request.getParameter("cognome");
+        String nome     = request.getParameter("nome");
+        String cognome  = request.getParameter("cognome");
 
         utente.setUsername(username);
         utente.setNome(nome);
@@ -74,64 +75,28 @@ public class ProfiloServlet extends HttpServlet {
         try {
             avatarPart = request.getPart("avatar");
         } catch (IllegalStateException | ServletException e) {
-            // se qualcosa va storto sull'upload, ignoro e tengo immagine precedente
+            avatarPart = null; // tieni l'immagine precedente
         }
 
         boolean hasNewUpload = (avatarPart != null && avatarPart.getSize() > 0);
 
         if (hasNewUpload) {
-            // elimina il vecchio file se esiste
-            String oldPath = utente.getImmagineProfilo();
-            if (oldPath != null && !oldPath.trim().isEmpty()) {
-                String oldRealPath = getServletContext().getRealPath("/" + oldPath);
-                File oldFile = new File(oldRealPath);
-                if (oldFile.exists()) {
-                    oldFile.delete();
-                }
+            // nuova immagine: carico i byte nel BLOB e salvo il content-type
+            try (InputStream is = avatarPart.getInputStream()) {
+                byte[] bytes = is.readAllBytes();
+                utente.setImmagineProfilo(bytes);
+                utente.setImmagineProfiloContentType(avatarPart.getContentType());
             }
-
-            // nome file originale
-            String submittedFileName = Paths.get(avatarPart.getSubmittedFileName())
-                    .getFileName().toString();
-
-            // estensione (es. .jpg, .png)
-            String extension = "";
-            int dotIndex = submittedFileName.lastIndexOf('.');
-            if (dotIndex >= 0) {
-                extension = submittedFileName.substring(dotIndex);
-            }
-
-            // nuovo nome file unico
-            String newFileName = "avatar_" + utente.getId() + "_" + System.currentTimeMillis() + extension;
-
-            // cartella di upload (es. .../webapp/uploads/avatars)
-            String uploadPath = getServletContext().getRealPath("/uploads/avatars");
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-
-            File targetFile = new File(uploadDir, newFileName);
-            avatarPart.write(targetFile.getAbsolutePath());
-
-            // path relativo da salvare nel DB
-            String relativePath = "uploads/avatars/" + newFileName;
-            utente.setImmagineProfilo(relativePath);
+            // se carico una nuova immagine, ignoro il flag di rimozione
+            removeAvatar = false;
 
         } else if (removeAvatar) {
             // rimozione esplicita senza nuovo upload
-            String oldPath = utente.getImmagineProfilo();
-            if (oldPath != null && !oldPath.trim().isEmpty()) {
-                String oldRealPath = getServletContext().getRealPath("/" + oldPath);
-                File oldFile = new File(oldRealPath);
-                if (oldFile.exists()) {
-                    oldFile.delete();
-                }
-            }
             utente.setImmagineProfilo(null);
+            utente.setImmagineProfiloContentType(null);
         }
 
-        // aggiorna profilo (username, nome, cognome, immagine_profilo)
+        // aggiorna profilo (username, nome, cognome, immagine_profilo + content_type)
         utenteService.aggiornaProfilo(utente);
 
         // aggiorna sessione

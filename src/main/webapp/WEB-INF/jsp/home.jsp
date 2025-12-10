@@ -22,7 +22,7 @@
         Foundly ti aiuta a ritrovare oggetti e animali smarriti grazie alla nostra
         community. Segnala, cerca e restituisci!
     </p>
-    <a href="crea-segnalazione" class="btn-cta-hero">
+    <a href="${pageContext.request.contextPath}/crea-segnalazione" class="btn-cta-hero">
         <span class="material-icons">inventory_2</span>
         Crea Segnalazione
     </a>
@@ -30,7 +30,7 @@
 
 <div class="search-wrapper">
     <div class="search-card">
-        <%-- FORM DI RICERCA: Punta alla SearchServlet --%>
+        <!-- FORM DI RICERCA -->
         <form action="${pageContext.request.contextPath}/search" method="GET">
 
             <div class="search-main-row">
@@ -38,7 +38,7 @@
                     <span class="material-icons search-icon">search</span>
                     <input type="text" name="q"
                            placeholder="Cerca per titolo..."
-                           value="${not empty paramQ ? paramQ : ''}">
+                           value="${param.q}">
                 </div>
                 <button type="submit" class="btn-search-submit">
                     Cerca
@@ -52,8 +52,8 @@
                     <span class="material-icons">category</span>
                     <select name="tipo">
                         <option value="">Tutti i tipi</option>
-                        <option value="oggetto" ${paramTipo == 'oggetto' ? 'selected' : ''}>Oggetto</option>
-                        <option value="animale" ${paramTipo == 'animale' ? 'selected' : ''}>Animale</option>
+                        <option value="oggetto" ${param.tipo == 'oggetto' ? 'selected' : ''}>Oggetto</option>
+                        <option value="animale" ${param.tipo == 'animale' ? 'selected' : ''}>Animale</option>
                     </select>
                 </div>
 
@@ -61,14 +61,14 @@
                     <span class="material-icons">sell</span>
                     <select name="categoria">
                         <option value="">Tutte le categorie</option>
-                        <option value="ELETTRONICA" ${paramCat == 'ELETTRONICA' ? 'selected' : ''}>Elettronica</option>
-                        <option value="DOCUMENTI" ${paramCat == 'DOCUMENTI' ? 'selected' : ''}>Documenti</option>
-                        <option value="ABBIGLIAMENTO" ${paramCat == 'ABBIGLIAMENTO' ? 'selected' : ''}>Abbigliamento</option>
-                        <option value="GIOIELLI" ${paramCat == 'GIOIELLI' ? 'selected' : ''}>Gioielli</option>
-                        <option value="CHIAVI" ${paramCat == 'CHIAVI' ? 'selected' : ''}>Chiavi</option>
-                        <option value="PORTAFOGLI" ${paramCat == 'PORTAFOGLI' ? 'selected' : ''}>Portafogli</option>
-                        <option value="BORSE" ${paramCat == 'BORSE' ? 'selected' : ''}>Borse</option>
-                        <option value="ALTRO" ${paramCat == 'ALTRO' ? 'selected' : ''}>Altro</option>
+                        <option value="ELETTRONICA" ${param.categoria == 'ELETTRONICA' ? 'selected' : ''}>Elettronica</option>
+                        <option value="DOCUMENTI" ${param.categoria == 'DOCUMENTI' ? 'selected' : ''}>Documenti</option>
+                        <option value="ABBIGLIAMENTO" ${param.categoria == 'ABBIGLIAMENTO' ? 'selected' : ''}>Abbigliamento</option>
+                        <option value="GIOIELLI" ${param.categoria == 'GIOIELLI' ? 'selected' : ''}>Gioielli</option>
+                        <option value="CHIAVI" ${param.categoria == 'CHIAVI' ? 'selected' : ''}>Chiavi</option>
+                        <option value="PORTAFOGLI" ${param.categoria == 'PORTAFOGLI' ? 'selected' : ''}>Portafogli</option>
+                        <option value="BORSE" ${param.categoria == 'BORSE' ? 'selected' : ''}>Borse</option>
+                        <option value="ALTRO" ${param.categoria == 'ALTRO' ? 'selected' : ''}>Altro</option>
                     </select>
                 </div>
             </div>
@@ -80,26 +80,39 @@
     <div class="section-header">
         <h2>
             <c:choose>
-                <c:when test="${not empty paramQ or not empty paramTipo or not empty paramCat}">
+                <c:when test="${not empty param.q or not empty param.tipo or not empty param.categoria}">
                     Risultati Ricerca
                 </c:when>
                 <c:otherwise>Segnalazioni Recenti</c:otherwise>
             </c:choose>
         </h2>
-        <span class="result-count">${segnalazioni != null ? segnalazioni.size() : 0} risultati</span>
+
+        <c:choose>
+            <c:when test="${empty segnalazioni}">
+                <span class="result-count">0 risultati</span>
+            </c:when>
+            <c:otherwise>
+                <span class="result-count">${segnalazioni.size()} risultati</span>
+            </c:otherwise>
+        </c:choose>
     </div>
 
     <div class="cards-grid">
         <c:if test="${empty segnalazioni}">
             <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
                 <span class="material-icons" style="font-size: 48px; color: #e0e0e0;">search_off</span>
-                <p style="color: #666; font-style: italic; margin-top: 10px;">Nessuna segnalazione trovata con questi criteri.</p>
-                <a href="${pageContext.request.contextPath}/index" style="color: var(--primary-orange); text-decoration: none; font-weight: 500;">Mostra tutto</a>
+                <p style="color: #666; font-style: italic; margin-top: 10px;">
+                    Nessuna segnalazione trovata con questi criteri.
+                </p>
+                <a href="${pageContext.request.contextPath}/index"
+                   style="color: var(--primary-orange); text-decoration: none; font-weight: 500;">
+                    Mostra tutto
+                </a>
             </div>
         </c:if>
 
         <c:forEach var="s" items="${segnalazioni}">
-            <a href="dettaglio-segnalazione?id=${s.id}" class="card-link">
+            <a href="${pageContext.request.contextPath}/dettaglio-segnalazione?id=${s.id}" class="card-link">
                 <article class="card">
                     <div class="card-badges">
                         <span class="badge ${s.stato == 'CHIUSA' ? 'badge-closed' : 'badge-active'}">
@@ -110,11 +123,16 @@
 
                     <div class="card-image-placeholder">
                         <c:choose>
-                            <c:when test="${not empty s.immagine and s.immagine != 'default.png'}">
-                                <img src="${pageContext.request.contextPath}/${s.immagine}" alt="${s.titolo}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                            <c:when test="${not empty s.immagine}">
+                                <!-- Immagine da BLOB -->
+                                <img src="${pageContext.request.contextPath}/segnalazione-img?id=${s.id}"
+                                     alt="${s.titolo}"
+                                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
                             </c:when>
                             <c:otherwise>
-                                <span class="material-icons" style="font-size: 42px; color: #9E9E9E;">inventory_2</span>
+                                <span class="material-icons" style="font-size: 42px; color: #9E9E9E;">
+                                    inventory_2
+                                </span>
                             </c:otherwise>
                         </c:choose>
                     </div>

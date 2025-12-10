@@ -2,16 +2,12 @@
 <%@ page import="java.util.List" %>
 <%@ page import="model.bean.Utente" %>
 <%@ page import="model.bean.DropPoint" %>
-<%@ page import="model.bean.enums.Ruolo" %>
 
 <%
     Utente utente = (Utente) session.getAttribute("utente");
 
     List<DropPoint> dropPoints = (List<DropPoint>) request.getAttribute("dropPoints");
     int countDropPoints = (dropPoints != null) ? dropPoints.size() : 0;
-
-    String navAvatarPath = (utente != null) ? utente.getImmagineProfilo() : null;
-    boolean navHasAvatar = navAvatarPath != null && !navAvatarPath.trim().isEmpty();
 %>
 
 <!DOCTYPE html>
@@ -34,7 +30,7 @@
 </head>
 <body class="page-enter">
 
-<jsp:include page="navbar.jsp" />
+<jsp:include page="/WEB-INF/jsp/navbar.jsp" />
 
 <!-- CONTENUTO -->
 <main class="dp-main">
@@ -131,23 +127,6 @@
         crossorigin=""></script>
 
 <script>
-    // dropdown avatar navbar
-    document.addEventListener("DOMContentLoaded", function () {
-        const userMenu = document.querySelector(".user-menu");
-        if (userMenu) {
-            const btn = userMenu.querySelector(".user-avatar-btn");
-            btn.addEventListener("click", function (e) {
-                e.stopPropagation();
-                userMenu.classList.toggle("open");
-            });
-            document.addEventListener("click", function () {
-                userMenu.classList.remove("open");
-            });
-        }
-    });
-</script>
-
-<script>
     // ====== DATI DAL SERVER ======
     const dropPointsData = [
         <% if (dropPoints != null) {
@@ -181,7 +160,6 @@
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // layer per poter ripulire/ricreare i marker
     const markersLayer = L.layerGroup().addTo(map);
 
     function renderMarkers(filterText) {
@@ -250,7 +228,6 @@
         });
     }
 </script>
-
 
 </body>
 </html>

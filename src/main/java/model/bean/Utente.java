@@ -10,7 +10,11 @@ public class Utente {
     private String nome;
     private String cognome;
     private String telefono;
-    private String immagineProfilo;
+
+    // Ora BLOB nel DB → byte[] nel model
+    private byte[] immagineProfilo;
+    private String immagineProfiloContentType;
+
     private int punteggio;
     private Ruolo ruolo;
     private String badge;
@@ -39,8 +43,13 @@ public class Utente {
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
 
-    public String getImmagineProfilo() { return immagineProfilo; }
-    public void setImmagineProfilo(String immagineProfilo) { this.immagineProfilo = immagineProfilo; }
+    public byte[] getImmagineProfilo() { return immagineProfilo; }
+    public void setImmagineProfilo(byte[] immagineProfilo) { this.immagineProfilo = immagineProfilo; }
+
+    public String getImmagineProfiloContentType() { return immagineProfiloContentType; }
+    public void setImmagineProfiloContentType(String immagineProfiloContentType) {
+        this.immagineProfiloContentType = immagineProfiloContentType;
+    }
 
     public int getPunteggio() { return punteggio; }
     public void setPunteggio(int punteggio) { this.punteggio = punteggio; }

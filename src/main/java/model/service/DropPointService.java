@@ -16,7 +16,10 @@ public class DropPointService {
                                      String telefono, String orari,
                                      Double latitudine, Double longitudine) {
 
-        if (dropPointDAO.doRetrieveByEmail(email) != null) return false;
+        // Email già registrata
+        if (dropPointDAO.doRetrieveByEmail(email) != null) {
+            return false;
+        }
 
         DropPoint dp = new DropPoint();
         dp.setNomeAttivita(nomeAttivita);
@@ -33,7 +36,11 @@ public class DropPointService {
 
         dp.setStato(StatoDropPoint.IN_ATTESA);
         dp.setRitiriEffettuati(0);
-        dp.setImmagine("default.png");
+
+        // Nessuna immagine caricata in fase di registrazione:
+        // BLOB e content-type null → la servlet immagini userà un placeholder di default
+        dp.setImmagine(null);
+        dp.setImmagineContentType(null);
 
         return dropPointDAO.doSave(dp);
     }
@@ -65,7 +72,7 @@ public class DropPointService {
         return dropPointDAO.updateStato(id, StatoDropPoint.RIFIUTATO);
     }
 
-    // --- Metodo corretto senza duplicati ---
+    /** Recupero per id (uso generale). */
     public DropPoint trovaPerId(long id) {
         return dropPointDAO.doRetrieveById(id);
     }

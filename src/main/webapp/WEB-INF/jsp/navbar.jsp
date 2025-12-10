@@ -6,27 +6,17 @@
     // Recupero Utente dalla sessione
     Utente utenteLoggatoNav = (Utente) session.getAttribute("utente");
 
-    // Logica Avatar
-    String navAvatarPath = null;
+    // Logica Avatar con BLOB
     boolean navHasAvatar = false;
+    String navAvatarUrl = null;
 
-    if (utenteLoggatoNav != null) {
-        navAvatarPath = utenteLoggatoNav.getImmagineProfilo();
-        if (navAvatarPath != null && !navAvatarPath.trim().isEmpty()) {
-            try {
-                // Controllo se il file esiste fisicamente
-                java.io.File navFile = new java.io.File(
-                        application.getRealPath("/" + navAvatarPath)
-                );
-                navHasAvatar = navFile.exists();
-                if (!navHasAvatar) {
-                    navAvatarPath = null;
-                }
-            } catch (Exception e) {
-                navHasAvatar = false;
-                navAvatarPath = null;
-            }
-        }
+    if (utenteLoggatoNav != null &&
+            utenteLoggatoNav.getImmagineProfilo() != null &&
+            utenteLoggatoNav.getImmagineProfilo().length > 0) {
+
+        navHasAvatar = true;
+        // URL della servlet che streamma l'immagine dal DB
+        navAvatarUrl = request.getContextPath() + "/avatar?userId=" + utenteLoggatoNav.getId();
     }
 %>
 
@@ -59,7 +49,7 @@
     <div class="user-menu">
         <button type="button" class="user-avatar-btn">
             <% if (navHasAvatar) { %>
-            <img src="${pageContext.request.contextPath}/<%= navAvatarPath %>" alt="" class="user-avatar-img">
+            <img src="<%= navAvatarUrl %>" alt="" class="user-avatar-img">
             <% } else { %>
             <div class="user-avatar-placeholder"></div>
             <% } %>
@@ -106,7 +96,7 @@
         if (!userMenu) return;
 
         const btn = userMenu.querySelector(".user-avatar-btn");
-        if(btn){
+        if (btn) {
             btn.addEventListener("click", function (e) {
                 e.stopPropagation();
                 userMenu.classList.toggle("open");

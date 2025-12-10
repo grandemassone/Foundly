@@ -5,37 +5,39 @@ USE defaultdb;
 -- 1. UTENTE
 CREATE TABLE utente
 (
-    id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
-    username           VARCHAR(50)  NOT NULL UNIQUE,
-    email              VARCHAR(100) NOT NULL UNIQUE,
-    password_hash      VARCHAR(255) NOT NULL,
-    nome               VARCHAR(50)  NOT NULL,
-    cognome            VARCHAR(50)  NOT NULL,
-    telefono           VARCHAR(20),
-    immagine_profilo   VARCHAR(255),
-    punteggio          INT                                                      DEFAULT 0,
-    ruolo              ENUM ('UTENTE_BASE', 'ADMIN')                            DEFAULT 'UTENTE_BASE',
-    badge              ENUM ('OCCHIO_DI_FALCO', 'DETECTIVE', 'SHERLOCK_HOLMES') DEFAULT 'OCCHIO_DI_FALCO'
+    id                           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username                     VARCHAR(50)  NOT NULL UNIQUE,
+    email                        VARCHAR(100) NOT NULL UNIQUE,
+    password_hash                VARCHAR(255) NOT NULL,
+    nome                         VARCHAR(50)  NOT NULL,
+    cognome                      VARCHAR(50)  NOT NULL,
+    telefono                     VARCHAR(20),
+    immagine_profilo             LONGBLOB,
+    immagine_profilo_content_type VARCHAR(50),
+    punteggio                    INT                                                      DEFAULT 0,
+    ruolo                        ENUM ('UTENTE_BASE', 'ADMIN')                            DEFAULT 'UTENTE_BASE',
+    badge                        ENUM ('OCCHIO_DI_FALCO', 'DETECTIVE', 'SHERLOCK_HOLMES') DEFAULT 'OCCHIO_DI_FALCO'
 );
 
 -- 2. DROP-POINT
 CREATE TABLE drop_point
 (
-    id                BIGINT AUTO_INCREMENT PRIMARY KEY,
-    nome_attivita     VARCHAR(100) NOT NULL,
-    email             VARCHAR(100) NOT NULL UNIQUE,
-    password_hash     VARCHAR(255) NOT NULL,
-    indirizzo         VARCHAR(100) NOT NULL,
-    citta             VARCHAR(50)  NOT NULL,
-    provincia         VARCHAR(50)  NOT NULL,
-    telefono          VARCHAR(20),
-    orari_apertura    VARCHAR(255),
-    descrizione       TEXT,
-    immagine          VARCHAR(255),
-    latitudine        DOUBLE,
-    longitudine       DOUBLE,
-    ritiri_effettuati INT                                          DEFAULT 0,
-    stato             ENUM ('IN_ATTESA', 'APPROVATO', 'RIFIUTATO') DEFAULT 'IN_ATTESA'
+    id                       BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome_attivita            VARCHAR(100) NOT NULL,
+    email                    VARCHAR(100) NOT NULL UNIQUE,
+    password_hash            VARCHAR(255) NOT NULL,
+    indirizzo                VARCHAR(100) NOT NULL,
+    citta                    VARCHAR(50)  NOT NULL,
+    provincia                VARCHAR(50)  NOT NULL,
+    telefono                 VARCHAR(20),
+    orari_apertura           VARCHAR(255),
+    descrizione              TEXT,
+    immagine                 LONGBLOB,
+    immagine_content_type    VARCHAR(50),
+    latitudine               DOUBLE,
+    longitudine              DOUBLE,
+    ritiri_effettuati        INT                                          DEFAULT 0,
+    stato                    ENUM ('IN_ATTESA', 'APPROVATO', 'RIFIUTATO') DEFAULT 'IN_ATTESA'
 );
 
 -- 3. SEGNALAZIONE (Tabella Padre - Abstract)
@@ -51,7 +53,8 @@ CREATE TABLE segnalazione
     provincia          VARCHAR(50)                 NOT NULL,
     latitudine         DOUBLE,
     longitudine        DOUBLE,
-    immagine           VARCHAR(255),
+    immagine           LONGBLOB,
+    immagine_content_type VARCHAR(50),
     domanda_verifica1  VARCHAR(255)                NOT NULL,
     domanda_verifica2  VARCHAR(255)                NOT NULL,
     data_pubblicazione DATETIME                                 DEFAULT CURRENT_TIMESTAMP,

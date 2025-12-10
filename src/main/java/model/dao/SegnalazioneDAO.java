@@ -11,7 +11,7 @@ import model.bean.enums.TipoSegnalazione;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List; // FONDAMENTALE: java.util, non java.awt
+import java.util.List;
 
 public class SegnalazioneDAO {
 
@@ -29,15 +29,19 @@ public class SegnalazioneDAO {
     }
 
     public boolean doSave(Segnalazione s) {
-        String sqlPadre = "INSERT INTO segnalazione (id_utente, titolo, descrizione, data_ritrovamento, " +
-                "luogo_ritrovamento, citta, provincia, latitudine, longitudine, immagine, " +
-                "domanda_verifica1, domanda_verifica2, stato, tipo_segnalazione) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sqlPadre =
+                "INSERT INTO segnalazione (" +
+                        "id_utente, titolo, descrizione, data_ritrovamento, " +
+                        "luogo_ritrovamento, citta, provincia, latitudine, longitudine, " +
+                        "immagine, immagine_content_type, " +
+                        "domanda_verifica1, domanda_verifica2, stato, tipo_segnalazione" +
+                        ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = ConPool.getConnection();
              PreparedStatement psPadre = con.prepareStatement(sqlPadre, Statement.RETURN_GENERATED_KEYS)) {
 
-            con.setAutoCommit(false); // Transazione
+            con.setAutoCommit(false);
+
             psPadre.setLong(1, s.getIdUtente());
             psPadre.setString(2, s.getTitolo());
             psPadre.setString(3, s.getDescrizione());
@@ -47,11 +51,20 @@ public class SegnalazioneDAO {
             psPadre.setString(7, s.getProvincia());
             psPadre.setObject(8, s.getLatitudine());
             psPadre.setObject(9, s.getLongitudine());
-            psPadre.setString(10, s.getImmagine());
-            psPadre.setString(11, s.getDomandaVerifica1());
-            psPadre.setString(12, s.getDomandaVerifica2());
-            psPadre.setString(13, s.getStato().toString());
-            psPadre.setString(14, s.getTipoSegnalazione().toString());
+
+            // immagine BLOB + content-type
+            if (s.getImmagine() != null && s.getImmagine().length > 0) {
+                psPadre.setBytes(10, s.getImmagine());
+                psPadre.setString(11, s.getImmagineContentType());
+            } else {
+                psPadre.setNull(10, Types.BLOB);
+                psPadre.setNull(11, Types.VARCHAR);
+            }
+
+            psPadre.setString(12, s.getDomandaVerifica1());
+            psPadre.setString(13, s.getDomandaVerifica2());
+            psPadre.setString(14, s.getStato().toString());
+            psPadre.setString(15, s.getTipoSegnalazione().toString());
 
             int result = psPadre.executeUpdate();
 
@@ -60,20 +73,29 @@ public class SegnalazioneDAO {
                     if (generatedKeys.next()) {
                         long id = generatedKeys.getLong(1);
                         s.setId(id);
-                        if (s instanceof SegnalazioneOggetto) saveOggetto(con, (SegnalazioneOggetto) s);
-                        else if (s instanceof SegnalazioneAnimale) saveAnimale(con, (SegnalazioneAnimale) s);
+
+                        if (s instanceof SegnalazioneOggetto) {
+                            saveOggetto(con, (SegnalazioneOggetto) s);
+                        } else if (s instanceof SegnalazioneAnimale) {
+                            saveAnimale(con, (SegnalazioneAnimale) s);
+                        }
+
                         con.commit();
                         return true;
                     }
                 }
             }
             con.rollback();
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     private void saveOggetto(Connection con, SegnalazioneOggetto so) throws SQLException {
-        String sql = "INSERT INTO segnalazione_oggetto (id_segnalazione, categoria, modalita_consegna, id_drop_point) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO segnalazione_oggetto " +
+                "(id_segnalazione, categoria, modalita_consegna, id_drop_point) " +
+                "VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setLong(1, so.getId());
             ps.setString(2, so.getCategoria().toString());
@@ -84,7 +106,8 @@ public class SegnalazioneDAO {
     }
 
     private void saveAnimale(Connection con, SegnalazioneAnimale sa) throws SQLException {
-        String sql = "INSERT INTO segnalazione_animale (id_segnalazione, specie, razza) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO segnalazione_animale " +
+                "(id_segnalazione, specie, razza) VALUES (?, ?, ?)";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setLong(1, sa.getId());
             ps.setString(2, sa.getSpecie());
@@ -106,9 +129,13 @@ public class SegnalazioneDAO {
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setInt(1, limit);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) list.add(mapRow(rs));
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
@@ -124,7 +151,9 @@ public class SegnalazioneDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapRow(rs);
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -139,9 +168,13 @@ public class SegnalazioneDAO {
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setLong(1, idUtente);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) list.add(mapRow(rs));
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
@@ -151,19 +184,22 @@ public class SegnalazioneDAO {
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setLong(1, id);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public List<Segnalazione> doRetrieveByFiltri(String queryTesto, String tipo, String categoria) {
-        StringBuilder sql = new StringBuilder("SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
-                "FROM segnalazione s " +
-                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
-                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
-                "WHERE 1=1");
+        StringBuilder sql = new StringBuilder(
+                "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
+                        "FROM segnalazione s " +
+                        "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
+                        "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
+                        "WHERE 1=1");
 
         List<Object> params = new ArrayList<>();
 
-        // Filtro Testo
         if (queryTesto != null && !queryTesto.trim().isEmpty()) {
             sql.append(" AND (s.titolo LIKE ? OR s.descrizione LIKE ? OR s.luogo_ritrovamento LIKE ?)");
             String likeQuery = "%" + queryTesto + "%";
@@ -172,13 +208,11 @@ public class SegnalazioneDAO {
             params.add(likeQuery);
         }
 
-        // Filtro Tipo (Gestisce null e stringhe vuote)
         if (tipo != null && !tipo.trim().isEmpty()) {
             sql.append(" AND s.tipo_segnalazione = ?");
             params.add(tipo.toUpperCase());
         }
 
-        // Filtro Categoria (Gestisce null e stringhe vuote)
         if (categoria != null && !categoria.trim().isEmpty()) {
             sql.append(" AND so.categoria = ?");
             params.add(categoria.toUpperCase());
@@ -196,7 +230,7 @@ public class SegnalazioneDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    list.add(mapRow(rs)); // Assicurati di avere il metodo mapRow definito nel DAO
+                    list.add(mapRow(rs));
                 }
             }
         } catch (SQLException e) {
@@ -205,7 +239,6 @@ public class SegnalazioneDAO {
         return list;
     }
 
-    // --- MAPPER UNICO PER EVITARE DUPLICAZIONI ---
     private Segnalazione mapRow(ResultSet rs) throws SQLException {
         Segnalazione s;
         String tipo = rs.getString("tipo_segnalazione");
@@ -218,7 +251,7 @@ public class SegnalazioneDAO {
 
                 String mod = rs.getString("modalita_consegna");
                 if (mod != null) so.setModalitaConsegna(ModalitaConsegna.valueOf(mod));
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
             so.setIdDropPoint(rs.getObject("id_drop_point", Long.class));
             s = so;
         } else {
@@ -238,7 +271,11 @@ public class SegnalazioneDAO {
         s.setProvincia(rs.getString("provincia"));
         s.setLatitudine(rs.getObject("latitudine", Double.class));
         s.setLongitudine(rs.getObject("longitudine", Double.class));
-        s.setImmagine(rs.getString("immagine"));
+
+        // immagine BLOB + content-type
+        s.setImmagine(rs.getBytes("immagine"));
+        s.setImmagineContentType(rs.getString("immagine_content_type"));
+
         s.setDomandaVerifica1(rs.getString("domanda_verifica1"));
         s.setDomandaVerifica2(rs.getString("domanda_verifica2"));
         s.setDataPubblicazione(rs.getTimestamp("data_pubblicazione"));
@@ -246,7 +283,7 @@ public class SegnalazioneDAO {
         try {
             s.setStato(StatoSegnalazione.valueOf(rs.getString("stato")));
             s.setTipoSegnalazione(TipoSegnalazione.valueOf(tipo));
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
 
         return s;
     }

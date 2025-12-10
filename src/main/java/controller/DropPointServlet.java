@@ -20,7 +20,7 @@ public class DropPointServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
 
-        // solo Drop-Point APPROVATI
+        // Solo Drop-Point APPROVATI
         List<DropPoint> approvati = dropPointService.findAllApprovati();
         request.setAttribute("dropPoints", approvati);
 

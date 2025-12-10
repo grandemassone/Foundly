@@ -1,8 +1,9 @@
 package model.bean;
 
-import model.bean.enums.StatoDropPoint; // Importa l'Enum esterno condiviso
+import model.bean.enums.StatoDropPoint;
 
 public class DropPoint {
+
     private Long id;
     private String nomeAttivita;
     private String email;
@@ -12,63 +13,147 @@ public class DropPoint {
     private String provincia;
     private String telefono;
     private String orariApertura;
+    private String descrizione;
 
-    // Rimosso 'descrizione' perché non esiste nella tabella SQL che abbiamo creato
-    // private String descrizione;
+    // Ora BLOB nel DB → byte[] nel model
+    private byte[] immagine;
+    private String immagineContentType;
 
-    private String immagine;
     private Double latitudine;
     private Double longitudine;
     private int ritiriEffettuati;
 
-    // Campo stato corretto
     private StatoDropPoint stato;
 
     public DropPoint() {}
 
     // Getters e Setters
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getNomeAttivita() { return nomeAttivita; }
-    public void setNomeAttivita(String nomeAttivita) { this.nomeAttivita = nomeAttivita; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getNomeAttivita() {
+        return nomeAttivita;
+    }
 
-    public String getPasswordHash() { return passwordHash; }
-    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+    public void setNomeAttivita(String nomeAttivita) {
+        this.nomeAttivita = nomeAttivita;
+    }
 
-    public String getIndirizzo() { return indirizzo; }
-    public void setIndirizzo(String indirizzo) { this.indirizzo = indirizzo; }
+    public String getEmail() {
+        return email;
+    }
 
-    public String getCitta() { return citta; }
-    public void setCitta(String citta) { this.citta = citta; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public String getProvincia() { return provincia; }
-    public void setProvincia(String provincia) { this.provincia = provincia; }
+    public String getPasswordHash() {
+        return passwordHash;
+    }
 
-    public String getTelefono() { return telefono; }
-    public void setTelefono(String telefono) { this.telefono = telefono; }
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
 
-    public String getOrariApertura() { return orariApertura; }
-    public void setOrariApertura(String orariApertura) { this.orariApertura = orariApertura; }
+    public String getIndirizzo() {
+        return indirizzo;
+    }
 
-    public String getImmagine() { return immagine; }
-    public void setImmagine(String immagine) { this.immagine = immagine; }
+    public void setIndirizzo(String indirizzo) {
+        this.indirizzo = indirizzo;
+    }
 
-    public Double getLatitudine() { return latitudine; }
-    public void setLatitudine(Double latitudine) { this.latitudine = latitudine; }
+    public String getCitta() {
+        return citta;
+    }
 
-    // CORRETTO: Rimosso parametro dal getter
-    public Double getLongitudine() { return longitudine; }
-    public void setLongitudine(Double longitudine) { this.longitudine = longitudine; }
+    public void setCitta(String citta) {
+        this.citta = citta;
+    }
 
-    public int getRitiriEffettuati() { return ritiriEffettuati; }
-    public void setRitiriEffettuati(int ritiriEffettuati) { this.ritiriEffettuati = ritiriEffettuati; }
+    public String getProvincia() {
+        return provincia;
+    }
 
-    // CORRETTO: Ora restituisce il campo stato
-    public StatoDropPoint getStato() { return stato; }
-    public void setStato(StatoDropPoint stato) { this.stato = stato; }
+    public void setProvincia(String provincia) {
+        this.provincia = provincia;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getOrariApertura() {
+        return orariApertura;
+    }
+
+    public void setOrariApertura(String orariApertura) {
+        this.orariApertura = orariApertura;
+    }
+
+    public String getDescrizione() {
+        return descrizione;
+    }
+
+    public void setDescrizione(String descrizione) {
+        this.descrizione = descrizione;
+    }
+
+    public byte[] getImmagine() {
+        return immagine;
+    }
+
+    public void setImmagine(byte[] immagine) {
+        this.immagine = immagine;
+    }
+
+    public String getImmagineContentType() {
+        return immagineContentType;
+    }
+
+    public void setImmagineContentType(String immagineContentType) {
+        this.immagineContentType = immagineContentType;
+    }
+
+    public Double getLatitudine() {
+        return latitudine;
+    }
+
+    public void setLatitudine(Double latitudine) {
+        this.latitudine = latitudine;
+    }
+
+    public Double getLongitudine() {
+        return longitudine;
+    }
+
+    public void setLongitudine(Double longitudine) {
+        this.longitudine = longitudine;
+    }
+
+    public int getRitiriEffettuati() {
+        return ritiriEffettuati;
+    }
+
+    public void setRitiriEffettuati(int ritiriEffettuati) {
+        this.ritiriEffettuati = ritiriEffettuati;
+    }
+
+    public StatoDropPoint getStato() {
+        return stato;
+    }
+
+    public void setStato(StatoDropPoint stato) {
+        this.stato = stato;
+    }
 }

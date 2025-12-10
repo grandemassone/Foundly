@@ -2,8 +2,6 @@
 <%@ page import="model.bean.Utente" %>
 <%@ page import="model.bean.enums.Ruolo" %>
 
-
-
 <%
     Utente utente = (Utente) session.getAttribute("utente");
     if (utente == null) {
@@ -36,24 +34,12 @@
         badgeImg = "badge_sherlock_holmes.png";
     }
 
-    // ===== AVATAR ===== (di default nessuna immagine)
-    String avatarPath = utente.getImmagineProfilo();
-    boolean hasAvatar = false;
+    // ===== AVATAR (BLOB nel DB) =====
+    boolean hasAvatar = (utente.getImmagineProfilo() != null
+            && utente.getImmagineProfilo().length > 0);
 
-    if (avatarPath != null && !avatarPath.trim().isEmpty()) {
-        try {
-            java.io.File avatarFile = new java.io.File(
-                    application.getRealPath("/" + avatarPath)
-            );
-            hasAvatar = avatarFile.exists();
-            if (!hasAvatar) {
-                avatarPath = null;
-            }
-        } catch (Exception e) {
-            hasAvatar = false;
-            avatarPath = null;
-        }
-    }
+    // URL della servlet che streamma l'immagine dal DB
+    String avatarUrl = request.getContextPath() + "/avatar?userId=" + utente.getId();
 %>
 
 <!DOCTYPE html>
@@ -79,12 +65,15 @@
             <div class="profile-avatar-wrapper <%= hasAvatar ? "has-avatar" : "" %>" id="avatarWrapper">
                 <div class="profile-avatar-large">
                     <% if (hasAvatar) { %>
+                    <!-- Avatar servito dalla servlet che legge il BLOB dal DB -->
                     <img
-                            src="<%= request.getContextPath() + "/" + avatarPath %>"
+                            src="<%= avatarUrl %>"
                             alt=""
                             id="profileAvatarImg">
                     <% } else { %>
+                    <!-- Nessun avatar: img nascosta, cerchio arancione gestito via CSS -->
                     <img
+                            src="<%= avatarUrl %>"
                             alt=""
                             id="profileAvatarImg"
                             style="display:none;">
