@@ -45,7 +45,7 @@
             <span class="material-icons">add_circle_outline</span> Crea Segnalazione
         </a>
         <a href="${pageContext.request.contextPath}/le-mie-segnalazioni" class="nav-item">
-            <span class="material-icons">inventory</span> Le mie Segnalazioni
+            <span class="material-icons">inventory</span> Segnalazioni e Reclami
         </a>
         <a href="${pageContext.request.contextPath}/drop-point" class="nav-item">
             <span class="material-icons">place</span> Drop-Point
