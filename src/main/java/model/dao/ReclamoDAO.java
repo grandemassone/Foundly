@@ -23,7 +23,6 @@ public class ReclamoDAO {
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 
-    // Recupera tutti i reclami per una data segnalazione (per il proprietario)
     public List<Reclamo> doRetrieveBySegnalazione(long idSegnalazione) {
         List<Reclamo> list = new ArrayList<>();
         String query = "SELECT * FROM reclamo WHERE id_segnalazione = ?";
@@ -32,19 +31,27 @@ public class ReclamoDAO {
             ps.setLong(1, idSegnalazione);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Reclamo r = new Reclamo();
-                    r.setId(rs.getLong("id"));
-                    r.setIdSegnalazione(rs.getLong("id_segnalazione"));
-                    r.setIdUtenteRichiedente(rs.getLong("id_utente_richiedente"));
-                    r.setRispostaVerifica1(rs.getString("risposta_verifica1"));
-                    r.setRispostaVerifica2(rs.getString("risposta_verifica2"));
-                    r.setStato(StatoReclamo.valueOf(rs.getString("stato")));
-                    r.setCodiceConsegna(rs.getString("codice_consegna"));
-                    list.add(r);
+                    list.add(mapRow(rs));
                 }
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return list;
+    }
+
+    /**
+     * NUOVO METODO: Controlla se un utente ha già fatto reclamo per una segnalazione
+     */
+    public Reclamo doRetrieveBySegnalazioneAndUtente(long idSegnalazione, long idUtente) {
+        String query = "SELECT * FROM reclamo WHERE id_segnalazione = ? AND id_utente_richiedente = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setLong(1, idSegnalazione);
+            ps.setLong(2, idUtente);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
     }
 
     public boolean accettaReclamo(long idReclamo, String codice) {
@@ -63,16 +70,35 @@ public class ReclamoDAO {
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setLong(1, id);
             try(ResultSet rs = ps.executeQuery()){
-                if(rs.next()){
-                    Reclamo r = new Reclamo();
-                    r.setId(rs.getLong("id"));
-                    r.setIdSegnalazione(rs.getLong("id_segnalazione"));
-                    r.setIdUtenteRichiedente(rs.getLong("id_utente_richiedente"));
-                    r.setStato(StatoReclamo.valueOf(rs.getString("stato")));
-                    return r;
-                }
+                if(rs.next()) return mapRow(rs);
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return null;
+    }
+
+    private Reclamo mapRow(ResultSet rs) throws SQLException {
+        Reclamo r = new Reclamo();
+        r.setId(rs.getLong("id"));
+        r.setIdSegnalazione(rs.getLong("id_segnalazione"));
+        r.setIdUtenteRichiedente(rs.getLong("id_utente_richiedente"));
+        r.setRispostaVerifica1(rs.getString("risposta_verifica1"));
+        r.setRispostaVerifica2(rs.getString("risposta_verifica2"));
+        try {
+            r.setStato(StatoReclamo.valueOf(rs.getString("stato")));
+        } catch (Exception e) {}
+        r.setCodiceConsegna(rs.getString("codice_consegna"));
+        return r;
+    }
+
+    public boolean rifiutaReclamo(long idReclamo) {
+        String query = "UPDATE reclamo SET stato = 'RIFIUTATO' WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

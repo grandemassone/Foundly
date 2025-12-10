@@ -150,4 +150,20 @@ public class DropPointDAO {
 
         return dp;
     }
+
+    public DropPoint doRetrieveById(long id) {
+        String query = "SELECT * FROM drop_point WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRowToDropPoint(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

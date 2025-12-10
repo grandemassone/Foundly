@@ -4,14 +4,30 @@ import model.ConPool;
 import model.bean.Segnalazione;
 import model.bean.SegnalazioneAnimale;
 import model.bean.SegnalazioneOggetto;
+import model.bean.enums.StatoSegnalazione; // Importante
 import model.bean.enums.TipoSegnalazione;
 
 import java.sql.*;
 
 public class SegnalazioneDAO {
 
+    /**
+     * NUOVO METODO: Aggiorna lo stato (es. da APERTA a CHIUSA)
+     */
+    public boolean updateStato(long id, StatoSegnalazione nuovoStato) {
+        String query = "UPDATE segnalazione SET stato = ? WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setString(1, nuovoStato.toString());
+            ps.setLong(2, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean doSave(Segnalazione s) {
-        // Query inserimento (id è auto-increment)
         String sqlPadre = "INSERT INTO segnalazione (id_utente, titolo, descrizione, data_ritrovamento, " +
                 "luogo_ritrovamento, citta, provincia, latitudine, longitudine, immagine, " +
                 "domanda_verifica1, domanda_verifica2, stato, tipo_segnalazione) " +
@@ -20,7 +36,7 @@ public class SegnalazioneDAO {
         try (Connection con = ConPool.getConnection();
              PreparedStatement psPadre = con.prepareStatement(sqlPadre, Statement.RETURN_GENERATED_KEYS)) {
 
-            // Nota: gestione transazione semplificata per brevità, in prod usare commit/rollback
+            con.setAutoCommit(false);
             psPadre.setLong(1, s.getIdUtente());
             psPadre.setString(2, s.getTitolo());
             psPadre.setString(3, s.getDescrizione());
@@ -43,20 +59,15 @@ public class SegnalazioneDAO {
                     if (generatedKeys.next()) {
                         long id = generatedKeys.getLong(1);
                         s.setId(id);
-
-                        // Salva nella tabella figlia corretta
-                        if (s instanceof SegnalazioneOggetto) {
-                            saveOggetto(con, (SegnalazioneOggetto) s);
-                        } else if (s instanceof SegnalazioneAnimale) {
-                            saveAnimale(con, (SegnalazioneAnimale) s);
-                        }
+                        if (s instanceof SegnalazioneOggetto) saveOggetto(con, (SegnalazioneOggetto) s);
+                        else if (s instanceof SegnalazioneAnimale) saveAnimale(con, (SegnalazioneAnimale) s);
+                        con.commit();
                         return true;
                     }
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            con.rollback();
+        } catch (SQLException e) { e.printStackTrace(); }
         return false;
     }
 
@@ -81,16 +92,14 @@ public class SegnalazioneDAO {
         }
     }
 
-    // --- METODI DI RECUPERO ---
-
+    // HOME PAGE: Mostra APERTA e CHIUSA
     public java.util.List<Segnalazione> doRetrieveLatest(int limit) {
         java.util.List<Segnalazione> list = new java.util.ArrayList<>();
-        // Query corretta: s.id
         String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
                 "FROM segnalazione s " +
                 "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
                 "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
-                "WHERE s.stato = 'APERTA' " +
+                "WHERE s.stato IN ('APERTA', 'CHIUSA') " +
                 "ORDER BY s.data_pubblicazione DESC LIMIT ?";
 
         try (Connection con = ConPool.getConnection();
@@ -104,13 +113,11 @@ public class SegnalazioneDAO {
     }
 
     public Segnalazione doRetrieveById(long id) {
-        // Query corretta: s.id
         String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
                 "FROM segnalazione s " +
                 "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
                 "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
                 "WHERE s.id = ?";
-
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setLong(1, id);
@@ -128,7 +135,6 @@ public class SegnalazioneDAO {
                 "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
                 "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
                 "WHERE s.id_utente = ? ORDER BY s.data_pubblicazione DESC";
-
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
             ps.setLong(1, idUtente);
@@ -140,7 +146,6 @@ public class SegnalazioneDAO {
     }
 
     public boolean doDelete(long id) {
-        // Delete usa 'id'
         String query = "DELETE FROM segnalazione WHERE id = ?";
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
@@ -152,7 +157,6 @@ public class SegnalazioneDAO {
     private Segnalazione mapRow(ResultSet rs) throws SQLException {
         Segnalazione s;
         String tipo = rs.getString("tipo_segnalazione");
-
         if ("OGGETTO".equals(tipo)) {
             SegnalazioneOggetto so = new SegnalazioneOggetto();
             try {
@@ -167,11 +171,7 @@ public class SegnalazioneDAO {
             sa.setRazza(rs.getString("razza"));
             s = sa;
         }
-
-        // --- PUNTO CRUCIALE ---
-        // Leggiamo la colonna "id" perché la tabella padre si chiama "id"
         s.setId(rs.getLong("id"));
-
         s.setIdUtente(rs.getLong("id_utente"));
         s.setTitolo(rs.getString("titolo"));
         s.setDescrizione(rs.getString("descrizione"));
@@ -189,7 +189,6 @@ public class SegnalazioneDAO {
             s.setStato(model.bean.enums.StatoSegnalazione.valueOf(rs.getString("stato")));
             s.setTipoSegnalazione(model.bean.enums.TipoSegnalazione.valueOf(tipo));
         } catch (Exception e) {}
-
         return s;
     }
 }

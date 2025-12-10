@@ -100,7 +100,10 @@
             <a href="dettaglio-segnalazione?id=${s.id}" class="card-link">
                 <article class="card">
                     <div class="card-badges">
-                        <span class="badge badge-active">${s.stato}</span>
+                            <%-- LOGICA COLORE BADGE --%>
+                        <span class="badge ${s.stato == 'CHIUSA' ? 'badge-closed' : 'badge-active'}">
+                                ${s.stato}
+                        </span>
                         <span class="badge badge-type">${s.tipoSegnalazione}</span>
                     </div>
 

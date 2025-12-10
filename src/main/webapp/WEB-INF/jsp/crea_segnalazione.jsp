@@ -2,277 +2,272 @@
 <%@ page import="model.bean.enums.CategoriaOggetto" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%
+    if (session.getAttribute("utente") == null) {
+        response.sendRedirect("login");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crea Segnalazione - Foundly</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
 
-    <style>
-        /* Stili extra per il form dinamico */
-        .hidden { display: none; }
-        .form-section-title {
-            font-size: 0.9rem;
-            color: #E65100;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin: 20px 0 10px;
-            border-bottom: 1px solid #FFE0B2;
-            padding-bottom: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/crea_segnalazione.css">
 </head>
 <body>
 
 <div class="main-container">
+
     <div class="info-section">
         <div class="brand-header">
             <div class="brand-icon">
-                <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="logo_foundly">
+                <a href="${pageContext.request.contextPath}/index">
+                    <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="logo_foundly">
+                </a>
             </div>
         </div>
+
         <div class="hero-text">
             <h1>Nuova Segnalazione</h1>
-            <p>Hai trovato qualcosa? Compila il modulo con i dettagli per aiutare il proprietario a ritrovarlo.</p>
-            <div class="feature-pills">
-                <span class="pill"><span class="material-icons">photo_camera</span> Foto</span>
-                <span class="pill"><span class="material-icons">location_on</span> Geolocalizzazione</span>
-                <span class="pill"><span class="material-icons">verified_user</span> Domande di Verifica</span>
+            <p>
+                Hai trovato qualcosa? Compila il modulo dettagliato qui a fianco.
+                Più informazioni fornisci, più facile sarà il ritrovamento.
+            </p>
+
+            <div style="margin-top: 40px;">
+                <a href="${pageContext.request.contextPath}/index" style="color: #E65100; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 500;">
+                    <span class="material-icons">arrow_back</span> Torna alla Home
+                </a>
             </div>
         </div>
     </div>
 
     <div class="auth-section">
-        <div class="auth-card" style="max-width: 600px;">
-            <h2>Dettagli Ritrovamento</h2>
+        <div class="auth-card wide">
+
+            <h2 class="form-page-title">Dettagli Ritrovamento</h2>
+            <p class="form-page-subtitle">Inserisci le informazioni principali</p>
 
             <% if (request.getAttribute("errore") != null) { %>
-            <div style="background:#ffebee; color:#c62828; padding:10px; border-radius:8px; margin-bottom:15px;">
+            <div style="background:#ffebee; color:#c62828; padding:12px; border-radius:12px; margin-bottom:20px; display:flex; align-items:center; gap:10px;">
+                <span class="material-icons">error_outline</span>
                 <%= request.getAttribute("errore") %>
             </div>
             <% } %>
 
             <form action="${pageContext.request.contextPath}/crea-segnalazione" method="post" enctype="multipart/form-data">
 
-                <div class="input-group">
-                    <label>Cosa hai trovato?</label>
-                    <select name="tipo" id="tipoSelect" onchange="toggleFormFields()" required style="width:100%; padding:12px; border-radius:8px; border:1px solid #ccc;">
-                        <option value="OGGETTO">Un Oggetto</option>
-                        <option value="ANIMALE">Un Animale</option>
-                    </select>
-                </div>
-
-                <div id="fieldsOggetto">
-                    <div class="input-group">
-                        <label>Categoria</label>
-                        <select name="categoria" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ccc;">
-                            <% for(CategoriaOggetto c : CategoriaOggetto.values()) { %>
-                            <option value="<%= c %>"><%= c %></option>
-                            <% } %>
-                        </select>
-                    </div>
-                </div>
-
-                <div id="fieldsAnimale" class="hidden">
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label>Specie</label>
-                            <input type="text" name="specie" placeholder="es. Cane, Gatto">
+                <div class="form-grid">
+                    <div>
+                        <div class="form-group">
+                            <label for="titolo" class="form-label">Titolo Annuncio</label>
+                            <input type="text" id="titolo" name="titolo" class="form-input" required placeholder="Es. Trovato mazzo di chiavi">
                         </div>
-                        <div class="input-group">
-                            <label>Razza (Opzionale)</label>
-                            <input type="text" name="razza" placeholder="es. Labrador">
-                        </div>
-                    </div>
-                </div>
 
-                <div id="deliverySection" class="hidden">
-                    <div class="form-section-title">Modalità di Restituzione</div>
-
-                    <div class="input-group">
-                        <label>Come vuoi restituirlo?</label>
-
-                        <div class="radio-container">
-                            <label class="radio-label">
-                                <input type="radio" name="modalita" value="DIRETTA" checked onclick="toggleDropPointList(false)">
-                                <span>Consegna Diretta (A mano)</span>
-                            </label>
-
-                            <label class="radio-label">
-                                <input type="radio" name="modalita" value="DROP_POINT" onclick="toggleDropPointList(true)">
-                                <span>Tramite Drop-Point (Negozio)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="dropPointSelection" class="hidden" style="margin-top: 15px;">
-                        <div class="input-group">
-                            <label>Scegli il Drop-Point più vicino</label>
-                            <select name="idDropPoint" id="selectDropPoint" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ccc;" onchange="showDropPointDetails()">
-                                <option value="">-- Seleziona un negozio --</option>
-                                <c:forEach var="dp" items="${listaDropPoint}">
-                                    <option value="${dp.id}"
-                                            data-indirizzo="${dp.indirizzo}, ${dp.citta} (${dp.provincia})"
-                                            data-orari="${dp.orariApertura}"
-                                            data-tel="${dp.telefono}">
-                                            ${dp.nomeAttivita} - ${dp.citta}
-                                    </option>
-                                </c:forEach>
+                        <div class="form-group">
+                            <label for="tipo_segnalazione" class="form-label">Cosa hai trovato?</label>
+                            <select id="tipo_segnalazione" name="tipo_segnalazione" class="form-select" required onchange="toggleCampi()">
+                                <option value="OGGETTO">Un Oggetto</option>
+                                <option value="ANIMALE">Un Animale</option>
                             </select>
+                        </div>
 
-                            <div id="dropPointDetails" style="display:none; margin-top:15px; padding:15px; background:#f9f9f9; border-radius:8px; border-left: 4px solid #FB8C00;">
-                                <h4 style="margin:0 0 5px 0; color:#E65100;">Dettagli Punto di Ritiro</h4>
-                                <p style="margin:5px 0; font-size:0.9rem;"><strong>📍 Indirizzo:</strong> <span id="dpAddr"></span></p>
-                                <p style="margin:5px 0; font-size:0.9rem;"><strong>🕒 Orari:</strong> <span id="dpTime"></span></p>
-                                <p style="margin:5px 0; font-size:0.9rem;"><strong>📞 Contatto:</strong> <span id="dpTel"></span></p>
+                        <div id="campi-oggetto">
+                            <div class="form-group">
+                                <label for="categoria" class="form-label">Categoria</label>
+                                <select id="categoria" name="categoria" class="form-select">
+                                    <% for(CategoriaOggetto c : CategoriaOggetto.values()) { %>
+                                    <option value="<%= c %>"><%= c %></option>
+                                    <% } %>
+                                </select>
                             </div>
 
-                            <small style="color: #666;">Lasciando l'oggetto qui, il proprietario potrà ritirarlo con un codice sicuro.</small>
+                            <div class="form-group">
+                                <label for="modalita_consegna" class="form-label">Modalità Restituzione</label>
+                                <select id="modalita_consegna" name="modalita_consegna" class="form-select" onchange="toggleCampi()">
+                                    <option value="DIRETTA">Consegna a mano (Diretta)</option>
+                                    <option value="DROP_POINT">Lascia a un Drop-Point (Negozio)</option>
+                                </select>
+                            </div>
+
+                            <div id="container-drop-point" class="hidden">
+                                <div class="form-group" style="background: #FFFDE7; padding: 15px; border-radius: 12px; border: 1px dashed #FBC02D;">
+                                    <label for="idDropPoint" class="form-label" style="color: #F57F17;">Seleziona il Drop-Point</label>
+                                    <select id="idDropPoint" name="idDropPoint" class="form-select" onchange="showDropPointDetails()">
+                                        <option value="">-- Scegli un negozio --</option>
+                                        <c:forEach var="dp" items="${listaDropPoint}">
+                                            <option value="${dp.id}"
+                                                    data-indirizzo="${dp.indirizzo}, ${dp.citta}"
+                                                    data-orari="${dp.orariApertura}"
+                                                    data-tel="${dp.telefono}">
+                                                    ${dp.nomeAttivita} - ${dp.citta}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+
+                                    <div id="dp-details-box" class="dp-details-box hidden">
+                                        <div class="dp-details-title">
+                                            <span class="material-icons">store</span> Dettagli Punto
+                                        </div>
+                                        <div class="dp-info-row">
+                                            <span class="material-icons dp-icon-small">place</span>
+                                            <span id="dp-addr">Indirizzo...</span>
+                                        </div>
+                                        <div class="dp-info-row">
+                                            <span class="material-icons dp-icon-small">schedule</span>
+                                            <span id="dp-time">Orari...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="campi-animale" class="hidden">
+                            <div class="form-group">
+                                <label for="specie" class="form-label">Specie</label>
+                                <input type="text" id="specie" name="specie" class="form-input" placeholder="Es. Cane">
+                            </div>
+                            <div class="form-group">
+                                <label for="razza" class="form-label">Razza (Opzionale)</label>
+                                <input type="text" id="razza" name="razza" class="form-input" placeholder="Es. Labrador">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="form-group">
+                            <label for="descrizione" class="form-label">Descrizione Dettagliata</label>
+                            <textarea id="descrizione" name="descrizione" class="form-textarea" required placeholder="Descrivi colore, marca, segni particolari..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Foto (Opzionale)</label>
+                            <label for="immagine" class="file-upload-label">
+                                <span class="material-icons file-upload-icon">cloud_upload</span>
+                                <span>Carica un'immagine</span>
+                            </label>
+                            <input type="file" id="immagine" name="immagine" class="file-input-hidden" accept="image/*" onchange="showFileName(this)">
+                            <div id="file-name-display"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-section-title">Informazioni Generali</div>
+                <hr style="margin: 25px 0;">
 
-                <div class="input-group">
-                    <label>Titolo Annuncio</label>
-                    <input type="text" name="titolo" placeholder="es. Mazzo di chiavi con portachiavi rosso" required>
-                </div>
+                <h3 style="font-size:1.1rem; color:#E65100; margin-bottom:15px;">📍 Dove e Quando</h3>
 
-                <div class="input-group">
-                    <label>Descrizione Dettagliata</label>
-                    <textarea name="descrizione" rows="4" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc;" required></textarea>
-                </div>
-
-                <div class="input-group">
-                    <label>Data Ritrovamento</label>
-                    <input type="date" name="dataRitrovamento" required>
-                </div>
-
-                <div class="form-section-title">Posizione</div>
-
-                <div class="input-group">
-                    <label>Via / Piazza (Luogo esatto)</label>
-                    <input type="text" name="luogo" placeholder="es. Via Roma 10" required>
-                </div>
-
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>Città</label>
-                        <input type="text" name="citta" required>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="luogo_ritrovamento" class="form-label">Indirizzo / Luogo</label>
+                        <input type="text" id="luogo_ritrovamento" name="luogo_ritrovamento" class="form-input" required placeholder="Es. Via Roma 10">
                     </div>
-                    <div class="input-group">
-                        <label>Provincia (Sigla)</label>
-                        <input type="text" name="provincia" maxlength="2" placeholder="NA" required>
+                    <div class="form-group">
+                        <label for="citta" class="form-label">Città</label>
+                        <input type="text" id="citta" name="citta" class="form-input" required placeholder="Es. Milano">
+                    </div>
+                    <div class="form-group">
+                        <label for="provincia" class="form-label">Provincia (Sigla)</label>
+                        <input type="text" id="provincia" name="provincia" class="form-input" maxlength="2" style="text-transform:uppercase;" required placeholder="MI">
+                    </div>
+                    <div class="form-group">
+                        <label for="data_ritrovamento" class="form-label">Data Ritrovamento</label>
+                        <input type="date" id="data_ritrovamento" name="dataRitrovamento" class="form-input" required>
                     </div>
                 </div>
 
-                <div class="form-section-title">Sicurezza (Secure Claim)</div>
-                <p style="font-size:0.8rem; color:#666; margin-bottom:10px;">
-                    Imposta due domande a cui solo il vero proprietario può rispondere.
-                </p>
+                <hr style="margin: 25px 0;">
 
-                <div class="input-group">
-                    <label>Domanda 1</label>
-                    <input type="text" name="domanda1" placeholder="es. Di che colore è il portachiavi?" required>
+                <h3 style="font-size:1.1rem; color:#E65100; margin-bottom:10px;">🔒 Sicurezza (Secure Claim)</h3>
+                <p style="font-size:0.85rem; color:#757575; margin-bottom:20px;">Imposta due domande a cui solo il vero proprietario può rispondere.</p>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="domanda1" class="form-label">Domanda 1</label>
+                        <input type="text" id="domanda1" name="domanda1" class="form-input" required placeholder="Es. Di che colore è il portachiavi?">
+                    </div>
+                    <div class="form-group">
+                        <label for="domanda2" class="form-label">Domanda 2</label>
+                        <input type="text" id="domanda2" name="domanda2" class="form-input" required placeholder="Es. C'è un graffio sul retro?">
+                    </div>
                 </div>
 
-                <div class="input-group">
-                    <label>Domanda 2</label>
-                    <input type="text" name="domanda2" placeholder="es. Quante chiavi ci sono?" required>
-                </div>
+                <button type="submit" class="btn-submit-modern">Pubblica Segnalazione</button>
 
-                <div class="input-group">
-                    <label>Foto (Opzionale)</label>
-                    <input type="file" name="immagine" accept="image/*">
-                </div>
-
-                <button type="submit" class="btn-primary mt-2">Pubblica Segnalazione</button>
             </form>
-
-            <div style="text-align:center; margin-top:20px;">
-                <a href="${pageContext.request.contextPath}/index" style="color:#666; text-decoration:none;">Annulla</a>
-            </div>
         </div>
     </div>
 </div>
 
 <script>
-    function toggleFormFields() {
-        const tipo = document.getElementById("tipoSelect").value;
-        const fieldsOggetto = document.getElementById("fieldsOggetto");
-        const fieldsAnimale = document.getElementById("fieldsAnimale");
-        const deliverySection = document.getElementById("deliverySection"); // Recupera la sezione consegna
+    function toggleCampi() {
+        const tipo = document.getElementById("tipo_segnalazione").value;
+        const campiOggetto = document.getElementById("campi-oggetto");
+        const campiAnimale = document.getElementById("campi-animale");
+
+        // Nuova logica per Drop-Point
+        const modalita = document.getElementById("modalita_consegna").value;
+        const containerDP = document.getElementById("container-drop-point");
+        const selectDP = document.getElementById("idDropPoint");
 
         if (tipo === "OGGETTO") {
-            fieldsOggetto.classList.remove("hidden");
-            fieldsAnimale.classList.add("hidden");
-            // MOSTRA la scelta consegna solo se è un oggetto
-            if (deliverySection) deliverySection.classList.remove("hidden");
+            campiOggetto.classList.remove("hidden");
+            campiAnimale.classList.add("hidden");
+
+            // Gestione Drop-Point visibile solo se è Oggetto AND modalità è Drop-Point
+            if (modalita === "DROP_POINT") {
+                containerDP.classList.remove("hidden");
+                selectDP.setAttribute("required", "required"); // Rende obbligatorio selezionare il negozio
+            } else {
+                containerDP.classList.add("hidden");
+                selectDP.removeAttribute("required");
+            }
+
         } else {
-            fieldsOggetto.classList.add("hidden");
-            fieldsAnimale.classList.remove("hidden");
-            // NASCONDI la scelta consegna se è un animale (sempre diretta)
-            if (deliverySection) deliverySection.classList.add("hidden");
+            // Se è ANIMALE
+            campiOggetto.classList.add("hidden");
+            campiAnimale.classList.remove("hidden");
+            // Gli animali non usano drop point nel nostro caso d'uso base
+            containerDP.classList.add("hidden");
+            selectDP.removeAttribute("required");
         }
     }
-
-    // Nuova funzione per mostrare la tendina solo se si sceglie Drop-Point
-    function toggleDropPointList(show) {
-        const dpDiv = document.getElementById("dropPointSelection");
-        if (show) {
-            dpDiv.classList.remove("hidden");
-            // Rendiamo la select obbligatoria se visibile
-            const select = dpDiv.querySelector("select");
-            if(select) select.setAttribute("required", "required");
-        } else {
-            dpDiv.classList.add("hidden");
-            // Togliamo l'obbligo se nascosta
-            const select = dpDiv.querySelector("select");
-            if(select) select.removeAttribute("required");
-        }
-    }
-
-    // Eseguiamo al caricamento per impostare lo stato corretto se la pagina viene ricaricata
-    document.addEventListener("DOMContentLoaded", function() {
-        toggleFormFields();
-        // Controlla anche lo stato iniziale dei radio button
-        const radioDrop = document.querySelector('input[name="modalita"][value="DROP_POINT"]');
-        if (radioDrop && radioDrop.checked) {
-            toggleDropPointList(true);
-        } else {
-            toggleDropPointList(false);
-        }
-    });
 
     function showDropPointDetails() {
-        const select = document.getElementById("selectDropPoint");
-        const detailsDiv = document.getElementById("dropPointDetails");
+        const select = document.getElementById("idDropPoint");
+        const detailsBox = document.getElementById("dp-details-box");
 
-        // Prendi l'opzione selezionata
-        const selectedOption = select.options[select.selectedIndex];
-
-        // Se non ha valore (es. "-- Seleziona --"), nascondi tutto
-        if (!select.value) {
-            detailsDiv.style.display = "none";
+        if (select.value === "") {
+            detailsBox.classList.add("hidden");
             return;
         }
 
-        // Recupera i dati dagli attributi data-...
-        const indirizzo = selectedOption.getAttribute("data-indirizzo");
-        const orari = selectedOption.getAttribute("data-orari");
-        const tel = selectedOption.getAttribute("data-tel");
+        const selectedOpt = select.options[select.selectedIndex];
+        const addr = selectedOpt.getAttribute("data-indirizzo");
+        const time = selectedOpt.getAttribute("data-orari");
 
-        // Riempi il box e mostralo
-        document.getElementById("dpAddr").textContent = indirizzo;
-        document.getElementById("dpTime").textContent = orari;
-        document.getElementById("dpTel").textContent = tel;
+        document.getElementById("dp-addr").textContent = addr;
+        document.getElementById("dp-time").textContent = time;
 
-        detailsDiv.style.display = "block";
+        detailsBox.classList.remove("hidden");
     }
+
+    function showFileName(input) {
+        const display = document.getElementById('file-name-display');
+        if (input.files && input.files.length > 0) {
+            display.textContent = input.files[0].name;
+            display.style.color = "#2E7D32";
+        } else {
+            display.textContent = "";
+        }
+    }
+
+    // Init
+    document.addEventListener("DOMContentLoaded", toggleCampi);
 </script>
 
 </body>

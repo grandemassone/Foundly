@@ -35,40 +35,59 @@ public class GestioneReclamoServlet extends HttpServlet {
         }
 
         if ("invia".equals(action)) {
-            // L'utente risponde alle domande
             long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
-            String r1 = request.getParameter("risposta1");
-            String r2 = request.getParameter("risposta2");
+
+            // 1. Recupero la segnalazione per verificare lo stato
+            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
+
+            // CONTROLLO STATO: Se non è APERTA, blocco tutto.
+            if (s == null || s.getStato() != model.bean.enums.StatoSegnalazione.APERTA) {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=segnalazione_chiusa");
+                return;
+            }
+
+            // 2. CONTROLLO DUPLICATI: Se esiste già un reclamo mio, stop.
+            if (reclamoDAO.doRetrieveBySegnalazioneAndUtente(idSegnalazione, utente.getId()) != null) {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_esistente");
+                return;
+            }
 
             Reclamo r = new Reclamo();
             r.setIdSegnalazione(idSegnalazione);
             r.setIdUtenteRichiedente(utente.getId());
-            r.setRispostaVerifica1(r1);
-            r.setRispostaVerifica2(r2);
+            r.setRispostaVerifica1(request.getParameter("risposta1"));
+            r.setRispostaVerifica2(request.getParameter("risposta2"));
 
             reclamoDAO.doSave(r);
             response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_inviato");
 
         } else if ("accetta".equals(action)) {
-            // Il proprietario accetta un reclamo
             long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
             long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
 
-            // Verifica sicurezza (opzionale ma consigliata): controllare se utente è proprietario segnalazione
-
             Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
             String codice = null;
-
-            // Se è un oggetto con Drop-Point, genera codice
             if (s instanceof SegnalazioneOggetto) {
                 SegnalazioneOggetto so = (SegnalazioneOggetto) s;
                 if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
-                    codice = UUID.randomUUID().toString().substring(0, 6).toUpperCase(); // Codice 6 cifre
+                    codice = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
                 }
             }
 
-            reclamoDAO.accettaReclamo(idReclamo, codice);
+            // Chiama il service che chiude la segnalazione e accetta il reclamo
+            segnalazioneService.accettaReclamoEChiudiSegnalazione(idReclamo, idSegnalazione, codice);
+
             response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_accettato");
+
+        } else if ("rifiuta".equals(action)) {
+            // --- NUOVA LOGICA DI RIFIUTO ---
+            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
+            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+
+            // Chiama il service per aggiornare lo stato del reclamo a RIFIUTATO
+            segnalazioneService.rifiutaReclamo(idReclamo);
+
+            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_rifiutato");
         }
     }
 }

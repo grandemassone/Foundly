@@ -1,36 +1,31 @@
 package model.service;
 
 import model.bean.Segnalazione;
+import model.bean.enums.StatoSegnalazione;
+import model.dao.ReclamoDAO;
 import model.dao.SegnalazioneDAO;
-import model.utils.GeocodingUtils; // Importa la utility
+import model.utils.GeocodingUtils;
 
 public class SegnalazioneService {
 
     private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
+    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
 
     public boolean creaSegnalazione(Segnalazione segnalazione) {
-
-        // 1. Calcolo automatico Latitudine e Longitudine
-        // CORREZIONE: getIndirizzo() -> getLuogoRitrovamento()
         if (segnalazione.getLuogoRitrovamento() != null && !segnalazione.getLuogoRitrovamento().isEmpty() &&
                 segnalazione.getCitta() != null && !segnalazione.getCitta().isEmpty()) {
-
             double[] coords = GeocodingUtils.getCoordinates(
-                    segnalazione.getLuogoRitrovamento(), // QUI ERA L'ERRORE
+                    segnalazione.getLuogoRitrovamento(),
                     segnalazione.getCitta(),
                     segnalazione.getProvincia()
             );
-
             segnalazione.setLatitudine(coords[0]);
             segnalazione.setLongitudine(coords[1]);
         }
-
-        // 2. Salvataggio nel DB
         return segnalazioneDAO.doSave(segnalazione);
     }
 
     public java.util.List<Segnalazione> getUltimeSegnalazioni() {
-        // Recuperiamo ad esempio le ultime 8 per la Home Page
         return segnalazioneDAO.doRetrieveLatest(8);
     }
 
@@ -43,7 +38,22 @@ public class SegnalazioneService {
     }
 
     public boolean eliminaSegnalazione(long id) {
-        // Qui si potrebbe aggiungere controllo se l'utente è il proprietario
         return segnalazioneDAO.doDelete(id);
+    }
+
+    /**
+     * NUOVO METODO: Accetta reclamo e chiude la segnalazione.
+     */
+    public boolean accettaReclamoEChiudiSegnalazione(long idReclamo, long idSegnalazione, String codice) {
+        boolean successo = reclamoDAO.accettaReclamo(idReclamo, codice);
+        if (successo) {
+            // Se accetto il reclamo, la segnalazione diventa CHIUSA
+            return segnalazioneDAO.updateStato(idSegnalazione, StatoSegnalazione.CHIUSA);
+        }
+        return false;
+    }
+
+    public boolean rifiutaReclamo(long idReclamo) {
+        return reclamoDAO.rifiutaReclamo(idReclamo);
     }
 }

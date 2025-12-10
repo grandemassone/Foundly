@@ -666,3 +666,10 @@ body {
     /* Reset animazione se necessario, o lascia com'è */
     height: 100%;
 }
+
+/* --- BADGE STATI AGGIUNTIVI --- */
+.badge-closed {
+    background-color: #FFEBEE; /* Rosso chiaro sfondo */
+    color: #C62828;            /* Rosso scuro testo */
+    border: 1px solid #FFCDD2; /* Bordo rosso */
+}

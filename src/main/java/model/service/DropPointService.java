@@ -50,18 +50,23 @@ public class DropPointService {
         return dropPointDAO.doRetrieveAllApprovati();
     }
 
-    /** NUOVO: Drop-Point in attesa per l’area admin. */
+    /** Drop-Point in attesa per l’area admin. */
     public List<DropPoint> findAllInAttesa() {
         return dropPointDAO.doRetrieveByStato(StatoDropPoint.IN_ATTESA);
     }
 
-    /** NUOVO: approvazione da Area Admin. */
+    /** Approvazione da Area Admin. */
     public boolean approvaDropPoint(long id) {
         return dropPointDAO.updateStato(id, StatoDropPoint.APPROVATO);
     }
 
-    /** NUOVO: rifiuto da Area Admin. */
+    /** Rifiuto da Area Admin. */
     public boolean rifiutaDropPoint(long id) {
         return dropPointDAO.updateStato(id, StatoDropPoint.RIFIUTATO);
+    }
+
+    // --- Metodo corretto senza duplicati ---
+    public DropPoint trovaPerId(long id) {
+        return dropPointDAO.doRetrieveById(id);
     }
 }

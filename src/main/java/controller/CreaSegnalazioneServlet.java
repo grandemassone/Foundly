@@ -47,9 +47,8 @@ public class CreaSegnalazioneServlet extends HttpServlet {
             return;
         }
 
-        // CARICA LA LISTA DEI DROP-POINT PER LA SELECT
+        // Carica i drop point per la select
         request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
-
         request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp").forward(request, response);
     }
 
@@ -64,29 +63,39 @@ public class CreaSegnalazioneServlet extends HttpServlet {
         }
 
         try {
-            // 1. Recupero parametri comuni
-            String tipo = request.getParameter("tipo"); // OGGETTO o ANIMALE
+            // 1. RECUPERO PARAMETRI (Nomi allineati alla JSP moderna)
+            String tipo = request.getParameter("tipo_segnalazione"); // Era "tipo"
             String titolo = request.getParameter("titolo");
             String descrizione = request.getParameter("descrizione");
             String dataStr = request.getParameter("dataRitrovamento");
-            String luogo = request.getParameter("luogo"); // Via/Piazza
+            String luogo = request.getParameter("luogo_ritrovamento"); // Era "luogo"
             String citta = request.getParameter("citta");
             String provincia = request.getParameter("provincia");
-            String domanda1 = request.getParameter("domanda1");
-            String domanda2 = request.getParameter("domanda2");
+            String domanda1 = request.getParameter("domanda1"); // Nella JSP è name="domanda1"
+            String domanda2 = request.getParameter("domanda2"); // Nella JSP è name="domanda2"
 
-            // 2. Creazione Oggetto Polimorfico
             Segnalazione segnalazione;
 
-            // ... dentro doPost ...
-
+            // 2. Creazione Oggetto Polimorfico
             if ("OGGETTO".equalsIgnoreCase(tipo)) {
                 SegnalazioneOggetto so = new SegnalazioneOggetto();
-                String categoriaStr = request.getParameter("categoria");
-                so.setCategoria(CategoriaOggetto.valueOf(categoriaStr));
 
-                // NUOVA LOGICA CONSEGNA
-                String modalitaStr = request.getParameter("modalita");
+                String categoriaStr = request.getParameter("categoria");
+                // Controllo per evitare errori se la categoria è vuota o non valida
+                if (categoriaStr != null && !categoriaStr.isEmpty()) {
+                    try {
+                        so.setCategoria(CategoriaOggetto.valueOf(categoriaStr));
+                    } catch (IllegalArgumentException e) {
+                        // Se la categoria non esiste (es. BORSE), fallback su ALTRO
+                        so.setCategoria(CategoriaOggetto.ALTRO);
+                    }
+                } else {
+                    so.setCategoria(CategoriaOggetto.ALTRO);
+                }
+
+                // Recupero modalità di consegna
+                String modalitaStr = request.getParameter("modalita_consegna"); // Era "modalita"
+
                 if ("DROP_POINT".equals(modalitaStr)) {
                     so.setModalitaConsegna(ModalitaConsegna.DROP_POINT);
                     String idDpStr = request.getParameter("idDropPoint");
@@ -100,6 +109,7 @@ public class CreaSegnalazioneServlet extends HttpServlet {
 
                 segnalazione = so;
             } else {
+                // Caso ANIMALE
                 SegnalazioneAnimale sa = new SegnalazioneAnimale();
                 sa.setSpecie(request.getParameter("specie"));
                 sa.setRazza(request.getParameter("razza"));
@@ -118,47 +128,53 @@ public class CreaSegnalazioneServlet extends HttpServlet {
             segnalazione.setStato(StatoSegnalazione.APERTA);
             segnalazione.setDataPubblicazione(new Timestamp(System.currentTimeMillis()));
 
-            // Conversione Data (da HTML yyyy-mm-dd a Timestamp)
+            // Gestione Data (Supporta sia 'date' che 'datetime-local')
             if (dataStr != null && !dataStr.isEmpty()) {
-                LocalDate date = LocalDate.parse(dataStr);
-                segnalazione.setDataRitrovamento(Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)));
+                if (dataStr.contains("T")) {
+                    // Formato datetime-local (yyyy-MM-ddTHH:mm)
+                    LocalDateTime dt = LocalDateTime.parse(dataStr);
+                    segnalazione.setDataRitrovamento(Timestamp.valueOf(dt));
+                } else {
+                    // Formato date (yyyy-MM-dd)
+                    LocalDate date = LocalDate.parse(dataStr);
+                    segnalazione.setDataRitrovamento(Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)));
+                }
             }
 
-            // 4. Gestione Immagine (Salvataggio su disco)
+            // 4. Gestione Immagine
             Part filePart = request.getPart("immagine");
-            String fileName = "default.png";
-
             if (filePart != null && filePart.getSize() > 0) {
-                // Genera nome unico per evitare sovrascritture
                 String originalName = filePart.getSubmittedFileName();
-                String ext = originalName.substring(originalName.lastIndexOf("."));
-                fileName = UUID.randomUUID().toString() + ext;
+                String ext = ".jpg";
+                if(originalName.contains(".")) {
+                    ext = originalName.substring(originalName.lastIndexOf("."));
+                }
+                String fileName = UUID.randomUUID().toString() + ext;
 
-                // Percorso di salvataggio (nella cartella upload del server)
                 String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
                 File uploadDir = new File(uploadPath);
                 if (!uploadDir.exists()) uploadDir.mkdir();
 
                 filePart.write(uploadPath + File.separator + fileName);
-
-                // Salviamo il path relativo nel DB (es. "uploads/foto.jpg")
                 segnalazione.setImmagine("uploads/" + fileName);
             } else {
                 segnalazione.setImmagine("assets/images/default-item.png");
             }
 
-            // 5. Chiamata al Service (che farà anche il Geocoding)
+            // 5. Salvataggio
             boolean successo = segnalazioneService.creaSegnalazione(segnalazione);
 
             if (successo) {
                 response.sendRedirect(request.getContextPath() + "/index?msg=success_segnalazione");
             } else {
-                request.setAttribute("errore", "Errore nel salvataggio. Riprova.");
+                request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
+                request.setAttribute("errore", "Errore nel salvataggio. Controlla i dati inseriti.");
                 request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
             request.setAttribute("errore", "Errore tecnico: " + e.getMessage());
             request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp").forward(request, response);
         }
