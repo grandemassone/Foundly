@@ -165,9 +165,9 @@ public class UtenteService {
      * >=5 punti  -> SHERLOCK_HOLMES
      */
     private String calcolaBadgePerPunteggio(int punti) {
-        if (punti >= 5) {
+        if (punti >= 150) {
             return "SHERLOCK_HOLMES";
-        } else if (punti >= 3) {
+        } else if (punti >= 100) {
             return "DETECTIVE";
         } else {
             return "OCCHIO_DI_FALCO";
