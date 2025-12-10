@@ -4,16 +4,17 @@ import model.ConPool;
 import model.bean.Segnalazione;
 import model.bean.SegnalazioneAnimale;
 import model.bean.SegnalazioneOggetto;
-import model.bean.enums.StatoSegnalazione; // Importante
+import model.bean.enums.CategoriaOggetto;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoSegnalazione;
 import model.bean.enums.TipoSegnalazione;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List; // FONDAMENTALE: java.util, non java.awt
 
 public class SegnalazioneDAO {
 
-    /**
-     * NUOVO METODO: Aggiorna lo stato (es. da APERTA a CHIUSA)
-     */
     public boolean updateStato(long id, StatoSegnalazione nuovoStato) {
         String query = "UPDATE segnalazione SET stato = ? WHERE id = ?";
         try (Connection con = ConPool.getConnection();
@@ -36,7 +37,7 @@ public class SegnalazioneDAO {
         try (Connection con = ConPool.getConnection();
              PreparedStatement psPadre = con.prepareStatement(sqlPadre, Statement.RETURN_GENERATED_KEYS)) {
 
-            con.setAutoCommit(false);
+            con.setAutoCommit(false); // Transazione
             psPadre.setLong(1, s.getIdUtente());
             psPadre.setString(2, s.getTitolo());
             psPadre.setString(3, s.getDescrizione());
@@ -92,9 +93,8 @@ public class SegnalazioneDAO {
         }
     }
 
-    // HOME PAGE: Mostra APERTA e CHIUSA
-    public java.util.List<Segnalazione> doRetrieveLatest(int limit) {
-        java.util.List<Segnalazione> list = new java.util.ArrayList<>();
+    public List<Segnalazione> doRetrieveLatest(int limit) {
+        List<Segnalazione> list = new ArrayList<>();
         String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
                 "FROM segnalazione s " +
                 "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
@@ -128,8 +128,8 @@ public class SegnalazioneDAO {
         return null;
     }
 
-    public java.util.List<Segnalazione> doRetrieveByUtente(long idUtente) {
-        java.util.List<Segnalazione> list = new java.util.ArrayList<>();
+    public List<Segnalazione> doRetrieveByUtente(long idUtente) {
+        List<Segnalazione> list = new ArrayList<>();
         String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
                 "FROM segnalazione s " +
                 "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
@@ -154,14 +154,70 @@ public class SegnalazioneDAO {
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 
+    public List<Segnalazione> doRetrieveByFiltri(String queryTesto, String tipo, String categoria) {
+        StringBuilder sql = new StringBuilder("SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
+                "FROM segnalazione s " +
+                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
+                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
+                "WHERE 1=1");
+
+        List<Object> params = new ArrayList<>();
+
+        // Filtro Testo
+        if (queryTesto != null && !queryTesto.trim().isEmpty()) {
+            sql.append(" AND (s.titolo LIKE ? OR s.descrizione LIKE ? OR s.luogo_ritrovamento LIKE ?)");
+            String likeQuery = "%" + queryTesto + "%";
+            params.add(likeQuery);
+            params.add(likeQuery);
+            params.add(likeQuery);
+        }
+
+        // Filtro Tipo (Gestisce null e stringhe vuote)
+        if (tipo != null && !tipo.trim().isEmpty()) {
+            sql.append(" AND s.tipo_segnalazione = ?");
+            params.add(tipo.toUpperCase());
+        }
+
+        // Filtro Categoria (Gestisce null e stringhe vuote)
+        if (categoria != null && !categoria.trim().isEmpty()) {
+            sql.append(" AND so.categoria = ?");
+            params.add(categoria.toUpperCase());
+        }
+
+        sql.append(" ORDER BY s.data_pubblicazione DESC");
+
+        List<Segnalazione> list = new ArrayList<>();
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs)); // Assicurati di avere il metodo mapRow definito nel DAO
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // --- MAPPER UNICO PER EVITARE DUPLICAZIONI ---
     private Segnalazione mapRow(ResultSet rs) throws SQLException {
         Segnalazione s;
         String tipo = rs.getString("tipo_segnalazione");
+
         if ("OGGETTO".equals(tipo)) {
             SegnalazioneOggetto so = new SegnalazioneOggetto();
             try {
-                so.setCategoria(model.bean.enums.CategoriaOggetto.valueOf(rs.getString("categoria")));
-                so.setModalitaConsegna(model.bean.enums.ModalitaConsegna.valueOf(rs.getString("modalita_consegna")));
+                String cat = rs.getString("categoria");
+                if (cat != null) so.setCategoria(CategoriaOggetto.valueOf(cat));
+
+                String mod = rs.getString("modalita_consegna");
+                if (mod != null) so.setModalitaConsegna(ModalitaConsegna.valueOf(mod));
             } catch (Exception e) {}
             so.setIdDropPoint(rs.getObject("id_drop_point", Long.class));
             s = so;
@@ -171,6 +227,7 @@ public class SegnalazioneDAO {
             sa.setRazza(rs.getString("razza"));
             s = sa;
         }
+
         s.setId(rs.getLong("id"));
         s.setIdUtente(rs.getLong("id_utente"));
         s.setTitolo(rs.getString("titolo"));
@@ -185,10 +242,12 @@ public class SegnalazioneDAO {
         s.setDomandaVerifica1(rs.getString("domanda_verifica1"));
         s.setDomandaVerifica2(rs.getString("domanda_verifica2"));
         s.setDataPubblicazione(rs.getTimestamp("data_pubblicazione"));
+
         try {
-            s.setStato(model.bean.enums.StatoSegnalazione.valueOf(rs.getString("stato")));
-            s.setTipoSegnalazione(model.bean.enums.TipoSegnalazione.valueOf(tipo));
+            s.setStato(StatoSegnalazione.valueOf(rs.getString("stato")));
+            s.setTipoSegnalazione(TipoSegnalazione.valueOf(tipo));
         } catch (Exception e) {}
+
         return s;
     }
 }

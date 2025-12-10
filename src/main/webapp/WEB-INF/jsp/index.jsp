@@ -30,52 +30,47 @@
 
 <div class="search-wrapper">
     <div class="search-card">
-        <form action="search" method="GET">
-            <div class="search-top">
-                <div class="input-box">
-                    <span class="material-icons" style="color: #9e9e9e;">search</span>
-                    <input type="text" name="q" placeholder="Cerca per titolo, descrizione o luogo...">
+        <%-- FORM DI RICERCA: Punta alla SearchServlet --%>
+        <form action="${pageContext.request.contextPath}/search" method="GET">
+
+            <div class="search-main-row">
+                <div class="input-group">
+                    <span class="material-icons search-icon">search</span>
+                    <input type="text" name="q"
+                           placeholder="Cerca per titolo..."
+                           value="${not empty paramQ ? paramQ : ''}">
                 </div>
-                <button type="button" class="btn-cerca">
-                    <span class="material-icons">search</span>
+                <button type="submit" class="btn-search-submit">
                     Cerca
                 </button>
             </div>
 
+            <div class="search-divider"></div>
+
             <div class="filters-row">
-                <div class="filter-icon-container">
-                    <span class="material-icons">filter_alt</span>
+                <div class="filter-item">
+                    <span class="material-icons">category</span>
+                    <select name="tipo">
+                        <option value="">Tutti i tipi</option>
+                        <option value="oggetto" ${paramTipo == 'oggetto' ? 'selected' : ''}>Oggetto</option>
+                        <option value="animale" ${paramTipo == 'animale' ? 'selected' : ''}>Animale</option>
+                    </select>
                 </div>
 
-                <select class="filter-select" name="tipo">
-                    <option value="">Tutti i tipi</option>
-                    <option value="oggetto">Oggetto</option>
-                    <option value="animale">Animale</option>
-                </select>
-
-                <select class="filter-select" name="categoria">
-                    <option value="">Tutte</option>
-                    <option value="elettronica">Elettronica</option>
-                    <option value="documenti">Documenti</option>
-                    <option value="abbigliamento">Abbigliamento</option>
-                    <option value="gioielli">Gioielli</option>
-                    <option value="chiavi">Chiavi</option>
-                    <option value="portafogli">Portafogli</option>
-                    <option value="borse">Borse</option>
-                    <option value="altro">Altro</option>
-                </select>
-
-                <select class="filter-select" name="citta">
-                    <option value="">Tutte le città</option>
-                    <option value="Roma">Roma</option>
-                    <option value="Milano">Milano</option>
-                    <option value="Napoli">Napoli</option>
-                    <option value="Torino">Torino</option>
-                    <option value="Firenze">Firenze</option>
-                    <option value="Venezia">Venezia</option>
-                    <option value="Bari">Bari</option>
-                    <option value="Palermo">Palermo</option>
-                </select>
+                <div class="filter-item">
+                    <span class="material-icons">sell</span>
+                    <select name="categoria">
+                        <option value="">Tutte le categorie</option>
+                        <option value="ELETTRONICA" ${paramCat == 'ELETTRONICA' ? 'selected' : ''}>Elettronica</option>
+                        <option value="DOCUMENTI" ${paramCat == 'DOCUMENTI' ? 'selected' : ''}>Documenti</option>
+                        <option value="ABBIGLIAMENTO" ${paramCat == 'ABBIGLIAMENTO' ? 'selected' : ''}>Abbigliamento</option>
+                        <option value="GIOIELLI" ${paramCat == 'GIOIELLI' ? 'selected' : ''}>Gioielli</option>
+                        <option value="CHIAVI" ${paramCat == 'CHIAVI' ? 'selected' : ''}>Chiavi</option>
+                        <option value="PORTAFOGLI" ${paramCat == 'PORTAFOGLI' ? 'selected' : ''}>Portafogli</option>
+                        <option value="BORSE" ${paramCat == 'BORSE' ? 'selected' : ''}>Borse</option>
+                        <option value="ALTRO" ${paramCat == 'ALTRO' ? 'selected' : ''}>Altro</option>
+                    </select>
+                </div>
             </div>
         </form>
     </div>
@@ -83,36 +78,45 @@
 
 <section class="recent-section">
     <div class="section-header">
-        <h2>Segnalazioni Recenti</h2>
-        <%-- Conta quanti elementi ci sono nella lista --%>
+        <h2>
+            <c:choose>
+                <c:when test="${not empty paramQ or not empty paramTipo or not empty paramCat}">
+                    Risultati Ricerca
+                </c:when>
+                <c:otherwise>Segnalazioni Recenti</c:otherwise>
+            </c:choose>
+        </h2>
         <span class="result-count">${segnalazioni != null ? segnalazioni.size() : 0} risultati</span>
     </div>
 
     <div class="cards-grid">
-
-        <%-- Se la lista è vuota --%>
         <c:if test="${empty segnalazioni}">
-            <p style="color: #666; font-style: italic;">Nessuna segnalazione recente trovata.</p>
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <span class="material-icons" style="font-size: 48px; color: #e0e0e0;">search_off</span>
+                <p style="color: #666; font-style: italic; margin-top: 10px;">Nessuna segnalazione trovata con questi criteri.</p>
+                <a href="${pageContext.request.contextPath}/index" style="color: var(--primary-orange); text-decoration: none; font-weight: 500;">Mostra tutto</a>
+            </div>
         </c:if>
 
-        <%-- Ciclo sulle segnalazioni reali --%>
         <c:forEach var="s" items="${segnalazioni}">
             <a href="dettaglio-segnalazione?id=${s.id}" class="card-link">
                 <article class="card">
                     <div class="card-badges">
-                            <%-- LOGICA COLORE BADGE --%>
                         <span class="badge ${s.stato == 'CHIUSA' ? 'badge-closed' : 'badge-active'}">
                                 ${s.stato}
                         </span>
                         <span class="badge badge-type">${s.tipoSegnalazione}</span>
                     </div>
 
-                    <div class="card-image-placeholder"
-                         style="${not empty s.immagine and s.immagine != 'default.png' ? 'background-image: url(' += pageContext.request.contextPath += '/' += s.immagine += '); background-size: cover; background-position: center;' : ''}">
-
-                        <c:if test="${empty s.immagine or s.immagine == 'default.png'}">
-                            <span class="material-icons">inventory_2</span>
-                        </c:if>
+                    <div class="card-image-placeholder">
+                        <c:choose>
+                            <c:when test="${not empty s.immagine and s.immagine != 'default.png'}">
+                                <img src="${pageContext.request.contextPath}/${s.immagine}" alt="${s.titolo}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                            </c:when>
+                            <c:otherwise>
+                                <span class="material-icons" style="font-size: 42px; color: #9E9E9E;">inventory_2</span>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
 
                     <div class="card-footer">
@@ -125,7 +129,6 @@
                 </article>
             </a>
         </c:forEach>
-
     </div>
 </section>
 

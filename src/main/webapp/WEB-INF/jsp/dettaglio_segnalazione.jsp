@@ -343,6 +343,7 @@
                                                         <div class="contact-row">
                                                             <strong>Tel:</strong> <a href="tel:${richiedente.telefono}">${richiedente.telefono}</a>
                                                         </div>
+                                                        <p class="contact-note">Contattalo per accordarvi sulla restituzione.</p>
                                                     </div>
                                                 </c:if>
                                             </div>

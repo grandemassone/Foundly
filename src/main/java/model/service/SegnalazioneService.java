@@ -6,6 +6,8 @@ import model.dao.ReclamoDAO;
 import model.dao.SegnalazioneDAO;
 import model.utils.GeocodingUtils;
 
+import java.util.List;
+
 public class SegnalazioneService {
 
     private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
@@ -25,7 +27,7 @@ public class SegnalazioneService {
         return segnalazioneDAO.doSave(segnalazione);
     }
 
-    public java.util.List<Segnalazione> getUltimeSegnalazioni() {
+    public List<Segnalazione> getUltimeSegnalazioni() {
         return segnalazioneDAO.doRetrieveLatest(8);
     }
 
@@ -33,7 +35,7 @@ public class SegnalazioneService {
         return segnalazioneDAO.doRetrieveById(id);
     }
 
-    public java.util.List<Segnalazione> trovaPerUtente(long idUtente) {
+    public List<Segnalazione> trovaPerUtente(long idUtente) {
         return segnalazioneDAO.doRetrieveByUtente(idUtente);
     }
 
@@ -41,13 +43,9 @@ public class SegnalazioneService {
         return segnalazioneDAO.doDelete(id);
     }
 
-    /**
-     * NUOVO METODO: Accetta reclamo e chiude la segnalazione.
-     */
     public boolean accettaReclamoEChiudiSegnalazione(long idReclamo, long idSegnalazione, String codice) {
         boolean successo = reclamoDAO.accettaReclamo(idReclamo, codice);
         if (successo) {
-            // Se accetto il reclamo, la segnalazione diventa CHIUSA
             return segnalazioneDAO.updateStato(idSegnalazione, StatoSegnalazione.CHIUSA);
         }
         return false;
@@ -55,5 +53,9 @@ public class SegnalazioneService {
 
     public boolean rifiutaReclamo(long idReclamo) {
         return reclamoDAO.rifiutaReclamo(idReclamo);
+    }
+
+    public List<Segnalazione> cercaSegnalazioni(String q, String tipo, String categoria) {
+        return segnalazioneDAO.doRetrieveByFiltri(q, tipo, categoria);
     }
 }
