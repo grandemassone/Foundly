@@ -33,6 +33,51 @@ public class ReclamoDAO {
         }
     }
 
+    // --- NUOVI METODI PER SCAMBIO DIRETTO ---
+    public boolean confermaFinder(long idReclamo) {
+        String sql = "UPDATE reclamo SET conferma_finder = 1 WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean confermaOwner(long idReclamo) {
+        String sql = "UPDATE reclamo SET conferma_owner = 1 WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    // ----------------------------------------
+
+    // --- NUOVO METODO PER DROP-POINT (CERCA PER CODICE) ---
+    public Reclamo doRetrieveByCodice(String codice) {
+        String query = "SELECT * FROM reclamo WHERE codice_consegna = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, codice);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    // -----------------------------------------------------
+
     public List<Reclamo> doRetrieveBySegnalazione(long idSegnalazione) {
         List<Reclamo> list = new ArrayList<>();
         String query = "SELECT * FROM reclamo WHERE id_segnalazione = ?";
@@ -82,35 +127,6 @@ public class ReclamoDAO {
         }
     }
 
-    // =========================================================
-    // NUOVI METODI PER LA DOPPIA CONFERMA (SCAMBIO DIRETTO)
-    // =========================================================
-
-    public boolean confermaFinder(long idReclamo) {
-        String sql = "UPDATE reclamo SET conferma_finder = 1 WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setLong(1, idReclamo);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean confermaOwner(long idReclamo) {
-        String sql = "UPDATE reclamo SET conferma_owner = 1 WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setLong(1, idReclamo);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    // =========================================================
-
     public Reclamo doRetrieveById(long id) {
         String query = "SELECT * FROM reclamo WHERE id = ?";
         try (Connection con = ConPool.getConnection();
@@ -142,7 +158,6 @@ public class ReclamoDAO {
 
     public List<Reclamo> doRetrieveByRichiedente(long idUtenteRichiedente) {
         List<Reclamo> list = new ArrayList<>();
-        // Query corretta senza colonne inesistenti
         String query = "SELECT r.*, s.titolo AS seg_titolo, s.immagine AS seg_immagine " +
                 "FROM reclamo r " +
                 "JOIN segnalazione s ON r.id_segnalazione = s.id " +
@@ -157,8 +172,6 @@ public class ReclamoDAO {
                 while (rs.next()) {
                     Reclamo r = mapRow(rs);
                     r.setTitoloSegnalazione(rs.getString("seg_titolo"));
-
-                    // Gestione immagine (path stringa convertita in bytes per compatibilità bean)
                     String imgPath = rs.getString("seg_immagine");
                     if (imgPath != null) {
                         r.setImmagineSegnalazione(imgPath.getBytes());
@@ -182,11 +195,8 @@ public class ReclamoDAO {
         r.setDataRichiesta(rs.getTimestamp("data_richiesta"));
         r.setDataDeposito(rs.getTimestamp("data_deposito"));
         r.setDataRitiro(rs.getTimestamp("data_ritiro"));
-
-        // Mappatura booleani conferma
         r.setConfermaFinder(rs.getBoolean("conferma_finder"));
         r.setConfermaOwner(rs.getBoolean("conferma_owner"));
-
         r.setCodiceConsegna(rs.getString("codice_consegna"));
         try {
             r.setStato(StatoReclamo.valueOf(rs.getString("stato")));

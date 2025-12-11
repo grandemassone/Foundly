@@ -77,21 +77,21 @@ public class AreaDropPointServlet extends HttpServlet {
             if ("deposito".equals(action)) {
                 boolean ok = dropPointService.registraDeposito(dp.getId(), codice.trim());
                 if (ok) {
-                    request.setAttribute("msgDeposito", "Deposito registrato correttamente.");
+                    request.setAttribute("msgDeposito", "Deposito verificato.");
                 } else {
-                    request.setAttribute("msgDeposito", "Impossibile registrare il deposito: codice già utilizzato.");
+                    request.setAttribute("msgDeposito", "Codice non valido o non associato a questo punto.");
                 }
             } else if ("ritiro".equals(action)) {
+                // QUI AVVIENE LA MAGIA: Chiama il service aggiornato che chiude la segnalazione nel DB
                 boolean ok = dropPointService.registraRitiro(dp.getId(), codice.trim());
                 if (ok) {
-                    request.setAttribute("msgRitiro", "Ritiro confermato. Operazione completata.");
+                    request.setAttribute("msgRitiro", "Ritiro confermato! Segnalazione chiusa e punti assegnati.");
                 } else {
-                    request.setAttribute("msgRitiro", "Nessun deposito attivo trovato per questo codice.");
+                    request.setAttribute("msgRitiro", "Errore: Codice non valido o segnalazione già chiusa.");
                 }
             }
         }
 
-        // ricalcolo i contatori dopo l'operazione
         long id = dp.getId();
         request.setAttribute("depositiAttivi",      dropPointService.countDepositiAttivi(id));
         request.setAttribute("consegneCompletate", dropPointService.countConsegneCompletate(id));
