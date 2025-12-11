@@ -70,7 +70,7 @@
                 <c:forEach var="s" items="${mieSegnalazioni}">
                     <article class="card-row">
 
-                        <!-- IMMAGINE A SINISTRA (SEGNALAZIONE) -->
+                        <!-- IMMAGINE A SINISTRA -->
                         <div class="card-thumb">
                             <c:choose>
                                 <c:when test="${not empty s.immagine}">
@@ -107,21 +107,23 @@
                             </p>
                         </div>
 
-                        <!-- AZIONI A DESTRA -->
+                        <!-- AZIONI A DESTRA: GESTISCI + CESTINO -->
                         <div class="card-actions">
                             <a href="${pageContext.request.contextPath}/dettaglio-segnalazione?id=${s.id}"
                                class="btn-secondary">
                                 Gestisci
                             </a>
 
+                            <!-- usa stessa logica di dettaglio_segnalazione.jsp -->
                             <form method="post"
-                                  action="${pageContext.request.contextPath}/elimina-segnalazione"
-                                  class="delete-form">
-                                <input type="hidden" name="id" value="${s.id}">
+                                  action="${pageContext.request.contextPath}/dettaglio-segnalazione"
+                                  class="delete-form"
+                                  onsubmit="return confirm('Eliminare definitivamente questa segnalazione?');">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="idSegnalazione" value="${s.id}">
                                 <button type="submit"
                                         class="icon-button"
-                                        title="Elimina segnalazione"
-                                        onclick="return confirm('Vuoi davvero eliminare questa segnalazione?');">
+                                        title="Elimina segnalazione">
                                     <span class="material-icons">delete</span>
                                 </button>
                             </form>
