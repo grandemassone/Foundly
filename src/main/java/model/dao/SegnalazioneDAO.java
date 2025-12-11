@@ -33,7 +33,7 @@ public class SegnalazioneDAO {
                 "INSERT INTO segnalazione (" +
                         "id_utente, titolo, descrizione, data_ritrovamento, " +
                         "luogo_ritrovamento, citta, provincia, latitudine, longitudine, " +
-                        "immagine, immagine_content_type, " +
+
                         "domanda_verifica1, domanda_verifica2, stato, tipo_segnalazione" +
                         ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -52,7 +52,6 @@ public class SegnalazioneDAO {
             psPadre.setObject(8, s.getLatitudine());
             psPadre.setObject(9, s.getLongitudine());
 
-            // immagine BLOB + content-type
             if (s.getImmagine() != null && s.getImmagine().length > 0) {
                 psPadre.setBytes(10, s.getImmagine());
                 psPadre.setString(11, s.getImmagineContentType());
@@ -116,13 +115,17 @@ public class SegnalazioneDAO {
         }
     }
 
+    /**
+     * Recupera le ultime segnalazioni per la HOME.
+     * MODIFICATO: Ora mostra SOLO quelle con stato 'APERTA'.
+     */
     public List<Segnalazione> doRetrieveLatest(int limit) {
         List<Segnalazione> list = new ArrayList<>();
         String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
                 "FROM segnalazione s " +
                 "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
                 "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
-                "WHERE s.stato IN ('APERTA', 'CHIUSA') " +
+                "WHERE s.stato = 'APERTA' " + // <--- FILTRO AGGIUNTO
                 "ORDER BY s.data_pubblicazione DESC LIMIT ?";
 
         try (Connection con = ConPool.getConnection();
@@ -157,6 +160,10 @@ public class SegnalazioneDAO {
         return null;
     }
 
+    /**
+     * Recupera le segnalazioni di un utente specifico.
+     * QUI NON FILTRIAMO lo stato, perché l'utente deve vedere il suo storico (anche quelle chiuse).
+     */
     public List<Segnalazione> doRetrieveByUtente(long idUtente) {
         List<Segnalazione> list = new ArrayList<>();
         String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
@@ -190,13 +197,17 @@ public class SegnalazioneDAO {
         }
     }
 
+    /**
+     * Ricerca con filtri.
+     * MODIFICATO: Aggiunto filtro fisso "WHERE s.stato = 'APERTA'".
+     */
     public List<Segnalazione> doRetrieveByFiltri(String queryTesto, String tipo, String categoria) {
         StringBuilder sql = new StringBuilder(
                 "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
                         "FROM segnalazione s " +
                         "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
                         "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
-                        "WHERE 1=1");
+                        "WHERE s.stato = 'APERTA'"); // <--- FILTRO AGGIUNTO
 
         List<Object> params = new ArrayList<>();
 
@@ -272,9 +283,10 @@ public class SegnalazioneDAO {
         s.setLatitudine(rs.getObject("latitudine", Double.class));
         s.setLongitudine(rs.getObject("longitudine", Double.class));
 
-        // immagine BLOB + content-type
-        s.setImmagine(rs.getBytes("immagine"));
-        s.setImmagineContentType(rs.getString("immagine_content_type"));
+        if (rs.getBytes("immagine") != null) {
+            s.setImmagine(rs.getBytes("immagine"));
+            s.setImmagineContentType(rs.getString("immagine_content_type"));
+        }
 
         s.setDomandaVerifica1(rs.getString("domanda_verifica1"));
         s.setDomandaVerifica2(rs.getString("domanda_verifica2"));
