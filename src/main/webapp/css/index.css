@@ -391,6 +391,40 @@ body {
     transition: opacity 0.15s ease, transform 0.15s ease;
     z-index: 30;
 }
+/* --- Navbar e dropdown utente (forzato) --- */
+
+.navbar {
+    position: relative;
+    z-index: 2000;          /* la navbar sta sopra tutto il resto */
+}
+
+.user-menu {
+    position: relative;     /* riferimento per il dropdown */
+    z-index: 2100;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 52px;              /* adattalo se serve */
+    right: 0;
+    z-index: 2200;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    padding: 12px 0;
+
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(6px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.user-menu.open .user-dropdown {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
 
 .user-menu.open .user-dropdown { opacity: 1; transform: translateY(0); pointer-events: auto; }
 

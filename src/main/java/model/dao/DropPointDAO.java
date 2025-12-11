@@ -181,4 +181,82 @@ public class DropPointDAO {
         }
         return null;
     }
+    public boolean updateProfilo(DropPoint dp) {
+        String sql = "UPDATE drop_point SET " +
+                "nome_attivita = ?, " +
+                "email = ?, " +
+                "indirizzo = ?, " +
+                "citta = ?, " +
+                "provincia = ?, " +
+                "telefono = ?, " +
+                "orari_apertura = ?, " +
+                "immagine = ?, " +
+                "immagine_content_type = ? " +
+                "WHERE id = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, dp.getNomeAttivita());
+            ps.setString(2, dp.getEmail());
+            ps.setString(3, dp.getIndirizzo());
+            ps.setString(4, dp.getCitta());
+            ps.setString(5, dp.getProvincia());
+            ps.setString(6, dp.getTelefono());
+            ps.setString(7, dp.getOrariApertura());
+
+            if (dp.getImmagine() != null && dp.getImmagine().length > 0) {
+                ps.setBytes(8, dp.getImmagine());
+                ps.setString(9, dp.getImmagineContentType());
+            } else {
+                ps.setNull(8, Types.BLOB);
+                ps.setNull(9, Types.VARCHAR);
+            }
+
+            ps.setLong(10, dp.getId());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean doUpdateProfilo(DropPoint dp) {
+        String sql = "UPDATE drop_point " +
+                "SET nome_attivita = ?, " +
+                "    indirizzo = ?, " +
+                "    citta = ?, " +
+                "    provincia = ?, " +
+                "    telefono = ?, " +
+                "    orari_apertura = ?, " +
+                "    immagine = ?, " +
+                "    immagine_content_type = ? " +
+                "WHERE id = ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, dp.getNomeAttivita());
+            ps.setString(2, dp.getIndirizzo());
+            ps.setString(3, dp.getCitta());
+            ps.setString(4, dp.getProvincia());
+            ps.setString(5, dp.getTelefono());
+            ps.setString(6, dp.getOrariApertura());
+
+            if (dp.getImmagine() != null && dp.getImmagine().length > 0) {
+                ps.setBytes(7, dp.getImmagine());
+                ps.setString(8, dp.getImmagineContentType());
+            } else {
+                ps.setNull(7, java.sql.Types.BLOB);
+                ps.setNull(8, java.sql.Types.VARCHAR);
+            }
+
+            ps.setLong(9, dp.getId());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

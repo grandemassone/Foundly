@@ -223,19 +223,6 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // ===== dropdown utente in navbar =====
-        const userMenu = document.querySelector(".user-menu");
-        if (userMenu) {
-            const btnAvatarMenu = userMenu.querySelector(".user-avatar-btn");
-            btnAvatarMenu.addEventListener("click", function (e) {
-                e.stopPropagation();
-                userMenu.classList.toggle("open");
-            });
-            document.addEventListener("click", function () {
-                userMenu.classList.remove("open");
-            });
-        }
-
         const editForm          = document.getElementById("profileEditForm");
         const editToggleBtn     = document.getElementById("editToggleBtn");
         const cancelEditBtn     = document.getElementById("cancelEditBtn");
@@ -258,7 +245,7 @@
             });
         }
 
-        // click sulla matita -> selezione file
+        // click sulla matita -> selezione file avatar
         if (avatarEditBtn && avatarInput && avatarImg) {
             avatarEditBtn.addEventListener("click", function (e) {
                 e.preventDefault();
@@ -299,13 +286,8 @@
                     editForm.classList.add("editing");
                 }
 
-                // segna la rimozione per il backend
                 removeAvatarField.value = "true";
-
-                // svuota eventuale file scelto
                 avatarInput.value = "";
-
-                // nasconde subito l'immagine
                 avatarImg.src = "";
                 avatarImg.style.display = "none";
                 avatarWrapper.classList.remove("has-avatar");
@@ -313,6 +295,7 @@
         }
     });
 </script>
+
 
 </body>
 </html>

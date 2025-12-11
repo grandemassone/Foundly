@@ -180,4 +180,8 @@ public class DropPointService {
         Map<String, StatoOperazione> mappa = operazioniByDropPoint.get(idDropPoint);
         return (mappa == null) ? 0 : mappa.size();
     }
+    /** Aggiornamento profilo Drop-Point (dati + logo). */
+    public boolean aggiornaProfilo(DropPoint dropPoint) {
+        return dropPointDAO.updateProfilo(dropPoint);
+    }
 }

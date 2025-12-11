@@ -232,27 +232,15 @@
                 // reset pannelli
                 panels.forEach(p => p.classList.remove("active"));
                 const targetPanel = document.getElementById(targetId);
-                if (targetPanel) targetPanel.classList.add("active");
-
-                // piccolo scroll morbido verso il pannello
-                targetPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+                if (targetPanel) {
+                    targetPanel.classList.add("active");
+                    targetPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
             });
         });
-
-        // dropdown avatar navbar
-        const userMenu = document.querySelector(".user-menu");
-        if (userMenu) {
-            const avatarBtn = userMenu.querySelector(".user-avatar-btn");
-            avatarBtn.addEventListener("click", function (e) {
-                e.stopPropagation();
-                userMenu.classList.toggle("open");
-            });
-            document.addEventListener("click", function () {
-                userMenu.classList.remove("open");
-            });
-        }
     });
 </script>
+
 
 </body>
 </html>
