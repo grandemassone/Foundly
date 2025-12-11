@@ -4,6 +4,17 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <%
+    model.bean.DropPoint dp = (model.bean.DropPoint) session.getAttribute("dropPoint");
+    model.bean.Utente u = (model.bean.Utente) session.getAttribute("utente");
+
+    if (dp != null) {
+        response.sendRedirect(request.getContextPath() + "/area-drop-point");
+        return;
+    }
+    if (u == null) {
+        response.sendRedirect(request.getContextPath() + "/login");
+        return;
+    }
     if (session.getAttribute("utente") == null) {
         response.sendRedirect(request.getContextPath() + "/login");
         return;

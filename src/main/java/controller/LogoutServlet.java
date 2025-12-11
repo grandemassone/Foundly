@@ -16,16 +16,14 @@ public class LogoutServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
 
-        // Recupera la sessione se esiste (false = non crearne una nuova)
         HttpSession session = request.getSession(false);
         if (session != null) {
-            session.removeAttribute("utente");
+            // escono sia utente che drop-point
+            session.invalidate();
         }
 
-        // Dopo il logout rimanda alla home (o alla pagina di login se preferisci)
+        // dopo il logout torno alla home pubblica
         response.sendRedirect(request.getContextPath() + "/index");
-        // oppure:
-        // response.sendRedirect(request.getContextPath() + "/login");
     }
 
     @Override

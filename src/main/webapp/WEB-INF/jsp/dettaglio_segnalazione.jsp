@@ -6,6 +6,17 @@
 <%@ page import="model.bean.SegnalazioneOggetto" %>
 
 <%
+    model.bean.DropPoint dp = (model.bean.DropPoint) session.getAttribute("dropPoint");
+    model.bean.Utente u = (model.bean.Utente) session.getAttribute("utente");
+
+    if (dp != null) {
+        response.sendRedirect(request.getContextPath() + "/area-drop-point");
+        return;
+    }
+    if (u == null) {
+        response.sendRedirect(request.getContextPath() + "/login");
+        return;
+    }
     Utente utente = (Utente) session.getAttribute("utente");
     model.bean.Segnalazione s = (model.bean.Segnalazione) request.getAttribute("segnalazione");
     boolean isLogged = (utente != null);

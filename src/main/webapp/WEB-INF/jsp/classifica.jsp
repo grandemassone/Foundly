@@ -1,20 +1,31 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="model.bean.Utente" %>
+<%@ page import="model.bean.DropPoint" %>
 <%@ page import="java.util.List" %>
+
 <%
-    // Recupero dati dalla Servlet e dalla Sessione
-    @SuppressWarnings("unchecked")
-    List<Utente> classifica = (List<Utente>) request.getAttribute("classifica");
+    // Controllo sessione: se sei un Drop-Point → Area Drop-Point
+    DropPoint dpSession = (DropPoint) session.getAttribute("dropPoint");
     Utente utenteLoggato = (Utente) session.getAttribute("utente");
 
-    // Helper per Avatar Navbar (BLOB byte[])
-    boolean navHasAvatar = false;
-    if (utenteLoggato != null &&
-            utenteLoggato.getImmagineProfilo() != null &&
-            utenteLoggato.getImmagineProfilo().length > 0) {
-        navHasAvatar = true;
+    if (dpSession != null) {
+        response.sendRedirect(request.getContextPath() + "/area-drop-point");
+        return;
     }
+    if (utenteLoggato == null) {
+        response.sendRedirect(request.getContextPath() + "/login");
+        return;
+    }
+
+    // Recupero dati classifica dalla servlet
+    @SuppressWarnings("unchecked")
+    List<Utente> classifica = (List<Utente>) request.getAttribute("classifica");
+
+    // Avatar navbar: BLOB byte[]
+    boolean navHasAvatar = utenteLoggato.getImmagineProfilo() != null &&
+            utenteLoggato.getImmagineProfilo().length > 0;
 %>
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -54,7 +65,6 @@
         </a>
     </div>
 
-    <% if (utenteLoggato != null) { %>
     <div class="user-menu">
         <button type="button" class="user-avatar-btn">
             <% if (navHasAvatar) { %>
@@ -80,11 +90,6 @@
             </a>
         </div>
     </div>
-    <% } else { %>
-    <a href="${pageContext.request.contextPath}/login" class="btn-login-nav">
-        <span class="material-icons">login</span><span>Accedi</span>
-    </a>
-    <% } %>
 </nav>
 
 <main class="classifica-main">
@@ -114,8 +119,9 @@
             <div class="medal-icon">🥈</div>
             <div class="podium-avatar">
                 <%
-                    boolean secondHasAvatar = second.getImmagineProfilo() != null &&
-                            second.getImmagineProfilo().length > 0;
+                    boolean secondHasAvatar =
+                            second.getImmagineProfilo() != null &&
+                                    second.getImmagineProfilo().length > 0;
                 %>
                 <% if (secondHasAvatar) { %>
                 <img src="<%= request.getContextPath() %>/avatar?userId=<%= second.getId() %>"
@@ -137,8 +143,9 @@
             <div class="crown-icon">👑</div>
             <div class="podium-avatar">
                 <%
-                    boolean firstHasAvatar = first.getImmagineProfilo() != null &&
-                            first.getImmagineProfilo().length > 0;
+                    boolean firstHasAvatar =
+                            first.getImmagineProfilo() != null &&
+                                    first.getImmagineProfilo().length > 0;
                 %>
                 <% if (firstHasAvatar) { %>
                 <img src="<%= request.getContextPath() %>/avatar?userId=<%= first.getId() %>"
@@ -161,8 +168,9 @@
             <div class="medal-icon">🥉</div>
             <div class="podium-avatar">
                 <%
-                    boolean thirdHasAvatar = third.getImmagineProfilo() != null &&
-                            third.getImmagineProfilo().length > 0;
+                    boolean thirdHasAvatar =
+                            third.getImmagineProfilo() != null &&
+                                    third.getImmagineProfilo().length > 0;
                 %>
                 <% if (thirdHasAvatar) { %>
                 <img src="<%= request.getContextPath() %>/avatar?userId=<%= third.getId() %>"
@@ -195,13 +203,12 @@
                 </thead>
                 <tbody>
                 <%
-                    // Dal 4° elemento (index 3) al 15° o fine lista
                     for (int i = 3; i < Math.min(classifica.size(), 15); i++) {
                         Utente u = classifica.get(i);
                         int rank = i + 1;
 
-                        String rawBadge = u.getBadge();
-                        String badgeName  = "Novizio";
+                        String rawBadge  = u.getBadge();
+                        String badgeName = "Novizio";
                         String badgeClass = "bg-gray";
 
                         if ("OCCHIO_DI_FALCO".equals(rawBadge)) {
@@ -212,10 +219,10 @@
                             badgeName = "Sherlock"; badgeClass = "bg-gold";
                         }
 
-                        boolean isMe = (utenteLoggato != null && utenteLoggato.getId() == u.getId());
-
-                        boolean uHasAvatar = u.getImmagineProfilo() != null &&
-                                u.getImmagineProfilo().length > 0;
+                        boolean isMe = utenteLoggato.getId() == u.getId();
+                        boolean uHasAvatar =
+                                u.getImmagineProfilo() != null &&
+                                        u.getImmagineProfilo().length > 0;
                 %>
                 <tr class="<%= isMe ? "highlight-me" : "" %>">
                     <td class="col-rank"><span class="rank-circle"><%= rank %></span></td>

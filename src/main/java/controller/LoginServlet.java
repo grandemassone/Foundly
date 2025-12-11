@@ -22,7 +22,8 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp")
+                .forward(request, response);
     }
 
     @Override
@@ -32,12 +33,15 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(true);
 
-        // 1. Login come UTENTE (cittadino)
+        // 1) Provo login come UTENTE "cittadino"
         Utente utente = utenteService.login(email, password);
         if (utente != null) {
-            session.setAttribute("utente", utente); // usato in home.jsp
+            // se prima era loggato un Drop-Point lo sgancio
+            session.removeAttribute("dropPoint");
+
+            session.setAttribute("utente", utente);
             session.setAttribute("ruoloLoggato", "CITTADINO");
             session.setMaxInactiveInterval(30 * 60);
 
@@ -45,24 +49,24 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // 2. Login come DROP-POINT
+        // 2) Provo login come DROP-POINT
         DropPoint dropPoint = dropPointService.login(email, password);
         if (dropPoint != null) {
-            // opzionale: tieni un attributo specifico
+            // se prima era loggato un utente "cittadino" lo sgancio
+            session.removeAttribute("utente");
+
             session.setAttribute("dropPoint", dropPoint);
-
-            // IMPORTANTE: metto anche "utente" così home.jsp lo vede come loggato
-            session.setAttribute("utente", dropPoint);
-
             session.setAttribute("ruoloLoggato", "DROPPOINT");
             session.setMaxInactiveInterval(30 * 60);
 
-            response.sendRedirect(request.getContextPath() + "/index");
+            // QUI è la differenza: il Drop-Point va SOLO nella sua area dedicata
+            response.sendRedirect(request.getContextPath() + "/area-drop-point");
             return;
         }
 
-        // 3. Nessun login valido
+        // 3) Credenziali non valide né per utente né per Drop-Point
         request.setAttribute("errore", "Email o Password non validi.");
-        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/jsp/login.jsp")
+                .forward(request, response);
     }
 }
