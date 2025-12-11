@@ -3,6 +3,7 @@
 <%@ page import="model.bean.Utente" %>
 <%@ page import="model.bean.DropPoint" %>
 <%@ page import="model.bean.enums.Ruolo" %>
+<%@ page import="java.util.Arrays" %>
 
 <%
   Utente utente = (Utente) session.getAttribute("utente");
@@ -14,7 +15,7 @@
   List<DropPoint> pendenti = (List<DropPoint>) request.getAttribute("dropPointsPendenti");
   List<Utente> utenti = (List<Utente>) request.getAttribute("listaUtenti");
 
-  String navAvatarPath = utente.getImmagineProfilo();
+  String navAvatarPath = Arrays.toString(utente.getImmagineProfilo());
   boolean navHasAvatar = navAvatarPath != null && !navAvatarPath.trim().isEmpty();
 %>
 
@@ -30,57 +31,7 @@
 </head>
 <body class="page-enter">
 
-<nav class="navbar">
-  <a href="${pageContext.request.contextPath}/index" class="brand">
-    <div class="brand-icon">
-      <img src="<%= request.getContextPath() %>/assets/images/logo.png" alt="logo_foundly">
-    </div>
-  </a>
-
-  <div class="nav-links">
-    <a href="${pageContext.request.contextPath}/index" class="nav-item">
-      <span class="material-icons">home</span> Home
-    </a>
-    <a href="${pageContext.request.contextPath}/admin" class="nav-item">
-      <span class="material-icons">admin_panel_settings</span> Area Admin
-    </a>
-  </div>
-
-  <div class="user-menu">
-    <button type="button" class="user-avatar-btn">
-      <% if (navHasAvatar) { %>
-      <img src="<%= request.getContextPath() + "/" + navAvatarPath %>"
-           alt=""
-           class="user-avatar-img">
-      <% } else { %>
-      <div class="user-avatar-placeholder"></div>
-      <% } %>
-    </button>
-
-    <div class="user-dropdown">
-      <div class="user-dropdown-header">
-        <div class="user-email"><%= utente.getEmail() %></div>
-        <div class="user-points-row">
-          <span class="points-label">punti</span>
-          <span class="points-value"><%= utente.getPunteggio() %></span>
-        </div>
-      </div>
-
-      <a href="${pageContext.request.contextPath}/profilo" class="user-dropdown-item">
-        <span class="material-icons">person</span>
-        <span>Profilo</span>
-      </a>
-      <a href="${pageContext.request.contextPath}/admin" class="user-dropdown-item">
-        <span class="material-icons">admin_panel_settings</span>
-        <span>Area Admin</span>
-      </a>
-      <a href="${pageContext.request.contextPath}/logout" class="user-dropdown-item user-dropdown-item-logout">
-        <span class="material-icons">logout</span>
-        <span>Logout</span>
-      </a>
-    </div>
-  </div>
-</nav>
+<jsp:include page="/WEB-INF/jsp/navbar.jsp"/>
 
 <main class="admin-main">
 
