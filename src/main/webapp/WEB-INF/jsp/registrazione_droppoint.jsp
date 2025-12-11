@@ -109,12 +109,12 @@
                             placeholder="Crea una password sicura"
                             required
                             minlength="8"
-                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&._-])[A-Za-z\\d@$!%*?&._-]{8,}$"
-                            title="Almeno 8 caratteri, con una maiuscola, una minuscola, un numero e un carattere speciale (@$!%*?&._-)"
+                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._#-])[A-Za-z\d@$!%*?&._#-]{8,}$"
+                            title="Almeno 8 caratteri, con una maiuscola, una minuscola, un numero e un carattere speciale (@$!%*?&._#-)"
                     >
                     <small id="passwordHelp" style="color:#777; font-size:0.8rem;">
                         Minimo 8 caratteri, almeno 1 maiuscola, 1 minuscola, 1 numero e 1 carattere speciale
-                        (@$!%*?&._-).
+                        (@$!%*?&._#-).
                     </small>
                     <div id="passwordError" style="display:none; color:#c62828; font-size:0.8rem; margin-top:4px;">
                         La password non rispetta i requisiti indicati.
@@ -281,7 +281,7 @@
         if (!form || !passwordInput || !passwordError) return;
 
         const passwordRegex =
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._-])[A-Za-z\d@$!%*?&._-]{8,}$/;
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._#-])[A-Za-z\d@$!%*?&._#-]{8,}$/;
 
         function validatePassword() {
             const value = passwordInput.value || "";
