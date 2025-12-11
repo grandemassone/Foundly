@@ -56,7 +56,6 @@
     <c:if test="${segnalazione != null}">
         <div class="local-grid">
 
-            <!-- COLONNA PRINCIPALE -->
             <div class="main-content">
                 <div class="local-card hero-card">
                     <div class="image-container">
@@ -75,9 +74,9 @@
 
 
                         <div class="status-overlay">
-        <span class="status-badge ${segnalazione.stato == 'CHIUSA' ? 'status-closed' : 'status-open'}">
-                ${segnalazione.stato}
-        </span>
+                            <span class="status-badge ${segnalazione.stato == 'CHIUSA' ? 'status-closed' : 'status-open'}">
+                                    ${segnalazione.stato}
+                            </span>
                         </div>
                     </div>
 
@@ -154,7 +153,6 @@
                 </div>
             </div>
 
-            <!-- SIDEBAR -->
             <aside class="sidebar">
 
                     <%-- UTENTE NON OWNER (potenziale proprietario) --%>
@@ -329,7 +327,10 @@
                                 <c:forEach var="r" items="${reclamiRicevuti}">
                                     <div class="claim-card">
                                         <div class="claim-header">
-                                            <strong>Utente #${r.idUtenteRichiedente}</strong>
+                                                <%-- MODIFICA QUI: Uso l'oggetto Utente dalla mappa --%>
+                                            <c:set var="richiedente" value="${mappaRichiedenti[r.idUtenteRichiedente]}" />
+                                            <strong>@${richiedente.username}</strong>
+
                                             <span class="date">
                                                 <fmt:formatDate value="${r.dataRichiesta}" pattern="dd/MM"/>
                                             </span>
@@ -383,8 +384,6 @@
                                                 </c:if>
 
                                                     <%-- DATI DEL PROPRIETARIO (richiedente vincente) --%>
-                                                <c:set var="richiedente"
-                                                       value="${mappaRichiedenti[r.idUtenteRichiedente]}"/>
                                                 <c:if test="${not empty richiedente}">
                                                     <div class="contact-card owner-view">
                                                         <div class="contact-header">
