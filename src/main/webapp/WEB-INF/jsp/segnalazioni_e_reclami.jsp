@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+
 <%
     model.bean.DropPoint dp = (model.bean.DropPoint) session.getAttribute("dropPoint");
     model.bean.Utente u = (model.bean.Utente) session.getAttribute("utente");
@@ -20,7 +21,7 @@
     <title>Segnalazioni e Reclami - Foundly</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/segnalazioni_e_reclami.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/segnalazioni_e_reclami.css?v=2">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
@@ -47,6 +48,7 @@
         </button>
     </div>
 
+    <!-- TAB SEGNALAZIONI -->
     <section id="tab-segnalazioni" class="tab-content active">
         <div class="section-header">
             <h2>Oggetti che hai trovato</h2>
@@ -64,38 +66,74 @@
         </c:if>
 
         <c:if test="${not empty mieSegnalazioni}">
-            <div class="cards-grid">
+            <div class="cards-column">
                 <c:forEach var="s" items="${mieSegnalazioni}">
-                    <article class="card">
-                        <div class="card-badges">
-                            <span class="badge ${s.stato == 'CHIUSA' ? 'badge-closed' : 'badge-active'}">
-                                    ${s.stato}
-                            </span>
+                    <article class="card-row">
+
+                        <!-- IMMAGINE A SINISTRA (SEGNALAZIONE) -->
+                        <div class="card-thumb">
+                            <c:choose>
+                                <c:when test="${not empty s.immagine}">
+                                    <div class="card-thumb-img-wrapper">
+                                        <img
+                                                src="${pageContext.request.contextPath}/segnalazione-img?id=${s.id}"
+                                                alt="Immagine segnalazione ${s.titolo}"
+                                                class="card-thumb-img">
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="card-thumb-placeholder">
+                                        <span class="material-icons">inventory_2</span>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
 
-                        <div class="card-image-placeholder"
-                             style="${not empty s.immagine and s.immagine != 'default.png' ? 'background-image: url(' += pageContext.request.contextPath += '/' += s.immagine += '); background-size: cover;' : ''}">
-                            <c:if test="${empty s.immagine or s.immagine == 'default.png'}">
-                                <span class="material-icons">inventory_2</span>
-                            </c:if>
-                        </div>
+                        <!-- CONTENUTO CENTRALE -->
+                        <div class="card-main">
+                            <div class="card-badges">
+                                <span class="badge ${s.stato == 'CHIUSA' ? 'badge-closed' : 'badge-active'}">
+                                        ${s.stato}
+                                </span>
+                            </div>
 
-                        <div class="card-footer">
                             <h3 class="card-title">${s.titolo}</h3>
+
                             <p class="card-info">
-                                <span class="material-icons" style="font-size:14px; vertical-align:middle">place</span> ${s.citta} •
+                                <span class="material-icons card-info-icon">place</span>
+                                    ${s.citta}
+                                &nbsp;•&nbsp;
                                 <fmt:formatDate value="${s.dataRitrovamento}" pattern="dd MMM" />
                             </p>
-                            <a href="dettaglio-segnalazione?id=${s.id}" class="btn-secondary full-width" style="margin-top:10px; text-align:center;">
+                        </div>
+
+                        <!-- AZIONI A DESTRA -->
+                        <div class="card-actions">
+                            <a href="${pageContext.request.contextPath}/dettaglio-segnalazione?id=${s.id}"
+                               class="btn-secondary">
                                 Gestisci
                             </a>
+
+                            <form method="post"
+                                  action="${pageContext.request.contextPath}/elimina-segnalazione"
+                                  class="delete-form">
+                                <input type="hidden" name="id" value="${s.id}">
+                                <button type="submit"
+                                        class="icon-button"
+                                        title="Elimina segnalazione"
+                                        onclick="return confirm('Vuoi davvero eliminare questa segnalazione?');">
+                                    <span class="material-icons">delete</span>
+                                </button>
+                            </form>
                         </div>
+
                     </article>
                 </c:forEach>
             </div>
         </c:if>
     </section>
 
+    <!-- TAB RECLAMI -->
     <section id="tab-reclami" class="tab-content">
         <div class="section-header">
             <h2>Oggetti che hai reclamato</h2>
@@ -110,37 +148,55 @@
         </c:if>
 
         <c:if test="${not empty mieiReclami}">
-            <div class="cards-grid">
+            <div class="cards-column">
                 <c:forEach var="r" items="${mieiReclami}">
-                    <article class="card">
-                        <div class="card-badges">
-                            <span class="badge" style="background-color: #E3F2FD; color: #1565C0;">
-                                RECLAMO
-                            </span>
-                            <span class="badge ${r.stato == 'ACCETTATO' ? 'badge-active' : (r.stato == 'RIFIUTATO' ? 'badge-closed' : 'badge-type')}">
-                                    ${r.stato}
-                            </span>
+                    <article class="card-row">
+
+                        <!-- IMMAGINE DELLA SEGNALAZIONE COLLEGATA AL RECLAMO -->
+                        <div class="card-thumb">
+                            <c:choose>
+                                <c:when test="${not empty r.immagineSegnalazione}">
+                                    <div class="card-thumb-img-wrapper">
+                                        <img
+                                                src="${pageContext.request.contextPath}/segnalazione-img?id=${r.idSegnalazione}"
+                                                alt="Immagine segnalazione reclamata"
+                                                class="card-thumb-img">
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="card-thumb-placeholder">
+                                        <span class="material-icons">help_outline</span>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
 
-                        <div class="card-image-placeholder"
-                             style="${not empty r.immagineSegnalazione and r.immagineSegnalazione != 'default.png' ? 'background-image: url(' += pageContext.request.contextPath += '/' += r.immagineSegnalazione += '); background-size: cover;' : ''}">
-                            <c:if test="${empty r.immagineSegnalazione or r.immagineSegnalazione == 'default.png'}">
-                                <span class="material-icons">help_outline</span>
-                            </c:if>
-                        </div>
+                        <!-- TESTO -->
+                        <div class="card-main">
+                            <div class="card-badges">
+                                <span class="badge badge-reclamo">RECLAMO</span>
+                                <span class="badge
+                                    ${r.stato == 'ACCETTATO' ? 'badge-active' :
+                                      (r.stato == 'RIFIUTATO' ? 'badge-closed' : 'badge-type')}">
+                                        ${r.stato}
+                                </span>
+                            </div>
 
-                        <div class="card-footer">
                             <h3 class="card-title">${r.titoloSegnalazione}</h3>
 
                             <p class="card-info">
                                 Richiesto il:
                                 <fmt:formatDate value="${r.dataRichiesta}" pattern="dd MMM yyyy" />
                             </p>
+                        </div>
 
-                            <a href="dettaglio-segnalazione?id=${r.idSegnalazione}" class="btn-secondary full-width" style="margin-top:10px; text-align:center;">
+                        <div class="card-actions">
+                            <a href="${pageContext.request.contextPath}/dettaglio-segnalazione?id=${r.idSegnalazione}"
+                               class="btn-secondary">
                                 Vedi Stato
                             </a>
                         </div>
+
                     </article>
                 </c:forEach>
             </div>
@@ -156,11 +212,9 @@
 
         buttons.forEach(btn => {
             btn.addEventListener("click", () => {
-                // Rimuovi active da tutti
                 buttons.forEach(b => b.classList.remove("active"));
                 tabs.forEach(t => t.classList.remove("active"));
 
-                // Aggiungi active al corrente
                 btn.classList.add("active");
                 const targetId = btn.dataset.target;
                 document.getElementById(targetId).classList.add("active");

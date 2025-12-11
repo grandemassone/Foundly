@@ -97,20 +97,40 @@
             <%
             } else {
                 for (DropPoint dp : dropPoints) {
+
+                    boolean hasLogo = (dp.getImmagine() != null &&
+                            dp.getImmagine().length > 0);
             %>
             <article class="dp-list-item">
-                <h3 class="dp-list-title"><%= dp.getNomeAttivita() %></h3>
-                <p class="dp-list-address">
-                    <%= dp.getIndirizzo() %>, <%= dp.getCitta() %> (<%= dp.getProvincia() %>)
-                </p>
-                <p class="dp-list-phone">
-                    <span class="material-icons">phone</span>
-                    <span><%= dp.getTelefono() != null ? dp.getTelefono() : "-" %></span>
-                </p>
-                <p class="dp-list-hours">
-                    <span class="material-icons">schedule</span>
-                    <span><%= dp.getOrariApertura() != null ? dp.getOrariApertura() : "Orari non disponibili" %></span>
-                </p>
+                <!-- COLONNA IMMAGINE A SINISTRA -->
+                <div class="dp-list-thumb">
+                    <% if (hasLogo) { %>
+                    <img
+                            src="<%= request.getContextPath() %>/drop-point-avatar?dpId=<%= dp.getId() %>"
+                            alt="Logo <%= dp.getNomeAttivita() %>"
+                            class="dp-list-thumb-img">
+                    <% } else { %>
+                    <div class="dp-list-thumb-placeholder">
+                        <span class="material-icons">storefront</span>
+                    </div>
+                    <% } %>
+                </div>
+
+                <!-- COLONNA TESTO A DESTRA -->
+                <div class="dp-list-content">
+                    <h3 class="dp-list-title"><%= dp.getNomeAttivita() %></h3>
+                    <p class="dp-list-address">
+                        <%= dp.getIndirizzo() %>, <%= dp.getCitta() %> (<%= dp.getProvincia() %>)
+                    </p>
+                    <p class="dp-list-phone">
+                        <span class="material-icons">phone</span>
+                        <span><%= dp.getTelefono() != null ? dp.getTelefono() : "-" %></span>
+                    </p>
+                    <p class="dp-list-hours">
+                        <span class="material-icons">schedule</span>
+                        <span><%= dp.getOrariApertura() != null ? dp.getOrariApertura() : "Orari non disponibili" %></span>
+                    </p>
+                </div>
             </article>
             <%
                     }
