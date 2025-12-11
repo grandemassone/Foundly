@@ -1,6 +1,17 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+
+<%
+        model.bean.DropPoint dp = (model.bean.DropPoint) session.getAttribute("dropPoint");
+        model.bean.Utente u = (model.bean.Utente) session.getAttribute("utente");
+
+        if (dp != null) {
+            response.sendRedirect(request.getContextPath() + "/area-drop-point");
+            return;
+        }
+%>
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
