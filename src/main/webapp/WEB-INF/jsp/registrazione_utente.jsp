@@ -87,71 +87,67 @@
                             placeholder="Minimo 8 caratteri"
                             required
                             minlength="8"
-                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&._-])[A-Za-z\\d@$!%*?&._-]{8,}$"
-                            title="Almeno 8 caratteri, con una maiuscola, una minuscola, un numero e un carattere speciale (@$!%*?&._-)"
+                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._#-])[A-Za-z\d@$!%*?&._#-]{8,}$"
+                            title="Almeno 8 caratteri, con una maiuscola, una minuscola, un numero e un carattere speciale (@$!%*?&._#-)"
                     >
                     <small id="passwordHelp" style="color:#777; font-size:0.8rem;">
                         Minimo 8 caratteri, almeno 1 maiuscola, 1 minuscola, 1 numero e 1 carattere speciale
-                        (@$!%*?&._-).
+                        (@$!%*?&._#-).
                     </small>
                     <div id="passwordError" style="display:none; color:#c62828; font-size:0.8rem; margin-top:4px;">
                         La password non rispetta i requisiti indicati.
                     </div>
+
+                    <button type="submit" class="btn-primary mt-2">Registrati</button>
+
+                    <div class="form-footer">
+                        <span>Hai già un account?</span>
+                        <a href="${pageContext.request.contextPath}/login" class="link-login">Accedi qui</a>
+                    </div>
+
                 </div>
 
-                <button type="submit" class="btn-primary mt-2">Registrati</button>
+                <script>
+                    (function () {
+                        const form = document.querySelector('.auth-card form');
+                        const passwordInput = document.getElementById('password');
+                        const passwordError = document.getElementById('passwordError');
 
-                <div class="form-footer">
-                    <span>Hai già un account?</span>
-                    <a href="${pageContext.request.contextPath}/login" class="link-login">Accedi qui</a>
-                </div>
+                        if (!form || !passwordInput || !passwordError) return;
 
-            </form>
+                        // REGEX AGGIORNATA ANCHE QUI
+                        const passwordRegex =
+                            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._#-])[A-Za-z\d@$!%*?&._#-]{8,}$/;
 
-        </div>
-    </div>
-</div>
+                        function validatePassword() {
+                            const value = passwordInput.value || "";
 
-<script>
-    (function () {
-        const form = document.querySelector('.auth-card form');
-        const passwordInput = document.getElementById('password');
-        const passwordError = document.getElementById('passwordError');
+                            if (passwordRegex.test(value)) {
+                                passwordInput.style.borderColor = '#ccc';
+                                passwordError.style.display = 'none';
+                                return true;
+                            } else {
+                                if (value.length > 0) {
+                                    passwordInput.style.borderColor = '#c62828';
+                                    passwordError.style.display = 'block';
+                                } else {
+                                    passwordInput.style.borderColor = '#ccc';
+                                    passwordError.style.display = 'none';
+                                }
+                                return false;
+                            }
+                        }
 
-        if (!form || !passwordInput || !passwordError) return;
+                        passwordInput.addEventListener('input', validatePassword);
 
-        const passwordRegex =
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._-])[A-Za-z\d@$!%*?&._-]{8,}$/;
-
-        function validatePassword() {
-            const value = passwordInput.value || "";
-
-            if (passwordRegex.test(value)) {
-                passwordInput.style.borderColor = '#ccc';
-                passwordError.style.display = 'none';
-                return true;
-            } else {
-                if (value.length > 0) {
-                    passwordInput.style.borderColor = '#c62828';
-                    passwordError.style.display = 'block';
-                } else {
-                    passwordInput.style.borderColor = '#ccc';
-                    passwordError.style.display = 'none';
-                }
-                return false;
-            }
-        }
-
-        passwordInput.addEventListener('input', validatePassword);
-
-        form.addEventListener('submit', function (e) {
-            if (!validatePassword()) {
-                e.preventDefault();
-                passwordInput.focus();
-            }
-        });
-    })();
-</script>
+                        form.addEventListener('submit', function (e) {
+                            if (!validatePassword()) {
+                                e.preventDefault();
+                                passwordInput.focus();
+                            }
+                        });
+                    })();
+                </script>
 
 </body>
 </html>
