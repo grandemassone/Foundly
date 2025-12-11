@@ -114,42 +114,39 @@
             Utente third  = classifica.size() > 2 ? classifica.get(2) : null;
         %>
 
-        <% if (second != null) { %>
+        <%-- SECONDO POSTO --%>
+        <% if (second != null) {
+            String[] b2 = getBadgeInfo(second.getBadge()); // Calcolo badge
+        %>
         <div class="podium-step step-silver">
             <div class="medal-icon">🥈</div>
             <div class="podium-avatar">
-                <%
-                    boolean secondHasAvatar =
-                            second.getImmagineProfilo() != null &&
-                                    second.getImmagineProfilo().length > 0;
-                %>
+                <% boolean secondHasAvatar = second.getImmagineProfilo() != null && second.getImmagineProfilo().length > 0; %>
                 <% if (secondHasAvatar) { %>
-                <img src="<%= request.getContextPath() %>/avatar?userId=<%= second.getId() %>"
-                     class="podium-img" alt="">
+                <img src="<%= request.getContextPath() %>/avatar?userId=<%= second.getId() %>" class="podium-img" alt="">
                 <% } else { %>
                 <div class="podium-placeholder"><%= second.getNome().charAt(0) %></div>
                 <% } %>
             </div>
             <div class="podium-info">
                 <span class="podium-name"><%= second.getNome() %> <%= second.getCognome() %></span>
+                <span class="badge-tag <%= b2[1] %>" style="margin-top: 4px;"><%= b2[0] %></span>
                 <span class="podium-points"><%= second.getPunteggio() %> pt</span>
             </div>
             <div class="podium-base">2</div>
         </div>
         <% } %>
 
-        <% if (first != null) { %>
+        <%-- PRIMO POSTO --%>
+        <% if (first != null) {
+            String[] b1 = getBadgeInfo(first.getBadge()); // Calcolo badge
+        %>
         <div class="podium-step step-gold">
             <div class="crown-icon">👑</div>
             <div class="podium-avatar">
-                <%
-                    boolean firstHasAvatar =
-                            first.getImmagineProfilo() != null &&
-                                    first.getImmagineProfilo().length > 0;
-                %>
+                <% boolean firstHasAvatar = first.getImmagineProfilo() != null && first.getImmagineProfilo().length > 0; %>
                 <% if (firstHasAvatar) { %>
-                <img src="<%= request.getContextPath() %>/avatar?userId=<%= first.getId() %>"
-                     class="podium-img" alt="">
+                <img src="<%= request.getContextPath() %>/avatar?userId=<%= first.getId() %>" class="podium-img" alt="">
                 <% } else { %>
                 <div class="podium-placeholder"><%= first.getNome().charAt(0) %></div>
                 <% } %>
@@ -157,30 +154,30 @@
             <div class="podium-info">
                 <span class="podium-name"><%= first.getNome() %> <%= first.getCognome() %></span>
                 <span class="podium-badge">🏆 Campione</span>
+                <span class="badge-tag <%= b1[1] %>" style="margin-top: 4px;"><%= b1[0] %></span>
                 <span class="podium-points"><%= first.getPunteggio() %> pt</span>
             </div>
             <div class="podium-base">1</div>
         </div>
         <% } %>
 
-        <% if (third != null) { %>
+        <%-- TERZO POSTO --%>
+        <% if (third != null) {
+            String[] b3 = getBadgeInfo(third.getBadge()); // Calcolo badge
+        %>
         <div class="podium-step step-bronze">
             <div class="medal-icon">🥉</div>
             <div class="podium-avatar">
-                <%
-                    boolean thirdHasAvatar =
-                            third.getImmagineProfilo() != null &&
-                                    third.getImmagineProfilo().length > 0;
-                %>
+                <% boolean thirdHasAvatar = third.getImmagineProfilo() != null && third.getImmagineProfilo().length > 0; %>
                 <% if (thirdHasAvatar) { %>
-                <img src="<%= request.getContextPath() %>/avatar?userId=<%= third.getId() %>"
-                     class="podium-img" alt="">
+                <img src="<%= request.getContextPath() %>/avatar?userId=<%= third.getId() %>" class="podium-img" alt="">
                 <% } else { %>
                 <div class="podium-placeholder"><%= third.getNome().charAt(0) %></div>
                 <% } %>
             </div>
             <div class="podium-info">
                 <span class="podium-name"><%= third.getNome() %> <%= third.getCognome() %></span>
+                <span class="badge-tag <%= b3[1] %>" style="margin-top: 4px;"><%= b3[0] %></span>
                 <span class="podium-points"><%= third.getPunteggio() %> pt</span>
             </div>
             <div class="podium-base">3</div>
@@ -207,17 +204,10 @@
                         Utente u = classifica.get(i);
                         int rank = i + 1;
 
-                        String rawBadge  = u.getBadge();
-                        String badgeName = "Novizio";
-                        String badgeClass = "bg-gray";
-
-                        if ("OCCHIO_DI_FALCO".equals(rawBadge)) {
-                            badgeName = "Occhio di Falco"; badgeClass = "bg-bronze";
-                        } else if ("DETECTIVE".equals(rawBadge)) {
-                            badgeName = "Detective"; badgeClass = "bg-silver";
-                        } else if ("SHERLOCK_HOLMES".equals(rawBadge)) {
-                            badgeName = "Sherlock"; badgeClass = "bg-gold";
-                        }
+                        // USIAMO LA FUNZIONE HELPER ANCHE QUI
+                        String[] bInfo = getBadgeInfo(u.getBadge());
+                        String badgeName = bInfo[0];
+                        String badgeClass = bInfo[1];
 
                         boolean isMe = utenteLoggato.getId() == u.getId();
                         boolean uHasAvatar =
@@ -277,3 +267,24 @@
 
 </body>
 </html>
+
+<%!
+    // Metodo helper per calcolare il badge (Nome e Classe CSS)
+    private String[] getBadgeInfo(String rawBadge) {
+        String badgeName = "Novizio";
+        String badgeClass = "bg-gray";
+
+        if ("OCCHIO_DI_FALCO".equals(rawBadge)) {
+            badgeName = "Occhio di Falco";
+            badgeClass = "bg-bronze";
+        } else if ("DETECTIVE".equals(rawBadge)) {
+            badgeName = "Detective";
+            badgeClass = "bg-silver";
+        } else if ("SHERLOCK_HOLMES".equals(rawBadge)) {
+            badgeName = "Sherlock";
+            badgeClass = "bg-gold";
+        }
+
+        return new String[]{badgeName, badgeClass};
+    }
+%>
