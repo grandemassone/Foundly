@@ -16,7 +16,7 @@ public class SegnalazioneService {
 
     private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
     private final ReclamoDAO reclamoDAO = new ReclamoDAO();
-    private final UtenteService utenteService = new UtenteService();
+    private final UtenteService utenteService = new UtenteService(); // Per gestire i punti
 
     public boolean creaSegnalazione(Segnalazione segnalazione) {
         if (segnalazione.getLuogoRitrovamento() != null && !segnalazione.getLuogoRitrovamento().isEmpty() &&
@@ -48,9 +48,7 @@ public class SegnalazioneService {
         return segnalazioneDAO.doDelete(id);
     }
 
-    /**
-     * LOGICA DROP-POINT: Chiude e da punti quando il DP inserisce il codice.
-     */
+    // --- LOGICA DROP-POINT (Con Codice) ---
     public boolean accettaReclamoEChiudiSegnalazione(long idReclamo, long idSegnalazione, String codice) {
         boolean successoReclamo = reclamoDAO.accettaReclamo(idReclamo, codice);
 
@@ -58,7 +56,7 @@ public class SegnalazioneService {
             boolean successoSegnalazione = segnalazioneDAO.updateStato(idSegnalazione, StatoSegnalazione.CHIUSA);
 
             if (successoSegnalazione) {
-                // Controllo se è un DropPoint prima di dare i punti
+                // Se è DropPoint, assegna il punto
                 Segnalazione s = segnalazioneDAO.doRetrieveById(idSegnalazione);
                 if (s != null) {
                     boolean isDropPoint = false;
@@ -68,8 +66,6 @@ public class SegnalazioneService {
                             isDropPoint = true;
                         }
                     }
-
-                    // Se DropPoint, assegna subito il punto
                     if (isDropPoint) {
                         Utente finder = utenteService.trovaPerId(s.getIdUtente());
                         if (finder != null) {
@@ -83,36 +79,32 @@ public class SegnalazioneService {
         return false;
     }
 
-    /**
-     * LOGICA SCAMBIO DIRETTO: Chiude e da punti SOLO SE entrambi confermano.
-     */
+    // --- LOGICA SCAMBIO DIRETTO (Doppia Conferma) ---
     public boolean gestisciConfermaScambio(long idReclamo, boolean isFinder) {
-        // 1. Metti la spunta nel DB
+        // 1. Registra la conferma singola
         if (isFinder) {
             reclamoDAO.confermaFinder(idReclamo);
         } else {
             reclamoDAO.confermaOwner(idReclamo);
         }
 
-        // 2. Ricarica il reclamo per vedere se ORA sono entrambi a true
+        // 2. Controlla se ORA sono entrambi confermati
         Reclamo r = reclamoDAO.doRetrieveById(idReclamo);
-
         if (r != null && r.isConfermaFinder() && r.isConfermaOwner()) {
-            // ENTRAMBI HANNO CONFERMATO -> CHIUDI TUTTO E DAI PUNTI
 
+            // Entrambi hanno confermato: Chiudi e dai punti
             segnalazioneDAO.updateStato(r.getIdSegnalazione(), StatoSegnalazione.CHIUSA);
 
             Segnalazione s = segnalazioneDAO.doRetrieveById(r.getIdSegnalazione());
             if (s != null) {
                 Utente finder = utenteService.trovaPerId(s.getIdUtente());
                 if (finder != null) {
-                    utenteService.aggiornaPunteggioEBadge(finder, 1); // +1 Punto al Finder
+                    utenteService.aggiornaPunteggioEBadge(finder, 1);
                 }
             }
             return true; // Scambio completato
         }
-
-        return false; // Manca ancora una conferma
+        return false; // Manca l'altro utente
     }
 
     public boolean rifiutaReclamo(long idReclamo) {

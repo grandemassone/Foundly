@@ -33,7 +33,7 @@ public class SegnalazioneDAO {
                 "INSERT INTO segnalazione (" +
                         "id_utente, titolo, descrizione, data_ritrovamento, " +
                         "luogo_ritrovamento, citta, provincia, latitudine, longitudine, " +
-
+                        "immagine, immagine_content_type, " +
                         "domanda_verifica1, domanda_verifica2, stato, tipo_segnalazione" +
                         ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -117,7 +117,7 @@ public class SegnalazioneDAO {
 
     /**
      * Recupera le ultime segnalazioni per la HOME.
-     * MODIFICATO: Ora mostra SOLO quelle con stato 'APERTA'.
+     * FILTRO: Solo segnalazioni 'APERTA'. Quelle CHIUSE non si vedono.
      */
     public List<Segnalazione> doRetrieveLatest(int limit) {
         List<Segnalazione> list = new ArrayList<>();
@@ -125,7 +125,7 @@ public class SegnalazioneDAO {
                 "FROM segnalazione s " +
                 "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
                 "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
-                "WHERE s.stato = 'APERTA' " + // <--- FILTRO AGGIUNTO
+                "WHERE s.stato = 'APERTA' " + // <--- QUESTA RIGA FA LA MAGIA
                 "ORDER BY s.data_pubblicazione DESC LIMIT ?";
 
         try (Connection con = ConPool.getConnection();
@@ -161,8 +161,8 @@ public class SegnalazioneDAO {
     }
 
     /**
-     * Recupera le segnalazioni di un utente specifico.
-     * QUI NON FILTRIAMO lo stato, perché l'utente deve vedere il suo storico (anche quelle chiuse).
+     * Recupera le segnalazioni di un utente specifico (Storico Personale).
+     * QUI NON FILTRIAMO: L'utente deve poter vedere anche le sue segnalazioni CHIUSE.
      */
     public List<Segnalazione> doRetrieveByUtente(long idUtente) {
         List<Segnalazione> list = new ArrayList<>();
@@ -198,8 +198,8 @@ public class SegnalazioneDAO {
     }
 
     /**
-     * Ricerca con filtri.
-     * MODIFICATO: Aggiunto filtro fisso "WHERE s.stato = 'APERTA'".
+     * Ricerca Pubblica.
+     * FILTRO: Solo segnalazioni 'APERTA'.
      */
     public List<Segnalazione> doRetrieveByFiltri(String queryTesto, String tipo, String categoria) {
         StringBuilder sql = new StringBuilder(
@@ -207,7 +207,7 @@ public class SegnalazioneDAO {
                         "FROM segnalazione s " +
                         "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
                         "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
-                        "WHERE s.stato = 'APERTA'"); // <--- FILTRO AGGIUNTO
+                        "WHERE s.stato = 'APERTA'"); // <--- ANCHE QUI LA MAGIA
 
         List<Object> params = new ArrayList<>();
 

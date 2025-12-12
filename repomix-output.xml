@@ -766,112 +766,6 @@ public class AreaAdminServlet extends HttpServlet {
 }
 </file>
 
-<file path="src/main/java/controller/AreaDropPointServlet.java">
-package controller;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import model.bean.DropPoint;
-import model.bean.enums.StatoDropPoint;
-import model.service.DropPointService;
-
-import java.io.IOException;
-
-@WebServlet(name = "AreaDropPointServlet", value = "/area-drop-point")
-public class AreaDropPointServlet extends HttpServlet {
-
-    private final DropPointService dropPointService = new DropPointService();
-
-    @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response) throws ServletException, IOException {
-
-        HttpSession session = request.getSession(false);
-        DropPoint dp = (session != null) ? (DropPoint) session.getAttribute("dropPoint") : null;
-
-        if (dp != null) {
-            // ricarico dal DB per avere lo stato aggiornato
-            DropPoint fromDb = dropPointService.trovaPerId(dp.getId());
-            if (fromDb != null) {
-                dp = fromDb;
-                session.setAttribute("dropPoint", dp);
-            }
-        }
-
-        request.setAttribute("dropPoint", dp);
-
-        if (dp != null && dp.getStato() == StatoDropPoint.APPROVATO) {
-            long id = dp.getId();
-            request.setAttribute("depositiAttivi",      dropPointService.countDepositiAttivi(id));
-            request.setAttribute("consegneCompletate", dropPointService.countConsegneCompletate(id));
-            request.setAttribute("totaleOperazioni",   dropPointService.countTotaleOperazioni(id));
-        } else {
-            request.setAttribute("depositiAttivi", 0);
-            request.setAttribute("consegneCompletate", 0);
-            request.setAttribute("totaleOperazioni", 0);
-        }
-
-        request.getRequestDispatcher("/WEB-INF/jsp/area_drop_point.jsp")
-                .forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response) throws ServletException, IOException {
-
-        HttpSession session = request.getSession(false);
-        DropPoint dp = (session != null) ? (DropPoint) session.getAttribute("dropPoint") : null;
-
-        if (dp == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        // ricarico stato
-        dp = dropPointService.trovaPerId(dp.getId());
-        session.setAttribute("dropPoint", dp);
-        request.setAttribute("dropPoint", dp);
-
-        String action = request.getParameter("action");
-        String codice = request.getParameter("codice");
-
-        if (dp.getStato() != StatoDropPoint.APPROVATO) {
-            request.setAttribute("erroreGenerale", "Devi avere un Drop-Point approvato per effettuare operazioni.");
-        } else if (action != null && codice != null && !codice.isBlank()) {
-
-            if ("deposito".equals(action)) {
-                boolean ok = dropPointService.registraDeposito(dp.getId(), codice.trim());
-                if (ok) {
-                    request.setAttribute("msgDeposito", "Deposito registrato correttamente.");
-                } else {
-                    request.setAttribute("msgDeposito", "Impossibile registrare il deposito: codice già utilizzato.");
-                }
-            } else if ("ritiro".equals(action)) {
-                boolean ok = dropPointService.registraRitiro(dp.getId(), codice.trim());
-                if (ok) {
-                    request.setAttribute("msgRitiro", "Ritiro confermato. Operazione completata.");
-                } else {
-                    request.setAttribute("msgRitiro", "Nessun deposito attivo trovato per questo codice.");
-                }
-            }
-        }
-
-        // ricalcolo i contatori dopo l'operazione
-        long id = dp.getId();
-        request.setAttribute("depositiAttivi",      dropPointService.countDepositiAttivi(id));
-        request.setAttribute("consegneCompletate", dropPointService.countConsegneCompletate(id));
-        request.setAttribute("totaleOperazioni",   dropPointService.countTotaleOperazioni(id));
-
-        request.getRequestDispatcher("/WEB-INF/jsp/area_drop_point.jsp")
-                .forward(request, response);
-    }
-}
-</file>
-
 <file path="src/main/java/controller/AvatarServlet.java">
 package controller;
 
@@ -2671,6 +2565,112 @@ CREATE TABLE reclamo
 );
 </file>
 
+<file path="src/main/java/controller/AreaDropPointServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.DropPoint;
+import model.bean.enums.StatoDropPoint;
+import model.service.DropPointService;
+
+import java.io.IOException;
+
+@WebServlet(name = "AreaDropPointServlet", value = "/area-drop-point")
+public class AreaDropPointServlet extends HttpServlet {
+
+    private final DropPointService dropPointService = new DropPointService();
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+        DropPoint dp = (session != null) ? (DropPoint) session.getAttribute("dropPoint") : null;
+
+        if (dp != null) {
+            // ricarico dal DB per avere lo stato aggiornato
+            DropPoint fromDb = dropPointService.trovaPerId(dp.getId());
+            if (fromDb != null) {
+                dp = fromDb;
+                session.setAttribute("dropPoint", dp);
+            }
+        }
+
+        request.setAttribute("dropPoint", dp);
+
+        if (dp != null && dp.getStato() == StatoDropPoint.APPROVATO) {
+            long id = dp.getId();
+            request.setAttribute("depositiAttivi",      dropPointService.countDepositiAttivi(id));
+            request.setAttribute("consegneCompletate", dropPointService.countConsegneCompletate(id));
+            request.setAttribute("totaleOperazioni",   dropPointService.countTotaleOperazioni(id));
+        } else {
+            request.setAttribute("depositiAttivi", 0);
+            request.setAttribute("consegneCompletate", 0);
+            request.setAttribute("totaleOperazioni", 0);
+        }
+
+        request.getRequestDispatcher("/WEB-INF/jsp/area_drop_point.jsp")
+                .forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+        DropPoint dp = (session != null) ? (DropPoint) session.getAttribute("dropPoint") : null;
+
+        if (dp == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        // ricarico stato
+        dp = dropPointService.trovaPerId(dp.getId());
+        session.setAttribute("dropPoint", dp);
+        request.setAttribute("dropPoint", dp);
+
+        String action = request.getParameter("action");
+        String codice = request.getParameter("codice");
+
+        if (dp.getStato() != StatoDropPoint.APPROVATO) {
+            request.setAttribute("erroreGenerale", "Devi avere un Drop-Point approvato per effettuare operazioni.");
+        } else if (action != null && codice != null && !codice.isBlank()) {
+
+            if ("deposito".equals(action)) {
+                boolean ok = dropPointService.registraDeposito(dp.getId(), codice.trim());
+                if (ok) {
+                    request.setAttribute("msgDeposito", "Deposito verificato.");
+                } else {
+                    request.setAttribute("msgDeposito", "Codice non valido o non associato a questo punto.");
+                }
+            } else if ("ritiro".equals(action)) {
+                // QUI AVVIENE LA MAGIA: Chiama il service aggiornato che chiude la segnalazione nel DB
+                boolean ok = dropPointService.registraRitiro(dp.getId(), codice.trim());
+                if (ok) {
+                    request.setAttribute("msgRitiro", "Ritiro confermato! Segnalazione chiusa e punti assegnati.");
+                } else {
+                    request.setAttribute("msgRitiro", "Errore: Codice non valido o segnalazione già chiusa.");
+                }
+            }
+        }
+
+        long id = dp.getId();
+        request.setAttribute("depositiAttivi",      dropPointService.countDepositiAttivi(id));
+        request.setAttribute("consegneCompletate", dropPointService.countConsegneCompletate(id));
+        request.setAttribute("totaleOperazioni",   dropPointService.countTotaleOperazioni(id));
+
+        request.getRequestDispatcher("/WEB-INF/jsp/area_drop_point.jsp")
+                .forward(request, response);
+    }
+}
+</file>
+
 <file path="src/main/java/controller/DettaglioSegnalazioneServlet.java">
 package controller;
 
@@ -2814,102 +2814,6 @@ public class DropPointServlet extends HttpServlet {
 
         request.getRequestDispatcher("/WEB-INF/jsp/drop_point.jsp")
                 .forward(request, response);
-    }
-}
-</file>
-
-<file path="src/main/java/controller/GestioneReclamoServlet.java">
-package controller;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import model.bean.Reclamo;
-import model.bean.Segnalazione;
-import model.bean.SegnalazioneOggetto;
-import model.bean.Utente;
-import model.bean.enums.ModalitaConsegna;
-import model.dao.ReclamoDAO;
-import model.service.SegnalazioneService;
-
-import java.io.IOException;
-import java.util.UUID;
-
-@WebServlet(name = "GestioneReclamoServlet", value = "/gestione-reclamo")
-public class GestioneReclamoServlet extends HttpServlet {
-
-    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
-    private final SegnalazioneService segnalazioneService = new SegnalazioneService();
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-        HttpSession session = request.getSession(false);
-        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
-
-        if (utente == null) {
-            response.sendRedirect("login");
-            return;
-        }
-
-        if ("invia".equals(action)) {
-            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
-
-            // 1. Recupero la segnalazione per verificare lo stato
-            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
-
-            // CONTROLLO STATO: Se non è APERTA, blocco tutto.
-            if (s == null || s.getStato() != model.bean.enums.StatoSegnalazione.APERTA) {
-                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=segnalazione_chiusa");
-                return;
-            }
-
-            // 2. CONTROLLO DUPLICATI: Se esiste già un reclamo mio, stop.
-            if (reclamoDAO.doRetrieveBySegnalazioneAndUtente(idSegnalazione, utente.getId()) != null) {
-                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_esistente");
-                return;
-            }
-
-            Reclamo r = new Reclamo();
-            r.setIdSegnalazione(idSegnalazione);
-            r.setIdUtenteRichiedente(utente.getId());
-            r.setRispostaVerifica1(request.getParameter("risposta1"));
-            r.setRispostaVerifica2(request.getParameter("risposta2"));
-
-            reclamoDAO.doSave(r);
-            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_inviato");
-
-        } else if ("accetta".equals(action)) {
-            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
-            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
-
-            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
-            String codice = null;
-            if (s instanceof SegnalazioneOggetto) {
-                SegnalazioneOggetto so = (SegnalazioneOggetto) s;
-                if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
-                    codice = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-                }
-            }
-
-            // Chiama il service che chiude la segnalazione e accetta il reclamo
-            segnalazioneService.accettaReclamoEChiudiSegnalazione(idReclamo, idSegnalazione, codice);
-
-            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_accettato");
-
-        } else if ("rifiuta".equals(action)) {
-            // --- NUOVA LOGICA DI RIFIUTO ---
-            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
-            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
-
-            // Chiama il service per aggiornare lo stato del reclamo a RIFIUTATO
-            segnalazioneService.rifiutaReclamo(idReclamo);
-
-            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_rifiutato");
-        }
     }
 }
 </file>
@@ -6146,6 +6050,142 @@ public class CreaSegnalazioneServlet extends HttpServlet {
 }
 </file>
 
+<file path="src/main/java/controller/GestioneReclamoServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.DropPoint;
+import model.bean.Reclamo;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoSegnalazione;
+import model.dao.ReclamoDAO;
+import model.service.SegnalazioneService;
+
+import java.io.IOException;
+import java.util.UUID;
+
+@WebServlet(name = "GestioneReclamoServlet", value = "/gestione-reclamo")
+public class GestioneReclamoServlet extends HttpServlet {
+
+    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
+    private final SegnalazioneService segnalazioneService = new SegnalazioneService();
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        HttpSession session = request.getSession(false);
+
+        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
+        DropPoint dropPoint = (session != null) ? (DropPoint) session.getAttribute("dropPoint") : null;
+
+        if (utente == null && dropPoint == null) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        // --- 1. DROP-POINT: Conferma Ritiro con Codice ---
+        if ("conferma_ritiro".equals(action)) {
+            if (dropPoint == null) { response.sendRedirect("login"); return; }
+            try {
+                long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
+                long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+                String codice = request.getParameter("codiceConsegna");
+
+                boolean successo = segnalazioneService.accettaReclamoEChiudiSegnalazione(idReclamo, idSegnalazione, codice);
+                response.sendRedirect("area-drop-point?msg=" + (successo ? "successo_consegna" : "codice_errato"));
+            } catch (Exception e) {
+                response.sendRedirect("area-drop-point?err=errore");
+            }
+            return;
+        }
+
+        // --- 2. AZIONI UTENTE (Finder / Owner) ---
+        if (utente == null) { response.sendRedirect("login"); return; }
+
+        if ("invia".equals(action)) {
+            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
+
+            if (s == null || s.getStato() != StatoSegnalazione.APERTA) {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=segnalazione_chiusa");
+                return;
+            }
+            if (reclamoDAO.doRetrieveBySegnalazioneAndUtente(idSegnalazione, utente.getId()) != null) {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_esistente");
+                return;
+            }
+
+            Reclamo r = new Reclamo();
+            r.setIdSegnalazione(idSegnalazione);
+            r.setIdUtenteRichiedente(utente.getId());
+            r.setRispostaVerifica1(request.getParameter("risposta1"));
+            r.setRispostaVerifica2(request.getParameter("risposta2"));
+            reclamoDAO.doSave(r);
+            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_inviato");
+
+        } else if ("accetta".equals(action)) {
+            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
+            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
+
+            String codice = null;
+            boolean isDropPoint = false;
+
+            // VERIFICA SE È DROP-POINT PER GENERARE IL CODICE
+            if (s instanceof SegnalazioneOggetto) {
+                SegnalazioneOggetto so = (SegnalazioneOggetto) s;
+                if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
+                    isDropPoint = true;
+                    // Genera codice univoco (6 caratteri)
+                    codice = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+                }
+            }
+
+            // Salva nel DB (se DropPoint salva codice, se Diretta salva null)
+            reclamoDAO.accettaReclamo(idReclamo, codice);
+
+            if (isDropPoint) {
+                // Reindirizza con un messaggio che la JSP userà per mostrare il codice
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=attesa_ritiro");
+            } else {
+                // Scambio diretto: avvia il flusso dei pulsanti
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=scambio_avviato");
+            }
+
+        } else if ("rifiuta".equals(action)) {
+            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
+            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+            segnalazioneService.rifiutaReclamo(idReclamo);
+            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_rifiutato");
+
+        } else if ("conferma_scambio".equals(action)) {
+            // SCAMBIO DIRETTO
+            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
+            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+
+            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
+            boolean isFinder = (s.getIdUtente() == utente.getId());
+
+            boolean finito = segnalazioneService.gestisciConfermaScambio(idReclamo, isFinder);
+
+            if (finito) {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=scambio_completato");
+            } else {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=conferma_registrata");
+            }
+        }
+    }
+}
+</file>
+
 <file path="src/main/java/controller/ProfiloServlet.java">
 package controller;
 
@@ -7479,197 +7519,6 @@ public class RecuperoPasswordServlet extends HttpServlet {
 }
 </file>
 
-<file path="src/main/java/model/dao/ReclamoDAO.java">
-package model.dao;
-
-import model.ConPool;
-import model.bean.Reclamo;
-import model.bean.enums.StatoReclamo;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-
-public class ReclamoDAO {
-
-    public boolean doSave(Reclamo r) {
-        String query = "INSERT INTO reclamo (" +
-                "id_segnalazione, id_utente_richiedente, " +
-                "risposta_verifica1, risposta_verifica2, " +
-                "stato, data_richiesta" +
-                ") VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setLong(1, r.getIdSegnalazione());
-            ps.setLong(2, r.getIdUtenteRichiedente());
-            ps.setString(3, r.getRispostaVerifica1());
-            ps.setString(4, r.getRispostaVerifica2());
-            ps.setString(5, StatoReclamo.IN_ATTESA.toString());
-            ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
-
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public List<Reclamo> doRetrieveBySegnalazione(long idSegnalazione) {
-        List<Reclamo> list = new ArrayList<>();
-        String query = "SELECT * FROM reclamo WHERE id_segnalazione = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setLong(1, idSegnalazione);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    /** Controlla se un utente ha già fatto reclamo per una segnalazione. */
-    public Reclamo doRetrieveBySegnalazioneAndUtente(long idSegnalazione, long idUtente) {
-        String query = "SELECT * FROM reclamo WHERE id_segnalazione = ? AND id_utente_richiedente = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setLong(1, idSegnalazione);
-            ps.setLong(2, idUtente);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public boolean accettaReclamo(long idReclamo, String codice) {
-        String query = "UPDATE reclamo SET stato = 'ACCETTATO', codice_consegna = ? WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setString(1, codice);
-            ps.setLong(2, idReclamo);
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public Reclamo doRetrieveById(long id) {
-        String query = "SELECT * FROM reclamo WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setLong(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private Reclamo mapRow(ResultSet rs) throws SQLException {
-        Reclamo r = new Reclamo();
-        r.setId(rs.getLong("id"));
-        r.setIdSegnalazione(rs.getLong("id_segnalazione"));
-        r.setIdUtenteRichiedente(rs.getLong("id_utente_richiedente"));
-        r.setRispostaVerifica1(rs.getString("risposta_verifica1"));
-        r.setRispostaVerifica2(rs.getString("risposta_verifica2"));
-
-        r.setDataRichiesta(rs.getTimestamp("data_richiesta"));
-        r.setDataDeposito(rs.getTimestamp("data_deposito"));
-        r.setDataRitiro(rs.getTimestamp("data_ritiro"));
-        r.setConfermaFinder(rs.getBoolean("conferma_finder"));
-        r.setConfermaOwner(rs.getBoolean("conferma_owner"));
-
-        try {
-            r.setStato(StatoReclamo.valueOf(rs.getString("stato")));
-        } catch (Exception e) {
-            r.setStato(StatoReclamo.IN_ATTESA);
-        }
-
-        r.setCodiceConsegna(rs.getString("codice_consegna"));
-        return r;
-    }
-
-    public boolean rifiutaReclamo(long idReclamo) {
-        String query = "UPDATE reclamo SET stato = 'RIFIUTATO' WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setLong(1, idReclamo);
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public List<Reclamo> doRetrieveByRichiedente(long idUtenteRichiedente) {
-        List<Reclamo> list = new ArrayList<>();
-
-        String query =
-                "SELECT r.*, " +
-                        "       s.titolo AS seg_titolo, " +
-                        "       s.immagine AS seg_immagine, " +
-                        "       s.immagine_content_type AS seg_immagine_content_type " +
-                        "FROM reclamo r " +
-                        "JOIN segnalazione s ON r.id_segnalazione = s.id " +
-                        "WHERE r.id_utente_richiedente = ? " +
-                        "ORDER BY r.data_richiesta DESC";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setLong(1, idUtenteRichiedente);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Reclamo r = new Reclamo();
-                    r.setId(rs.getLong("id"));
-                    r.setIdSegnalazione(rs.getLong("id_segnalazione"));
-                    r.setIdUtenteRichiedente(rs.getLong("id_utente_richiedente"));
-                    r.setRispostaVerifica1(rs.getString("risposta_verifica1"));
-                    r.setRispostaVerifica2(rs.getString("risposta_verifica2"));
-                    r.setDataRichiesta(rs.getTimestamp("data_richiesta"));
-
-                    try {
-                        r.setStato(StatoReclamo.valueOf(rs.getString("stato")));
-                    } catch (Exception e) {
-                        r.setStato(StatoReclamo.IN_ATTESA);
-                    }
-
-                    r.setCodiceConsegna(rs.getString("codice_consegna"));
-
-                    // Dati della segnalazione collegata
-                    r.setTitoloSegnalazione(rs.getString("seg_titolo"));
-                    r.setImmagineSegnalazione(rs.getBytes("seg_immagine"));
-                    r.setImmagineSegnalazioneContentType(rs.getString("seg_immagine_content_type"));
-
-                    list.add(r);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-}
-</file>
-
 <file path="src/main/webapp/WEB-INF/jsp/classifica.jsp">
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="model.bean.Utente" %>
@@ -8634,30 +8483,35 @@ public class ReclamoDAO {
 </project>
 </file>
 
-<file path="src/main/java/model/dao/SegnalazioneDAO.java">
+<file path="src/main/java/model/dao/ReclamoDAO.java">
 package model.dao;
 
 import model.ConPool;
-import model.bean.Segnalazione;
-import model.bean.SegnalazioneAnimale;
-import model.bean.SegnalazioneOggetto;
-import model.bean.enums.CategoriaOggetto;
-import model.bean.enums.ModalitaConsegna;
-import model.bean.enums.StatoSegnalazione;
-import model.bean.enums.TipoSegnalazione;
+import model.bean.Reclamo;
+import model.bean.enums.StatoReclamo;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SegnalazioneDAO {
+public class ReclamoDAO {
 
-    public boolean updateStato(long id, StatoSegnalazione nuovoStato) {
-        String query = "UPDATE segnalazione SET stato = ? WHERE id = ?";
+    public boolean doSave(Reclamo r) {
+        String query = "INSERT INTO reclamo (" +
+                "id_segnalazione, id_utente_richiedente, " +
+                "risposta_verifica1, risposta_verifica2, " +
+                "stato, data_richiesta" +
+                ") VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setString(1, nuovoStato.toString());
-            ps.setLong(2, id);
+
+            ps.setLong(1, r.getIdSegnalazione());
+            ps.setLong(2, r.getIdUtenteRichiedente());
+            ps.setString(3, r.getRispostaVerifica1());
+            ps.setString(4, r.getRispostaVerifica2());
+            ps.setString(5, StatoReclamo.IN_ATTESA.toString());
+            ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -8665,106 +8519,58 @@ public class SegnalazioneDAO {
         }
     }
 
-    public boolean doSave(Segnalazione s) {
-        String sqlPadre =
-                "INSERT INTO segnalazione (" +
-                        "id_utente, titolo, descrizione, data_ritrovamento, " +
-                        "luogo_ritrovamento, citta, provincia, latitudine, longitudine, " +
-                        "immagine, immagine_content_type, " +
-                        "domanda_verifica1, domanda_verifica2, stato, tipo_segnalazione" +
-                        ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
+    // --- NUOVI METODI PER SCAMBIO DIRETTO ---
+    public boolean confermaFinder(long idReclamo) {
+        String sql = "UPDATE reclamo SET conferma_finder = 1 WHERE id = ?";
         try (Connection con = ConPool.getConnection();
-             PreparedStatement psPadre = con.prepareStatement(sqlPadre, Statement.RETURN_GENERATED_KEYS)) {
-
-            con.setAutoCommit(false);
-
-            psPadre.setLong(1, s.getIdUtente());
-            psPadre.setString(2, s.getTitolo());
-            psPadre.setString(3, s.getDescrizione());
-            psPadre.setTimestamp(4, s.getDataRitrovamento());
-            psPadre.setString(5, s.getLuogoRitrovamento());
-            psPadre.setString(6, s.getCitta());
-            psPadre.setString(7, s.getProvincia());
-            psPadre.setObject(8, s.getLatitudine());
-            psPadre.setObject(9, s.getLongitudine());
-
-            // immagine BLOB + content-type
-            if (s.getImmagine() != null && s.getImmagine().length > 0) {
-                psPadre.setBytes(10, s.getImmagine());
-                psPadre.setString(11, s.getImmagineContentType());
-            } else {
-                psPadre.setNull(10, Types.BLOB);
-                psPadre.setNull(11, Types.VARCHAR);
-            }
-
-            psPadre.setString(12, s.getDomandaVerifica1());
-            psPadre.setString(13, s.getDomandaVerifica2());
-            psPadre.setString(14, s.getStato().toString());
-            psPadre.setString(15, s.getTipoSegnalazione().toString());
-
-            int result = psPadre.executeUpdate();
-
-            if (result > 0) {
-                try (ResultSet generatedKeys = psPadre.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        long id = generatedKeys.getLong(1);
-                        s.setId(id);
-
-                        if (s instanceof SegnalazioneOggetto) {
-                            saveOggetto(con, (SegnalazioneOggetto) s);
-                        } else if (s instanceof SegnalazioneAnimale) {
-                            saveAnimale(con, (SegnalazioneAnimale) s);
-                        }
-
-                        con.commit();
-                        return true;
-                    }
-                }
-            }
-            con.rollback();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    private void saveOggetto(Connection con, SegnalazioneOggetto so) throws SQLException {
-        String sql = "INSERT INTO segnalazione_oggetto " +
-                "(id_segnalazione, categoria, modalita_consegna, id_drop_point) " +
-                "VALUES (?, ?, ?, ?)";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setLong(1, so.getId());
-            ps.setString(2, so.getCategoria().toString());
-            ps.setString(3, so.getModalitaConsegna().toString());
-            ps.setObject(4, so.getIdDropPoint());
-            ps.executeUpdate();
+    public boolean confermaOwner(long idReclamo) {
+        String sql = "UPDATE reclamo SET conferma_owner = 1 WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        return false;
     }
+    // ----------------------------------------
 
-    private void saveAnimale(Connection con, SegnalazioneAnimale sa) throws SQLException {
-        String sql = "INSERT INTO segnalazione_animale " +
-                "(id_segnalazione, specie, razza) VALUES (?, ?, ?)";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setLong(1, sa.getId());
-            ps.setString(2, sa.getSpecie());
-            ps.setString(3, sa.getRazza());
-            ps.executeUpdate();
-        }
-    }
-
-    public List<Segnalazione> doRetrieveLatest(int limit) {
-        List<Segnalazione> list = new ArrayList<>();
-        String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
-                "FROM segnalazione s " +
-                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
-                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
-                "WHERE s.stato IN ('APERTA', 'CHIUSA') " +
-                "ORDER BY s.data_pubblicazione DESC LIMIT ?";
-
+    // --- NUOVO METODO PER DROP-POINT (CERCA PER CODICE) ---
+    public Reclamo doRetrieveByCodice(String codice) {
+        String query = "SELECT * FROM reclamo WHERE codice_consegna = ?";
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setInt(1, limit);
+
+            ps.setString(1, codice);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    // -----------------------------------------------------
+
+    public List<Reclamo> doRetrieveBySegnalazione(long idSegnalazione) {
+        List<Reclamo> list = new ArrayList<>();
+        String query = "SELECT * FROM reclamo WHERE id_segnalazione = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setLong(1, idSegnalazione);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapRow(rs));
@@ -8776,14 +8582,42 @@ public class SegnalazioneDAO {
         return list;
     }
 
-    public Segnalazione doRetrieveById(long id) {
-        String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
-                "FROM segnalazione s " +
-                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
-                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
-                "WHERE s.id = ?";
+    public Reclamo doRetrieveBySegnalazioneAndUtente(long idSegnalazione, long idUtente) {
+        String query = "SELECT * FROM reclamo WHERE id_segnalazione = ? AND id_utente_richiedente = ?";
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setLong(1, idSegnalazione);
+            ps.setLong(2, idUtente);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean accettaReclamo(long idReclamo, String codice) {
+        String query = "UPDATE reclamo SET stato = 'ACCETTATO', codice_consegna = ? WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, codice);
+            ps.setLong(2, idReclamo);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Reclamo doRetrieveById(long id) {
+        String query = "SELECT * FROM reclamo WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
             ps.setLong(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapRow(rs);
@@ -8794,80 +8628,41 @@ public class SegnalazioneDAO {
         return null;
     }
 
-    public List<Segnalazione> doRetrieveByUtente(long idUtente) {
-        List<Segnalazione> list = new ArrayList<>();
-        String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
-                "FROM segnalazione s " +
-                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
-                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
-                "WHERE s.id_utente = ? ORDER BY s.data_pubblicazione DESC";
+    public boolean rifiutaReclamo(long idReclamo) {
+        String query = "UPDATE reclamo SET stato = 'RIFIUTATO' WHERE id = ?";
         try (Connection con = ConPool.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setLong(1, idUtente);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
 
-    public boolean doDelete(long id) {
-        String query = "DELETE FROM segnalazione WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setLong(1, id);
+            ps.setLong(1, idReclamo);
             return ps.executeUpdate() > 0;
+
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    public List<Segnalazione> doRetrieveByFiltri(String queryTesto, String tipo, String categoria) {
-        StringBuilder sql = new StringBuilder(
-                "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
-                        "FROM segnalazione s " +
-                        "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
-                        "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
-                        "WHERE 1=1");
+    public List<Reclamo> doRetrieveByRichiedente(long idUtenteRichiedente) {
+        List<Reclamo> list = new ArrayList<>();
+        String query = "SELECT r.*, s.titolo AS seg_titolo, s.immagine AS seg_immagine " +
+                "FROM reclamo r " +
+                "JOIN segnalazione s ON r.id_segnalazione = s.id " +
+                "WHERE r.id_utente_richiedente = ? " +
+                "ORDER BY r.data_richiesta DESC";
 
-        List<Object> params = new ArrayList<>();
-
-        if (queryTesto != null && !queryTesto.trim().isEmpty()) {
-            sql.append(" AND (s.titolo LIKE ? OR s.descrizione LIKE ? OR s.luogo_ritrovamento LIKE ?)");
-            String likeQuery = "%" + queryTesto + "%";
-            params.add(likeQuery);
-            params.add(likeQuery);
-            params.add(likeQuery);
-        }
-
-        if (tipo != null && !tipo.trim().isEmpty()) {
-            sql.append(" AND s.tipo_segnalazione = ?");
-            params.add(tipo.toUpperCase());
-        }
-
-        if (categoria != null && !categoria.trim().isEmpty()) {
-            sql.append(" AND so.categoria = ?");
-            params.add(categoria.toUpperCase());
-        }
-
-        sql.append(" ORDER BY s.data_pubblicazione DESC");
-
-        List<Segnalazione> list = new ArrayList<>();
         try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql.toString())) {
+             PreparedStatement ps = con.prepareStatement(query)) {
 
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-
+            ps.setLong(1, idUtenteRichiedente);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    list.add(mapRow(rs));
+                    Reclamo r = mapRow(rs);
+                    r.setTitoloSegnalazione(rs.getString("seg_titolo"));
+                    String imgPath = rs.getString("seg_immagine");
+                    if (imgPath != null) {
+                        r.setImmagineSegnalazione(imgPath.getBytes());
+                    }
+                    list.add(r);
                 }
             }
         } catch (SQLException e) {
@@ -8876,122 +8671,25 @@ public class SegnalazioneDAO {
         return list;
     }
 
-    private Segnalazione mapRow(ResultSet rs) throws SQLException {
-        Segnalazione s;
-        String tipo = rs.getString("tipo_segnalazione");
-
-        if ("OGGETTO".equals(tipo)) {
-            SegnalazioneOggetto so = new SegnalazioneOggetto();
-            try {
-                String cat = rs.getString("categoria");
-                if (cat != null) so.setCategoria(CategoriaOggetto.valueOf(cat));
-
-                String mod = rs.getString("modalita_consegna");
-                if (mod != null) so.setModalitaConsegna(ModalitaConsegna.valueOf(mod));
-            } catch (Exception ignored) {}
-            so.setIdDropPoint(rs.getObject("id_drop_point", Long.class));
-            s = so;
-        } else {
-            SegnalazioneAnimale sa = new SegnalazioneAnimale();
-            sa.setSpecie(rs.getString("specie"));
-            sa.setRazza(rs.getString("razza"));
-            s = sa;
-        }
-
-        s.setId(rs.getLong("id"));
-        s.setIdUtente(rs.getLong("id_utente"));
-        s.setTitolo(rs.getString("titolo"));
-        s.setDescrizione(rs.getString("descrizione"));
-        s.setDataRitrovamento(rs.getTimestamp("data_ritrovamento"));
-        s.setLuogoRitrovamento(rs.getString("luogo_ritrovamento"));
-        s.setCitta(rs.getString("citta"));
-        s.setProvincia(rs.getString("provincia"));
-        s.setLatitudine(rs.getObject("latitudine", Double.class));
-        s.setLongitudine(rs.getObject("longitudine", Double.class));
-
-        // immagine BLOB + content-type
-        s.setImmagine(rs.getBytes("immagine"));
-        s.setImmagineContentType(rs.getString("immagine_content_type"));
-
-        s.setDomandaVerifica1(rs.getString("domanda_verifica1"));
-        s.setDomandaVerifica2(rs.getString("domanda_verifica2"));
-        s.setDataPubblicazione(rs.getTimestamp("data_pubblicazione"));
-
+    private Reclamo mapRow(ResultSet rs) throws SQLException {
+        Reclamo r = new Reclamo();
+        r.setId(rs.getLong("id"));
+        r.setIdSegnalazione(rs.getLong("id_segnalazione"));
+        r.setIdUtenteRichiedente(rs.getLong("id_utente_richiedente"));
+        r.setRispostaVerifica1(rs.getString("risposta_verifica1"));
+        r.setRispostaVerifica2(rs.getString("risposta_verifica2"));
+        r.setDataRichiesta(rs.getTimestamp("data_richiesta"));
+        r.setDataDeposito(rs.getTimestamp("data_deposito"));
+        r.setDataRitiro(rs.getTimestamp("data_ritiro"));
+        r.setConfermaFinder(rs.getBoolean("conferma_finder"));
+        r.setConfermaOwner(rs.getBoolean("conferma_owner"));
+        r.setCodiceConsegna(rs.getString("codice_consegna"));
         try {
-            s.setStato(StatoSegnalazione.valueOf(rs.getString("stato")));
-            s.setTipoSegnalazione(TipoSegnalazione.valueOf(tipo));
-        } catch (Exception ignored) {}
-
-        return s;
-    }
-}
-</file>
-
-<file path="src/main/java/model/service/SegnalazioneService.java">
-package model.service;
-
-import model.bean.Reclamo;
-import model.bean.Segnalazione;
-import model.bean.enums.StatoSegnalazione;
-import model.dao.ReclamoDAO;
-import model.dao.SegnalazioneDAO;
-import model.utils.GeocodingUtils;
-
-import java.util.List;
-
-public class SegnalazioneService {
-
-    private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
-    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
-
-    public boolean creaSegnalazione(Segnalazione segnalazione) {
-        if (segnalazione.getLuogoRitrovamento() != null && !segnalazione.getLuogoRitrovamento().isEmpty() &&
-                segnalazione.getCitta() != null && !segnalazione.getCitta().isEmpty()) {
-            double[] coords = GeocodingUtils.getCoordinates(
-                    segnalazione.getLuogoRitrovamento(),
-                    segnalazione.getCitta(),
-                    segnalazione.getProvincia()
-            );
-            segnalazione.setLatitudine(coords[0]);
-            segnalazione.setLongitudine(coords[1]);
+            r.setStato(StatoReclamo.valueOf(rs.getString("stato")));
+        } catch (Exception e) {
+            r.setStato(StatoReclamo.IN_ATTESA);
         }
-        return segnalazioneDAO.doSave(segnalazione);
-    }
-
-    public List<Segnalazione> getUltimeSegnalazioni() {
-        return segnalazioneDAO.doRetrieveLatest(8);
-    }
-
-    public Segnalazione trovaPerId(long id) {
-        return segnalazioneDAO.doRetrieveById(id);
-    }
-
-    public List<Segnalazione> trovaPerUtente(long idUtente) {
-        return segnalazioneDAO.doRetrieveByUtente(idUtente);
-    }
-
-    public boolean eliminaSegnalazione(long id) {
-        return segnalazioneDAO.doDelete(id);
-    }
-
-    public boolean accettaReclamoEChiudiSegnalazione(long idReclamo, long idSegnalazione, String codice) {
-        boolean successo = reclamoDAO.accettaReclamo(idReclamo, codice);
-        if (successo) {
-            return segnalazioneDAO.updateStato(idSegnalazione, StatoSegnalazione.CHIUSA);
-        }
-        return false;
-    }
-
-    public boolean rifiutaReclamo(long idReclamo) {
-        return reclamoDAO.rifiutaReclamo(idReclamo);
-    }
-
-    public List<Segnalazione> cercaSegnalazioni(String q, String tipo, String categoria) {
-        return segnalazioneDAO.doRetrieveByFiltri(q, tipo, categoria);
-    }
-
-    public List<Reclamo> trovaReclamiFattiDaUtente(long idUtente) {
-        return reclamoDAO.doRetrieveByRichiedente(idUtente);
+        return r;
     }
 }
 </file>
@@ -9453,6 +9151,435 @@ public class SegnalazioneService {
 </html>
 </file>
 
+<file path="src/main/java/model/dao/SegnalazioneDAO.java">
+package model.dao;
+
+import model.ConPool;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneAnimale;
+import model.bean.SegnalazioneOggetto;
+import model.bean.enums.CategoriaOggetto;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoSegnalazione;
+import model.bean.enums.TipoSegnalazione;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class SegnalazioneDAO {
+
+    public boolean updateStato(long id, StatoSegnalazione nuovoStato) {
+        String query = "UPDATE segnalazione SET stato = ? WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setString(1, nuovoStato.toString());
+            ps.setLong(2, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean doSave(Segnalazione s) {
+        String sqlPadre =
+                "INSERT INTO segnalazione (" +
+                        "id_utente, titolo, descrizione, data_ritrovamento, " +
+                        "luogo_ritrovamento, citta, provincia, latitudine, longitudine, " +
+                        "immagine, immagine_content_type, " +
+                        "domanda_verifica1, domanda_verifica2, stato, tipo_segnalazione" +
+                        ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement psPadre = con.prepareStatement(sqlPadre, Statement.RETURN_GENERATED_KEYS)) {
+
+            con.setAutoCommit(false);
+
+            psPadre.setLong(1, s.getIdUtente());
+            psPadre.setString(2, s.getTitolo());
+            psPadre.setString(3, s.getDescrizione());
+            psPadre.setTimestamp(4, s.getDataRitrovamento());
+            psPadre.setString(5, s.getLuogoRitrovamento());
+            psPadre.setString(6, s.getCitta());
+            psPadre.setString(7, s.getProvincia());
+            psPadre.setObject(8, s.getLatitudine());
+            psPadre.setObject(9, s.getLongitudine());
+
+            if (s.getImmagine() != null && s.getImmagine().length > 0) {
+                psPadre.setBytes(10, s.getImmagine());
+                psPadre.setString(11, s.getImmagineContentType());
+            } else {
+                psPadre.setNull(10, Types.BLOB);
+                psPadre.setNull(11, Types.VARCHAR);
+            }
+
+            psPadre.setString(12, s.getDomandaVerifica1());
+            psPadre.setString(13, s.getDomandaVerifica2());
+            psPadre.setString(14, s.getStato().toString());
+            psPadre.setString(15, s.getTipoSegnalazione().toString());
+
+            int result = psPadre.executeUpdate();
+
+            if (result > 0) {
+                try (ResultSet generatedKeys = psPadre.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        long id = generatedKeys.getLong(1);
+                        s.setId(id);
+
+                        if (s instanceof SegnalazioneOggetto) {
+                            saveOggetto(con, (SegnalazioneOggetto) s);
+                        } else if (s instanceof SegnalazioneAnimale) {
+                            saveAnimale(con, (SegnalazioneAnimale) s);
+                        }
+
+                        con.commit();
+                        return true;
+                    }
+                }
+            }
+            con.rollback();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private void saveOggetto(Connection con, SegnalazioneOggetto so) throws SQLException {
+        String sql = "INSERT INTO segnalazione_oggetto " +
+                "(id_segnalazione, categoria, modalita_consegna, id_drop_point) " +
+                "VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, so.getId());
+            ps.setString(2, so.getCategoria().toString());
+            ps.setString(3, so.getModalitaConsegna().toString());
+            ps.setObject(4, so.getIdDropPoint());
+            ps.executeUpdate();
+        }
+    }
+
+    private void saveAnimale(Connection con, SegnalazioneAnimale sa) throws SQLException {
+        String sql = "INSERT INTO segnalazione_animale " +
+                "(id_segnalazione, specie, razza) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, sa.getId());
+            ps.setString(2, sa.getSpecie());
+            ps.setString(3, sa.getRazza());
+            ps.executeUpdate();
+        }
+    }
+
+    /**
+     * Recupera le ultime segnalazioni per la HOME.
+     * FILTRO: Solo segnalazioni 'APERTA'. Quelle CHIUSE non si vedono.
+     */
+    public List<Segnalazione> doRetrieveLatest(int limit) {
+        List<Segnalazione> list = new ArrayList<>();
+        String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
+                "FROM segnalazione s " +
+                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
+                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
+                "WHERE s.stato = 'APERTA' " + // <--- QUESTA RIGA FA LA MAGIA
+                "ORDER BY s.data_pubblicazione DESC LIMIT ?";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public Segnalazione doRetrieveById(long id) {
+        String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
+                "FROM segnalazione s " +
+                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
+                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
+                "WHERE s.id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Recupera le segnalazioni di un utente specifico (Storico Personale).
+     * QUI NON FILTRIAMO: L'utente deve poter vedere anche le sue segnalazioni CHIUSE.
+     */
+    public List<Segnalazione> doRetrieveByUtente(long idUtente) {
+        List<Segnalazione> list = new ArrayList<>();
+        String query = "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
+                "FROM segnalazione s " +
+                "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
+                "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
+                "WHERE s.id_utente = ? ORDER BY s.data_pubblicazione DESC";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setLong(1, idUtente);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public boolean doDelete(long id) {
+        String query = "DELETE FROM segnalazione WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setLong(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Ricerca Pubblica.
+     * FILTRO: Solo segnalazioni 'APERTA'.
+     */
+    public List<Segnalazione> doRetrieveByFiltri(String queryTesto, String tipo, String categoria) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
+                        "FROM segnalazione s " +
+                        "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
+                        "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
+                        "WHERE s.stato = 'APERTA'"); // <--- ANCHE QUI LA MAGIA
+
+        List<Object> params = new ArrayList<>();
+
+        if (queryTesto != null && !queryTesto.trim().isEmpty()) {
+            sql.append(" AND (s.titolo LIKE ? OR s.descrizione LIKE ? OR s.luogo_ritrovamento LIKE ?)");
+            String likeQuery = "%" + queryTesto + "%";
+            params.add(likeQuery);
+            params.add(likeQuery);
+            params.add(likeQuery);
+        }
+
+        if (tipo != null && !tipo.trim().isEmpty()) {
+            sql.append(" AND s.tipo_segnalazione = ?");
+            params.add(tipo.toUpperCase());
+        }
+
+        if (categoria != null && !categoria.trim().isEmpty()) {
+            sql.append(" AND so.categoria = ?");
+            params.add(categoria.toUpperCase());
+        }
+
+        sql.append(" ORDER BY s.data_pubblicazione DESC");
+
+        List<Segnalazione> list = new ArrayList<>();
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    private Segnalazione mapRow(ResultSet rs) throws SQLException {
+        Segnalazione s;
+        String tipo = rs.getString("tipo_segnalazione");
+
+        if ("OGGETTO".equals(tipo)) {
+            SegnalazioneOggetto so = new SegnalazioneOggetto();
+            try {
+                String cat = rs.getString("categoria");
+                if (cat != null) so.setCategoria(CategoriaOggetto.valueOf(cat));
+
+                String mod = rs.getString("modalita_consegna");
+                if (mod != null) so.setModalitaConsegna(ModalitaConsegna.valueOf(mod));
+            } catch (Exception ignored) {}
+            so.setIdDropPoint(rs.getObject("id_drop_point", Long.class));
+            s = so;
+        } else {
+            SegnalazioneAnimale sa = new SegnalazioneAnimale();
+            sa.setSpecie(rs.getString("specie"));
+            sa.setRazza(rs.getString("razza"));
+            s = sa;
+        }
+
+        s.setId(rs.getLong("id"));
+        s.setIdUtente(rs.getLong("id_utente"));
+        s.setTitolo(rs.getString("titolo"));
+        s.setDescrizione(rs.getString("descrizione"));
+        s.setDataRitrovamento(rs.getTimestamp("data_ritrovamento"));
+        s.setLuogoRitrovamento(rs.getString("luogo_ritrovamento"));
+        s.setCitta(rs.getString("citta"));
+        s.setProvincia(rs.getString("provincia"));
+        s.setLatitudine(rs.getObject("latitudine", Double.class));
+        s.setLongitudine(rs.getObject("longitudine", Double.class));
+
+        if (rs.getBytes("immagine") != null) {
+            s.setImmagine(rs.getBytes("immagine"));
+            s.setImmagineContentType(rs.getString("immagine_content_type"));
+        }
+
+        s.setDomandaVerifica1(rs.getString("domanda_verifica1"));
+        s.setDomandaVerifica2(rs.getString("domanda_verifica2"));
+        s.setDataPubblicazione(rs.getTimestamp("data_pubblicazione"));
+
+        try {
+            s.setStato(StatoSegnalazione.valueOf(rs.getString("stato")));
+            s.setTipoSegnalazione(TipoSegnalazione.valueOf(tipo));
+        } catch (Exception ignored) {}
+
+        return s;
+    }
+}
+</file>
+
+<file path="src/main/java/model/service/SegnalazioneService.java">
+package model.service;
+
+import model.bean.Reclamo;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoSegnalazione;
+import model.dao.ReclamoDAO;
+import model.dao.SegnalazioneDAO;
+import model.utils.GeocodingUtils;
+
+import java.util.List;
+
+public class SegnalazioneService {
+
+    private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
+    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
+    private final UtenteService utenteService = new UtenteService(); // Per gestire i punti
+
+    public boolean creaSegnalazione(Segnalazione segnalazione) {
+        if (segnalazione.getLuogoRitrovamento() != null && !segnalazione.getLuogoRitrovamento().isEmpty() &&
+                segnalazione.getCitta() != null && !segnalazione.getCitta().isEmpty()) {
+            double[] coords = GeocodingUtils.getCoordinates(
+                    segnalazione.getLuogoRitrovamento(),
+                    segnalazione.getCitta(),
+                    segnalazione.getProvincia()
+            );
+            segnalazione.setLatitudine(coords[0]);
+            segnalazione.setLongitudine(coords[1]);
+        }
+        return segnalazioneDAO.doSave(segnalazione);
+    }
+
+    public List<Segnalazione> getUltimeSegnalazioni() {
+        return segnalazioneDAO.doRetrieveLatest(8);
+    }
+
+    public Segnalazione trovaPerId(long id) {
+        return segnalazioneDAO.doRetrieveById(id);
+    }
+
+    public List<Segnalazione> trovaPerUtente(long idUtente) {
+        return segnalazioneDAO.doRetrieveByUtente(idUtente);
+    }
+
+    public boolean eliminaSegnalazione(long id) {
+        return segnalazioneDAO.doDelete(id);
+    }
+
+    // --- LOGICA DROP-POINT (Con Codice) ---
+    public boolean accettaReclamoEChiudiSegnalazione(long idReclamo, long idSegnalazione, String codice) {
+        boolean successoReclamo = reclamoDAO.accettaReclamo(idReclamo, codice);
+
+        if (successoReclamo) {
+            boolean successoSegnalazione = segnalazioneDAO.updateStato(idSegnalazione, StatoSegnalazione.CHIUSA);
+
+            if (successoSegnalazione) {
+                // Se è DropPoint, assegna il punto
+                Segnalazione s = segnalazioneDAO.doRetrieveById(idSegnalazione);
+                if (s != null) {
+                    boolean isDropPoint = false;
+                    if (s instanceof SegnalazioneOggetto) {
+                        SegnalazioneOggetto so = (SegnalazioneOggetto) s;
+                        if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
+                            isDropPoint = true;
+                        }
+                    }
+                    if (isDropPoint) {
+                        Utente finder = utenteService.trovaPerId(s.getIdUtente());
+                        if (finder != null) {
+                            utenteService.aggiornaPunteggioEBadge(finder, 1);
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // --- LOGICA SCAMBIO DIRETTO (Doppia Conferma) ---
+    public boolean gestisciConfermaScambio(long idReclamo, boolean isFinder) {
+        // 1. Registra la conferma singola
+        if (isFinder) {
+            reclamoDAO.confermaFinder(idReclamo);
+        } else {
+            reclamoDAO.confermaOwner(idReclamo);
+        }
+
+        // 2. Controlla se ORA sono entrambi confermati
+        Reclamo r = reclamoDAO.doRetrieveById(idReclamo);
+        if (r != null && r.isConfermaFinder() && r.isConfermaOwner()) {
+
+            // Entrambi hanno confermato: Chiudi e dai punti
+            segnalazioneDAO.updateStato(r.getIdSegnalazione(), StatoSegnalazione.CHIUSA);
+
+            Segnalazione s = segnalazioneDAO.doRetrieveById(r.getIdSegnalazione());
+            if (s != null) {
+                Utente finder = utenteService.trovaPerId(s.getIdUtente());
+                if (finder != null) {
+                    utenteService.aggiornaPunteggioEBadge(finder, 1);
+                }
+            }
+            return true; // Scambio completato
+        }
+        return false; // Manca l'altro utente
+    }
+
+    public boolean rifiutaReclamo(long idReclamo) {
+        return reclamoDAO.rifiutaReclamo(idReclamo);
+    }
+
+    public List<Segnalazione> cercaSegnalazioni(String q, String tipo, String categoria) {
+        return segnalazioneDAO.doRetrieveByFiltri(q, tipo, categoria);
+    }
+
+    public List<Reclamo> trovaReclamiFattiDaUtente(long idUtente) {
+        return reclamoDAO.doRetrieveByRichiedente(idUtente);
+    }
+}
+</file>
+
 <file path="src/main/webapp/WEB-INF/jsp/navbar.jsp">
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="model.bean.Utente" %>
@@ -9909,495 +10036,6 @@ public class SegnalazioneService {
     });
 </script>
 
-
-</body>
-</html>
-</file>
-
-<file path="src/main/webapp/WEB-INF/jsp/dettaglio_segnalazione.jsp">
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%@ page import="model.bean.Utente" %>
-<%@ page import="model.bean.enums.ModalitaConsegna" %>
-<%@ page import="model.bean.SegnalazioneOggetto" %>
-
-<%
-    model.bean.DropPoint dp = (model.bean.DropPoint) session.getAttribute("dropPoint");
-    model.bean.Utente u = (model.bean.Utente) session.getAttribute("utente");
-
-    if (dp != null) {
-        response.sendRedirect(request.getContextPath() + "/area-drop-point");
-        return;
-    }
-    if (u == null) {
-        response.sendRedirect(request.getContextPath() + "/login");
-        return;
-    }
-    Utente utente = (Utente) session.getAttribute("utente");
-    model.bean.Segnalazione s = (model.bean.Segnalazione) request.getAttribute("segnalazione");
-    boolean isLogged = (utente != null);
-    boolean isOwner = (isLogged && s != null && s.getIdUtente() == utente.getId());
-
-    boolean isDropPoint = false;
-    if (s instanceof SegnalazioneOggetto) {
-        SegnalazioneOggetto so = (SegnalazioneOggetto) s;
-        if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
-            isDropPoint = true;
-        }
-    }
-%>
-
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <title>${segnalazione.titolo != null ? segnalazione.titolo : "Dettaglio"} - Foundly</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-</head>
-
-<body>
-
-<jsp:include page="/WEB-INF/jsp/navbar.jsp"/>
-
-<div class="local-wrapper">
-
-    <a href="${pageContext.request.contextPath}/index" class="local-back-link">
-        <span class="material-icons">arrow_back</span>
-        Torna alla Home
-    </a>
-
-    <%-- Messaggio se non trovata --%>
-    <c:if test="${segnalazione == null}">
-        <div class="local-card empty-card">
-            <h2>Segnalazione non trovata</h2>
-            <p>Potrebbe essere stata rimossa o non esistere più.</p>
-            <a href="${pageContext.request.contextPath}/index" class="btn-primary">Vai alla Home</a>
-        </div>
-    </c:if>
-
-    <%-- Contenuto se trovata --%>
-    <c:if test="${segnalazione != null}">
-        <div class="local-grid">
-
-            <div class="main-content">
-                <div class="local-card hero-card">
-                    <div class="image-container">
-                        <c:choose>
-                            <c:when test="${not empty segnalazione.immagine}">
-                                <img src="${pageContext.request.contextPath}/segnalazione-img?id=${segnalazione.id}"
-                                     alt="${segnalazione.titolo}"
-                                     class="local-hero-img">
-                            </c:when>
-                            <c:otherwise>
-                                <div class="local-hero-placeholder">
-                                    <span class="material-icons">image_not_supported</span>
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
-
-
-                        <div class="status-overlay">
-                            <span class="status-badge ${segnalazione.stato == 'CHIUSA' ? 'status-closed' : 'status-open'}">
-                                    ${segnalazione.stato}
-                            </span>
-                        </div>
-                    </div>
-
-
-                    <div class="local-content">
-                        <div class="header-row">
-                            <div class="category-tags">
-                                <span class="tag-pill">${segnalazione.tipoSegnalazione}</span>
-                                <span class="tag-pill outline">
-                                    <c:choose>
-                                        <c:when test="${segnalazione.tipoSegnalazione == 'OGGETTO'}">
-                                            ${segnalazione.categoria}
-                                        </c:when>
-                                        <c:otherwise>
-                                            ${segnalazione.specie}
-                                        </c:otherwise>
-                                    </c:choose>
-                                </span>
-                            </div>
-                            <span class="date-text">
-                                Pubblicato il
-                                <fmt:formatDate value="${segnalazione.dataPubblicazione}" pattern="dd MMM yyyy"/>
-                            </span>
-                        </div>
-
-                        <h1 class="local-title">${segnalazione.titolo}</h1>
-
-                        <div class="description-box">
-                            <p class="local-text">${segnalazione.descrizione}</p>
-                        </div>
-
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <span class="material-icons">event</span>
-                                <div>
-                                    <span class="label">Data Ritrovamento</span>
-                                    <span class="value">
-                                        <fmt:formatDate value="${segnalazione.dataRitrovamento}"
-                                                        pattern="dd MMMM yyyy"/>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="info-item">
-                                <span class="material-icons">location_on</span>
-                                <div>
-                                    <span class="label">Luogo</span>
-                                    <span class="value">${segnalazione.luogoRitrovamento}</span>
-                                    <span class="sub-value">${segnalazione.citta} (${segnalazione.provincia})</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="itemMap" class="mini-map"></div>
-
-                        <% if (isDropPoint) { %>
-                        <div class="delivery-box purple">
-                            <div class="icon-box"><span class="material-icons">store</span></div>
-                            <div>
-                                <h4>Consegna tramite Drop-Point</h4>
-                                <p>L'oggetto si trova in un negozio partner. Richiedi il claim per ottenere il codice di
-                                    ritiro.</p>
-                            </div>
-                        </div>
-                        <% } else { %>
-                        <div class="delivery-box green">
-                            <div class="icon-box"><span class="material-icons">handshake</span></div>
-                            <div>
-                                <h4>Consegna Diretta</h4>
-                                <p>Incontro diretto tra Finder e Proprietario. Accordatevi in un luogo sicuro.</p>
-                            </div>
-                        </div>
-                        <% } %>
-                    </div>
-                </div>
-            </div>
-
-            <aside class="sidebar">
-
-                    <%-- UTENTE NON OWNER (potenziale proprietario) --%>
-                <c:if test="<%= !isOwner %>">
-                    <div class="sidebar-card action-card">
-                        <h3 class="sidebar-title">È tuo questo oggetto?</h3>
-
-                            <%-- NON LOGGATO: invito al login --%>
-                        <c:if test="<%= !isLogged %>">
-                            <div class="login-prompt">
-                                <p>Accedi per dimostrare di essere il proprietario.</p>
-                                <a href="${pageContext.request.contextPath}/login" class="btn-primary full-width">
-                                    Accedi per Reclamare
-                                </a>
-                            </div>
-                        </c:if>
-
-                            <%-- LOGGATO --%>
-                        <c:if test="<%= isLogged %>">
-                            <c:choose>
-                                <%-- ESISTE GIÀ UN MIO RECLAMO --%>
-                                <c:when test="${not empty mioReclamo}">
-
-                                    <c:if test="${mioReclamo.stato == 'IN_ATTESA'}">
-                                        <div class="status-box pending">
-                                            <span class="material-icons">hourglass_top</span>
-                                            <h4>Richiesta Inviata</h4>
-                                            <p>Il finder sta valutando le tue risposte.</p>
-                                        </div>
-                                    </c:if>
-
-                                    <c:if test="${mioReclamo.stato == 'RIFIUTATO'}">
-                                        <div class="status-box rejected">
-                                            <span class="material-icons">error_outline</span>
-                                            <h4>Richiesta Rifiutata</h4>
-                                            <p>Le risposte non erano corrette.</p>
-                                        </div>
-                                    </c:if>
-
-                                    <c:if test="${mioReclamo.stato == 'ACCETTATO'}">
-                                        <div class="status-box winner">
-                                            <div class="confetti-icon">🎉</div>
-                                            <h4>Congratulazioni!</h4>
-                                            <p>L'oggetto è tuo.</p>
-
-                                            <c:if test="${not empty mioReclamo.codiceConsegna}">
-                                                <div class="code-display">
-                                                    <small>CODICE DI RITIRO</small>
-                                                    <div class="the-code">${mioReclamo.codiceConsegna}</div>
-                                                </div>
-
-                                                <c:if test="${not empty dropPointRitiro}">
-                                                    <div class="dp-pickup-info">
-                                                        <div class="pickup-header">
-                                                            <span class="material-icons">store</span>
-                                                            <strong>Ritira presso:</strong>
-                                                        </div>
-                                                        <div class="dp-name">${dropPointRitiro.nomeAttivita}</div>
-                                                        <div class="dp-address">
-                                                                ${dropPointRitiro.indirizzo}, ${dropPointRitiro.citta}
-                                                        </div>
-                                                        <div class="dp-hours">
-                                                            <span class="material-icons">schedule</span>
-                                                                ${dropPointRitiro.orariApertura}
-                                                        </div>
-                                                        <a href="https://www.google.com/maps/search/?api=1&query=${dropPointRitiro.latitudine},${dropPointRitiro.longitudine}"
-                                                           target="_blank" class="btn-map-nav">
-                                                            <span class="material-icons">directions</span>
-                                                            Naviga al Drop-Point
-                                                        </a>
-                                                    </div>
-                                                </c:if>
-                                            </c:if>
-
-                                            <c:if test="${empty mioReclamo.codiceConsegna}">
-                                                <div class="contact-card">
-                                                    <div class="contact-header">
-                                                        <span class="material-icons">person</span>
-                                                        Contatti del Finder
-                                                    </div>
-                                                    <div class="contact-row">
-                                                        <strong>Nome:</strong>
-                                                            ${proprietarioSegnalazione.nome} ${proprietarioSegnalazione.cognome}
-                                                    </div>
-                                                    <div class="contact-row">
-                                                        <strong>Email:</strong>
-                                                        <a href="mailto:${proprietarioSegnalazione.email}">
-                                                                ${proprietarioSegnalazione.email}
-                                                        </a>
-                                                    </div>
-                                                    <div class="contact-row">
-                                                        <strong>Tel:</strong>
-                                                        <a href="tel:${proprietarioSegnalazione.telefono}">
-                                                                ${proprietarioSegnalazione.telefono}
-                                                        </a>
-                                                    </div>
-                                                    <p class="contact-note">
-                                                        Contattalo per accordarvi sulla restituzione.
-                                                    </p>
-                                                </div>
-                                            </c:if>
-                                        </div>
-                                    </c:if>
-
-                                </c:when>
-
-                                <%-- NESSUN MIO RECLAMO ANCORA --%>
-                                <c:otherwise>
-                                    <c:choose>
-                                        <%-- SEGNALAZIONE APERTA: mostra form reclamo --%>
-                                        <c:when test="${segnalazione.stato == 'APERTA'}">
-                                            <p class="claim-intro">
-                                                Rispondi alle domande di sicurezza impostate dal Finder.
-                                            </p>
-                                            <form action="${pageContext.request.contextPath}/gestione-reclamo"
-                                                  method="post" class="claim-form">
-                                                <input type="hidden" name="action" value="invia">
-                                                <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-
-                                                <div class="form-group">
-                                                    <label class="q-label">
-                                                        1. ${segnalazione.domandaVerifica1}
-                                                    </label>
-                                                    <input type="text" name="risposta1" required
-                                                           class="form-input" placeholder="La tua risposta...">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="q-label">
-                                                        2. ${segnalazione.domandaVerifica2}
-                                                    </label>
-                                                    <input type="text" name="risposta2" required
-                                                           class="form-input" placeholder="La tua risposta...">
-                                                </div>
-                                                <button class="btn-primary full-width">Invia Reclamo</button>
-                                            </form>
-                                        </c:when>
-
-                                        <%-- SEGNALAZIONE CHIUSA: avviso --%>
-                                        <c:otherwise>
-                                            <div class="status-box closed-public">
-                                                <span class="material-icons">lock</span>
-                                                <h4>Segnalazione Chiusa</h4>
-                                                <p>Questo oggetto è stato già assegnato al legittimo proprietario.</p>
-                                            </div>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </c:otherwise>
-                            </c:choose>
-                        </c:if>
-                    </div>
-                </c:if>
-
-                    <%-- OWNER (FINDER): pannello gestione reclami --%>
-                <c:if test="<%= isOwner %>">
-                    <div class="sidebar-card owner-card">
-                        <div class="owner-header">
-                            <span class="material-icons">admin_panel_settings</span>
-                            <h3>Gestione Finder</h3>
-                        </div>
-
-                        <div class="claims-section">
-                            <h4>Reclami Ricevuti (${reclamiRicevuti != null ? reclamiRicevuti.size() : 0})</h4>
-
-                            <c:if test="${empty reclamiRicevuti}">
-                                <div class="empty-claims">
-                                    <span class="material-icons">inbox</span>
-                                    <p>Nessun reclamo ricevuto ancora.</p>
-                                </div>
-                            </c:if>
-
-                            <div class="claims-list">
-                                <c:forEach var="r" items="${reclamiRicevuti}">
-                                    <div class="claim-card">
-                                        <div class="claim-header">
-                                                <%-- MODIFICA QUI: Uso l'oggetto Utente dalla mappa --%>
-                                            <c:set var="richiedente" value="${mappaRichiedenti[r.idUtenteRichiedente]}" />
-                                            <strong>@${richiedente.username}</strong>
-
-                                            <span class="date">
-                                                <fmt:formatDate value="${r.dataRichiesta}" pattern="dd/MM"/>
-                                            </span>
-                                        </div>
-
-                                        <div class="claim-answers">
-                                            <div class="qa-pair">
-                                                <small>Risposta 1:</small>
-                                                <span>${r.rispostaVerifica1}</span>
-                                            </div>
-                                            <div class="qa-pair">
-                                                <small>Risposta 2:</small>
-                                                <span>${r.rispostaVerifica2}</span>
-                                            </div>
-                                        </div>
-
-                                        <c:if test="${r.stato == 'IN_ATTESA'}">
-                                            <div class="action-buttons-row">
-                                                <form action="${pageContext.request.contextPath}/gestione-reclamo"
-                                                      method="post" class="action-form">
-                                                    <input type="hidden" name="action" value="accetta">
-                                                    <input type="hidden" name="idReclamo" value="${r.id}">
-                                                    <input type="hidden" name="idSegnalazione"
-                                                           value="${segnalazione.id}">
-                                                    <button class="btn-accept">Accetta</button>
-                                                </form>
-
-                                                <form action="${pageContext.request.contextPath}/gestione-reclamo"
-                                                      method="post" class="action-form"
-                                                      onsubmit="return confirm('Sei sicuro di voler rifiutare questa richiesta?');">
-                                                    <input type="hidden" name="action" value="rifiuta">
-                                                    <input type="hidden" name="idReclamo" value="${r.id}">
-                                                    <input type="hidden" name="idSegnalazione"
-                                                           value="${segnalazione.id}">
-                                                    <button class="btn-reject">Rifiuta</button>
-                                                </form>
-                                            </div>
-                                        </c:if>
-
-                                            <%-- BOX VINCITORE PER IL FINDER --%>
-                                        <c:if test="${r.stato == 'ACCETTATO'}">
-                                            <div class="status-box winner" style="margin-top: 15px;">
-                                                <div class="confetti-icon">🎉</div>
-                                                <h4>Accettato!</h4>
-
-                                                <c:if test="${not empty r.codiceConsegna}">
-                                                    <div class="code-display">
-                                                        <small>CODICE DI RITIRO</small>
-                                                        <div class="the-code">${r.codiceConsegna}</div>
-                                                    </div>
-                                                </c:if>
-
-                                                    <%-- DATI DEL PROPRIETARIO (richiedente vincente) --%>
-                                                <c:if test="${not empty richiedente}">
-                                                    <div class="contact-card owner-view">
-                                                        <div class="contact-header">
-                                                            <span class="material-icons">person</span>
-                                                            Contatti Proprietario
-                                                        </div>
-                                                        <div class="contact-row">
-                                                            <strong>Nome:</strong>
-                                                                ${richiedente.nome} ${richiedente.cognome}
-                                                        </div>
-                                                        <div class="contact-row">
-                                                            <strong>Email:</strong>
-                                                            <a href="mailto:${richiedente.email}">
-                                                                    ${richiedente.email}
-                                                            </a>
-                                                        </div>
-                                                        <div class="contact-row">
-                                                            <strong>Tel:</strong>
-                                                            <a href="tel:${richiedente.telefono}">
-                                                                    ${richiedente.telefono}
-                                                            </a>
-                                                        </div>
-                                                        <p class="contact-note">
-                                                            Contattalo per accordarvi sulla restituzione.
-                                                        </p>
-                                                    </div>
-                                                </c:if>
-                                            </div>
-                                        </c:if>
-
-                                        <c:if test="${r.stato == 'RIFIUTATO'}">
-                                            <div class="rejected-badge"
-                                                 style="margin-top: 8px; color: #C62828; font-weight: 700; font-size: 0.9rem; text-align: center;">
-                                                <span class="material-icons"
-                                                      style="font-size: 16px; vertical-align: middle;">cancel</span>
-                                                Rifiutato
-                                            </div>
-                                        </c:if>
-                                    </div>
-                                </c:forEach>
-                            </div>
-                        </div>
-
-                        <div class="danger-zone">
-                            <form action="${pageContext.request.contextPath}/dettaglio-segnalazione"
-                                  method="post"
-                                  onsubmit="return confirm('Eliminare definitivamente questa segnalazione?');">
-                                <input type="hidden" name="action" value="delete">
-                                <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-                                <button class="btn-danger full-width">
-                                    <span class="material-icons">delete</span>
-                                    Elimina Segnalazione
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </c:if>
-
-            </aside>
-
-        </div>
-    </c:if>
-</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var lat = ${segnalazione.latitudine != null ? segnalazione.latitudine : 'null'};
-        var lon = ${segnalazione.longitudine != null ? segnalazione.longitudine : 'null'};
-
-        if (lat && lon) {
-            var map = L.map('itemMap').setView([lat, lon], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-
-            L.marker([lat, lon]).addTo(map)
-                .bindPopup("<b>${segnalazione.titolo}</b><br>${segnalazione.luogoRitrovamento}")
-                .openPopup();
-        } else {
-            document.getElementById('itemMap').style.display = 'none';
-        }
-    });
-</script>
 
 </body>
 </html>
@@ -10991,6 +10629,311 @@ public class UtenteDAO {
 }
 </file>
 
+<file path="src/main/webapp/WEB-INF/jsp/dettaglio_segnalazione.jsp">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ page import="model.bean.Utente" %>
+<%@ page import="model.bean.Reclamo" %>
+<%@ page import="model.bean.enums.ModalitaConsegna" %>
+<%@ page import="model.bean.SegnalazioneOggetto" %>
+<%@ page import="model.bean.enums.StatoReclamo" %>
+<%@ page import="model.bean.enums.StatoSegnalazione" %>
+<%@ page import="java.util.List" %>
+
+<%
+    model.bean.DropPoint dp = (model.bean.DropPoint) session.getAttribute("dropPoint");
+    model.bean.Utente u = (model.bean.Utente) session.getAttribute("utente");
+
+    if (dp != null) { response.sendRedirect(request.getContextPath() + "/area-drop-point"); return; }
+    if (u == null) { response.sendRedirect(request.getContextPath() + "/login"); return; }
+
+    Utente utente = (Utente) session.getAttribute("utente");
+    model.bean.Segnalazione s = (model.bean.Segnalazione) request.getAttribute("segnalazione");
+    boolean isLogged = (utente != null);
+    boolean isOwner = (isLogged && s != null && s.getIdUtente() == utente.getId());
+
+    // Controllo Modalità Consegna
+    boolean isDropPoint = false;
+    if (s instanceof SegnalazioneOggetto) {
+        SegnalazioneOggetto so = (SegnalazioneOggetto) s;
+        if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
+            isDropPoint = true;
+        }
+    }
+
+    // Recupero Reclamo Accettato
+    List<Reclamo> reclami = (List<Reclamo>) request.getAttribute("reclamiRicevuti");
+    Reclamo reclamoAccettato = null;
+
+    if(reclami != null) {
+        for(Reclamo r : reclami) {
+            if(r.getStato() == StatoReclamo.ACCETTATO) { reclamoAccettato = r; break; }
+        }
+    }
+    if(reclamoAccettato == null) {
+        Reclamo mio = (Reclamo) request.getAttribute("mioReclamo");
+        if(mio != null && mio.getStato() == StatoReclamo.ACCETTATO) {
+            reclamoAccettato = mio;
+        }
+    }
+%>
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <title>${segnalazione.titolo != null ? segnalazione.titolo : "Dettaglio"} - Foundly</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+
+<jsp:include page="/WEB-INF/jsp/navbar.jsp"/>
+
+<div class="local-wrapper">
+
+    <a href="${pageContext.request.contextPath}/index" class="local-back-link">
+        <span class="material-icons">arrow_back</span> Torna alla Home
+    </a>
+
+    <c:if test="${segnalazione == null}">
+        <div class="local-card empty-card" style="text-align:center; padding:40px;">
+            <h2>Segnalazione non trovata</h2>
+            <a href="${pageContext.request.contextPath}/index" class="btn-primary" style="display:inline-block; width:auto; margin-top:10px;">Vai alla Home</a>
+        </div>
+    </c:if>
+
+    <c:if test="${segnalazione != null}">
+        <div class="local-grid">
+
+            <div class="main-content">
+                <div class="local-card hero-card">
+                    <div class="image-container">
+                        <c:choose>
+                            <c:when test="${not empty segnalazione.immagine}">
+                                <img src="${pageContext.request.contextPath}/segnalazione-img?id=${segnalazione.id}" class="local-hero-img">
+                            </c:when>
+                            <c:otherwise>
+                                <div class="local-hero-placeholder"><span class="material-icons">image_not_supported</span></div>
+                            </c:otherwise>
+                        </c:choose>
+                        <div class="status-overlay">
+                            <span class="status-badge ${segnalazione.stato == 'CHIUSA' ? 'status-closed' : 'status-open'}">
+                                    ${segnalazione.stato}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="local-content">
+                        <div class="header-row">
+                            <div class="category-tags">
+                                <span class="tag-pill">${segnalazione.tipoSegnalazione}</span>
+                                <c:if test="${segnalazione.tipoSegnalazione == 'OGGETTO'}">
+                                    <span class="tag-pill outline">${segnalazione.categoria}</span>
+                                </c:if>
+                                <c:if test="${segnalazione.tipoSegnalazione == 'ANIMALE'}">
+                                    <span class="tag-pill outline">${segnalazione.specie}</span>
+                                </c:if>
+                            </div>
+                            <span class="date-text">
+                                Pubblicato il <fmt:formatDate value="${segnalazione.dataPubblicazione}" pattern="dd MMM yyyy"/>
+                            </span>
+                        </div>
+
+                        <h1 class="local-title">${segnalazione.titolo}</h1>
+                        <p class="local-text">${segnalazione.descrizione}</p>
+
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="material-icons">event</span>
+                                <div><span class="label">Data Ritrovamento</span><span class="value"><fmt:formatDate value="${segnalazione.dataRitrovamento}" pattern="dd MMMM yyyy"/></span></div>
+                            </div>
+                            <div class="info-item">
+                                <span class="material-icons">location_on</span>
+                                <div><span class="label">Luogo</span><span class="value">${segnalazione.luogoRitrovamento}</span><span class="sub-value">${segnalazione.citta} (${segnalazione.provincia})</span></div>
+                            </div>
+                        </div>
+
+                        <div id="itemMap" class="mini-map"></div>
+
+                        <% if (isDropPoint) { %>
+                        <div class="delivery-box purple">
+                            <div class="icon-box"><span class="material-icons">store</span></div>
+                            <div><h4>Drop-Point</h4><p>Ritiro presso negozio partner autorizzato.</p></div>
+                        </div>
+                        <% } else { %>
+                        <div class="delivery-box green">
+                            <div class="icon-box"><span class="material-icons">handshake</span></div>
+                            <div><h4>Consegna Diretta</h4><p>Accordo diretto tra Finder e Proprietario.</p></div>
+                        </div>
+                        <% } %>
+
+                        <% if (reclamoAccettato != null && !isDropPoint && s.getStato() == StatoSegnalazione.APERTA) { %>
+                        <div class="scambio-action-box">
+                            <h3 class="scambio-title"><span class="material-icons">published_with_changes</span> Scambio in Corso</h3>
+                            <p style="color:#5D4037; margin-bottom:20px;">
+                                Ottimo! Il reclamo è stato accettato. Incontratevi per lo scambio.<br>
+                                Per chiudere la pratica e assegnare i punti, <strong>entrambi dovete confermare</strong>.
+                            </p>
+                            <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post">
+                                <input type="hidden" name="action" value="conferma_scambio">
+                                <input type="hidden" name="idReclamo" value="<%= reclamoAccettato.getId() %>">
+                                <input type="hidden" name="idSegnalazione" value="<%= s.getId() %>">
+
+                                <% if (isOwner) { %>
+                                <% if (reclamoAccettato.isConfermaFinder()) { %>
+                                <button type="button" class="btn-disabled"><span class="material-icons" style="vertical-align: middle;">check_circle</span> Hai confermato</button>
+                                <% } else { %>
+                                <button type="submit" class="btn-primary" style="background: #2E7D32;"><span class="material-icons" style="vertical-align: middle;">send</span> Conferma Consegna</button>
+                                <% } %>
+                                <% } %>
+
+                                <% if (utente.getId() == reclamoAccettato.getIdUtenteRichiedente()) { %>
+                                <% if (reclamoAccettato.isConfermaOwner()) { %>
+                                <button type="button" class="btn-disabled"><span class="material-icons" style="vertical-align: middle;">check_circle</span> Hai confermato</button>
+                                <% } else { %>
+                                <button type="submit" class="btn-primary" style="background: #1565C0;"><span class="material-icons" style="vertical-align: middle;">inventory</span> Conferma Ricezione</button>
+                                <% } %>
+                                <% } %>
+                            </form>
+                            <div class="scambio-status">
+                                    <span class="status-pill <%= reclamoAccettato.isConfermaFinder() ? "done" : "" %>">
+                                        <span class="material-icons" style="font-size:16px"><%= reclamoAccettato.isConfermaFinder() ? "check" : "hourglass_empty" %></span> Finder
+                                    </span>
+                                <span class="status-pill <%= reclamoAccettato.isConfermaOwner() ? "done" : "" %>">
+                                        <span class="material-icons" style="font-size:16px"><%= reclamoAccettato.isConfermaOwner() ? "check" : "hourglass_empty" %></span> Owner
+                                    </span>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="sidebar">
+                    <%-- UTENTE RICHIEDENTE (NON FINDER) --%>
+                <c:if test="<%= !isOwner %>">
+                    <c:choose>
+                        <%-- RECLAMO ACCETTATO (WINNER BOX) --%>
+                        <c:when test="${not empty mioReclamo && mioReclamo.stato == 'ACCETTATO'}">
+                            <div class="winner-card">
+                                <div class="confetti-icon">🎉</div>
+                                <h4>Congratulazioni!</h4>
+                                <p>Il tuo reclamo è stato accettato.</p>
+
+                                    <%-- SE C'È CODICE (DROP POINT) --%>
+                                <c:if test="${not empty mioReclamo.codiceConsegna}">
+                                    <div style="background:rgba(255,255,255,0.2); padding:10px; border-radius:8px; margin-bottom:15px;">
+                                        <small>CODICE RITIRO:</small>
+                                        <div style="font-size:1.8rem; font-weight:800; letter-spacing:2px; margin-top:5px;">${mioReclamo.codiceConsegna}</div>
+                                    </div>
+                                    <p style="font-size:0.9rem;">Mostra questo codice al Drop-Point per ritirare l'oggetto.</p>
+                                </c:if>
+
+                                <div class="contact-box-white">
+                                    <div style="margin-bottom:10px; font-weight:bold; color:#E65100;">Contatti del Finder</div>
+                                    <div class="contact-row"><span class="material-icons">person</span><span>${proprietarioSegnalazione.nome} ${proprietarioSegnalazione.cognome}</span></div>
+                                    <div class="contact-row"><span class="material-icons">email</span><a href="mailto:${proprietarioSegnalazione.email}">${proprietarioSegnalazione.email}</a></div>
+                                    <div class="contact-row"><span class="material-icons">phone</span><a href="tel:${proprietarioSegnalazione.telefono}">${proprietarioSegnalazione.telefono}</a></div>
+                                </div>
+                            </div>
+                        </c:when>
+
+                        <c:otherwise>
+                            <div class="sidebar-card action-card">
+                                <h3 class="sidebar-title">È tuo questo oggetto?</h3>
+                                <c:if test="${not empty mioReclamo}">
+                                    <div style="padding:15px; background:#f5f5f5; border-radius:8px; text-align:center;">Stato Richiesta: <strong>${mioReclamo.stato}</strong></div>
+                                </c:if>
+                                <c:if test="${empty mioReclamo && segnalazione.stato == 'APERTA'}">
+
+                                    <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post">
+                                        <input type="hidden" name="action" value="invia">
+                                        <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
+
+                                        <label style="font-size:0.9rem; margin-bottom:5px;">1. ${segnalazione.domandaVerifica1}</label>
+                                        <input type="text" name="risposta1" required class="form-input">
+
+                                        <label style="font-size:0.9rem; margin-bottom:5px;">2. ${segnalazione.domandaVerifica2}</label>
+                                        <input type="text" name="risposta2" required class="form-input">
+
+                                        <button class="btn-primary full-width">Invia Reclamo</button>
+                                    </form>
+
+                                </c:if>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                </c:if>
+
+                    <%-- UTENTE FINDER (Gestione) --%>
+                <c:if test="<%= isOwner %>">
+                    <div class="sidebar-card owner-card">
+                        <h3 class="sidebar-title">Gestione Reclami</h3>
+                        <c:if test="${empty reclamiRicevuti}"><p style="color:#999; font-style:italic;">Nessuna richiesta ricevuta.</p></c:if>
+                        <c:forEach var="r" items="${reclamiRicevuti}">
+                            <div class="claim-card">
+                                <div class="claim-header">
+                                    <strong>Richiesta #${r.id}</strong>
+                                    <span style="font-size:0.8rem; color:#666;"><fmt:formatDate value="${r.dataRichiesta}" pattern="dd/MM HH:mm"/></span>
+                                </div>
+                                <div style="font-size:0.9rem; margin-bottom:10px;">
+                                    R1: <i>${r.rispostaVerifica1}</i><br>R2: <i>${r.rispostaVerifica2}</i>
+                                </div>
+                                <c:if test="${r.stato == 'IN_ATTESA'}">
+                                    <div style="display:flex; gap:5px;">
+                                        <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post" style="flex:1;">
+                                            <input type="hidden" name="action" value="accetta"><input type="hidden" name="idReclamo" value="${r.id}"><input type="hidden" name="idSegnalazione" value="${segnalazione.id}"><button class="btn-accept" style="width:100%;">Accetta</button>
+                                        </form>
+                                        <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post" style="flex:1;">
+                                            <input type="hidden" name="action" value="rifiuta"><input type="hidden" name="idReclamo" value="${r.id}"><input type="hidden" name="idSegnalazione" value="${segnalazione.id}"><button class="btn-reject" style="width:100%;">Rifiuta</button>
+                                        </form>
+                                    </div>
+                                </c:if>
+                                <c:if test="${r.stato == 'ACCETTATO'}">
+                                    <div style="text-align:center; margin-top:10px;">
+                                        <span style="color:green; font-weight:bold;">ACCETTATO</span>
+                                        <c:if test="${not empty r.codiceConsegna}">
+                                            <div style="background:#E8F5E9; padding:5px; border-radius:4px; margin-top:5px; font-family:monospace; font-weight:bold;">COD: ${r.codiceConsegna}</div>
+                                        </c:if>
+                                    </div>
+                                </c:if>
+                                <c:if test="${r.stato == 'RIFIUTATO'}">
+                                    <div style="text-align:center; color:red; font-weight:bold;">RIFIUTATO</div>
+                                </c:if>
+                            </div>
+                        </c:forEach>
+                        <form action="${pageContext.request.contextPath}/dettaglio-segnalazione" method="post" onsubmit="return confirm('Eliminare definitivamente questa segnalazione?');">
+                            <input type="hidden" name="action" value="delete"><input type="hidden" name="idSegnalazione" value="${segnalazione.id}"><button class="btn-danger"><span class="material-icons">delete</span> Elimina Segnalazione</button>
+                        </form>
+                    </div>
+                </c:if>
+            </aside>
+
+        </div>
+    </c:if>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var lat = ${segnalazione.latitudine != null ? segnalazione.latitudine : 'null'};
+        var lon = ${segnalazione.longitudine != null ? segnalazione.longitudine : 'null'};
+        if (lat && lon) {
+            var map = L.map('itemMap').setView([lat, lon], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
+            L.marker([lat, lon]).addTo(map).bindPopup("<b>${segnalazione.titolo}</b><br>${segnalazione.luogoRitrovamento}").openPopup();
+        } else { document.getElementById('itemMap').style.display = 'none'; }
+    });
+</script>
+
+</body>
+</html>
+</file>
+
 <file path="src/main/java/controller/LoginServlet.java">
 package controller;
 
@@ -11062,196 +11005,6 @@ public class LoginServlet extends HttpServlet {
         request.setAttribute("errore", "Email o Password non validi.");
         request.getRequestDispatcher("/WEB-INF/jsp/login.jsp")
                 .forward(request, response);
-    }
-}
-</file>
-
-<file path="src/main/java/model/service/DropPointService.java">
-package model.service;
-
-import model.bean.DropPoint;
-import model.bean.enums.StatoDropPoint;
-import model.dao.DropPointDAO;
-import model.utils.PasswordUtils;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-public class DropPointService {
-
-    private final DropPointDAO dropPointDAO = new DropPointDAO();
-
-    // ==========================
-    //  REGISTRAZIONE / LOGIN
-    // ==========================
-
-    public boolean registraDropPoint(String nomeAttivita, String email, String password,
-                                     String indirizzo, String citta, String provincia,
-                                     String telefono, String orari,
-                                     Double latitudine, Double longitudine) {
-
-        if (dropPointDAO.doRetrieveByEmail(email) != null) {
-            return false;
-        }
-
-        DropPoint dp = new DropPoint();
-        dp.setNomeAttivita(nomeAttivita);
-        dp.setEmail(email);
-        dp.setPasswordHash(PasswordUtils.hashPassword(password));
-        dp.setIndirizzo(indirizzo);
-        dp.setCitta(citta);
-        dp.setProvincia(provincia);
-        dp.setTelefono(telefono);
-        dp.setOrariApertura(orari);
-        dp.setLatitudine(latitudine);
-        dp.setLongitudine(longitudine);
-
-        dp.setStato(StatoDropPoint.IN_ATTESA);
-        dp.setRitiriEffettuati(0);
-
-        // Nessuna immagine in registrazione (BLOB null)
-        dp.setImmagine(null);
-        dp.setImmagineContentType(null);
-
-        return dropPointDAO.doSave(dp);
-    }
-
-    public DropPoint login(String email, String password) {
-        DropPoint dp = dropPointDAO.doRetrieveByEmail(email);
-        if (dp == null) return null;
-
-        if (!PasswordUtils.checkPassword(password, dp.getPasswordHash())) {
-            return null;
-        }
-
-        // ricarico dal DB così ho lo stato aggiornato (APPROVATO / IN_ATTESA / RIFIUTATO)
-        return dropPointDAO.doRetrieveById(dp.getId());
-    }
-
-    // ==========================
-    //   QUERY DI SUPPORTO
-    // ==========================
-
-    /** Drop-Point approvati per la mappa/pubblico. */
-    public List<DropPoint> findAllApprovati() {
-        return dropPointDAO.doRetrieveAllApprovati();
-    }
-
-    /** Drop-Point in attesa per l’area admin. */
-    public List<DropPoint> findAllInAttesa() {
-        return dropPointDAO.doRetrieveByStato(StatoDropPoint.IN_ATTESA);
-    }
-
-    /** Approvazione da Area Admin. */
-    public boolean approvaDropPoint(long id) {
-        return dropPointDAO.updateStato(id, StatoDropPoint.APPROVATO);
-    }
-
-    /** Rifiuto da Area Admin. */
-    public boolean rifiutaDropPoint(long id) {
-        return dropPointDAO.updateStato(id, StatoDropPoint.RIFIUTATO);
-    }
-
-    /** Recupero per id. */
-    public DropPoint trovaPerId(long id) {
-        return dropPointDAO.doRetrieveById(id);
-    }
-
-    // =====================================================
-    //   LOGICA IN-MEMORY DEPOSITO / RITIRO (NO DB CHANGE)
-    // =====================================================
-
-    private enum StatoOperazione {
-        DEPOSITATO,
-        RITIRATO
-    }
-
-    /**
-     * Mappa: idDropPoint -> (codiceConsegna -> stato operazione)
-     * È statica così vale per tutta la JVM (finché il server resta acceso).
-     */
-    private static final Map<Long, Map<String, StatoOperazione>> operazioniByDropPoint =
-            new ConcurrentHashMap<>();
-
-    private Map<String, StatoOperazione> getMappaOperazioni(long idDropPoint) {
-        return operazioniByDropPoint.computeIfAbsent(idDropPoint,
-                k -> new ConcurrentHashMap<>());
-    }
-
-    /**
-     * Registra un DEPOSITO per quel Drop-Point e codice.
-     * Ritorna false se il codice è già stato usato (depositato o ritirato).
-     */
-    public synchronized boolean registraDeposito(long idDropPoint, String codiceConsegna) {
-        if (codiceConsegna == null || codiceConsegna.isBlank()) {
-            return false;
-        }
-
-        Map<String, StatoOperazione> mappa = getMappaOperazioni(idDropPoint);
-        StatoOperazione stato = mappa.get(codiceConsegna);
-
-        if (stato == null) {
-            mappa.put(codiceConsegna, StatoOperazione.DEPOSITATO);
-            return true;
-        }
-
-        // se esiste già, non permetto un secondo deposito con lo stesso codice
-        return false;
-    }
-
-    /**
-     * Registra un RITIRO.
-     * È consentito SOLO se prima esisteva un DEPOSITATO per quel codice.
-     */
-    public synchronized boolean registraRitiro(long idDropPoint, String codiceConsegna) {
-        if (codiceConsegna == null || codiceConsegna.isBlank()) {
-            return false;
-        }
-
-        Map<String, StatoOperazione> mappa = getMappaOperazioni(idDropPoint);
-        StatoOperazione stato = mappa.get(codiceConsegna);
-
-        // posso ritirare solo se prima è stato registrato un deposito
-        if (stato == StatoOperazione.DEPOSITATO) {
-            mappa.put(codiceConsegna, StatoOperazione.RITIRATO);
-            return true;
-        }
-
-        return false; // nessun deposito, o già ritirato
-    }
-
-    // ---------- Contatori per dashboard ----------
-
-    public int countDepositiAttivi(long idDropPoint) {
-        Map<String, StatoOperazione> mappa = operazioniByDropPoint.get(idDropPoint);
-        if (mappa == null) return 0;
-
-        int c = 0;
-        for (StatoOperazione s : mappa.values()) {
-            if (s == StatoOperazione.DEPOSITATO) c++;
-        }
-        return c;
-    }
-
-    public int countConsegneCompletate(long idDropPoint) {
-        Map<String, StatoOperazione> mappa = operazioniByDropPoint.get(idDropPoint);
-        if (mappa == null) return 0;
-
-        int c = 0;
-        for (StatoOperazione s : mappa.values()) {
-            if (s == StatoOperazione.RITIRATO) c++;
-        }
-        return c;
-    }
-
-    public int countTotaleOperazioni(long idDropPoint) {
-        Map<String, StatoOperazione> mappa = operazioniByDropPoint.get(idDropPoint);
-        return (mappa == null) ? 0 : mappa.size();
-    }
-    /** Aggiornamento profilo Drop-Point (dati + logo). */
-    public boolean aggiornaProfilo(DropPoint dropPoint) {
-        return dropPointDAO.updateProfilo(dropPoint);
     }
 }
 </file>
@@ -11462,6 +11215,171 @@ public class UtenteService {
     /** Ban = cancellazione account. */
     public boolean cancellaUtente(long id) {
         return utenteDAO.deleteById(id);
+    }
+}
+</file>
+
+<file path="src/main/java/model/service/DropPointService.java">
+package model.service;
+
+import model.bean.DropPoint;
+import model.bean.Reclamo;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoDropPoint;
+import model.bean.enums.StatoSegnalazione;
+import model.dao.DropPointDAO;
+import model.dao.ReclamoDAO;
+import model.dao.SegnalazioneDAO;
+import model.utils.PasswordUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class DropPointService {
+
+    private final DropPointDAO dropPointDAO = new DropPointDAO();
+    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
+    private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
+    private final UtenteService utenteService = new UtenteService();
+
+    // ==========================
+    //  REGISTRAZIONE / LOGIN
+    // ==========================
+
+    public boolean registraDropPoint(String nomeAttivita, String email, String password,
+                                     String indirizzo, String citta, String provincia,
+                                     String telefono, String orari,
+                                     Double latitudine, Double longitudine) {
+
+        if (dropPointDAO.doRetrieveByEmail(email) != null) {
+            return false;
+        }
+
+        DropPoint dp = new DropPoint();
+        dp.setNomeAttivita(nomeAttivita);
+        dp.setEmail(email);
+        dp.setPasswordHash(PasswordUtils.hashPassword(password));
+        dp.setIndirizzo(indirizzo);
+        dp.setCitta(citta);
+        dp.setProvincia(provincia);
+        dp.setTelefono(telefono);
+        dp.setOrariApertura(orari);
+        dp.setLatitudine(latitudine);
+        dp.setLongitudine(longitudine);
+
+        dp.setStato(StatoDropPoint.IN_ATTESA);
+        dp.setRitiriEffettuati(0);
+        dp.setImmagine(null);
+        dp.setImmagineContentType(null);
+
+        return dropPointDAO.doSave(dp);
+    }
+
+    public DropPoint login(String email, String password) {
+        DropPoint dp = dropPointDAO.doRetrieveByEmail(email);
+        if (dp == null) return null;
+
+        if (!PasswordUtils.checkPassword(password, dp.getPasswordHash())) {
+            return null;
+        }
+        return dropPointDAO.doRetrieveById(dp.getId());
+    }
+
+    // ==========================
+    //   QUERY DI SUPPORTO
+    // ==========================
+
+    public List<DropPoint> findAllApprovati() {
+        return dropPointDAO.doRetrieveAllApprovati();
+    }
+
+    public List<DropPoint> findAllInAttesa() {
+        return dropPointDAO.doRetrieveByStato(StatoDropPoint.IN_ATTESA);
+    }
+
+    public boolean approvaDropPoint(long id) {
+        return dropPointDAO.updateStato(id, StatoDropPoint.APPROVATO);
+    }
+
+    public boolean rifiutaDropPoint(long id) {
+        return dropPointDAO.updateStato(id, StatoDropPoint.RIFIUTATO);
+    }
+
+    public DropPoint trovaPerId(long id) {
+        return dropPointDAO.doRetrieveById(id);
+    }
+
+    // =====================================================
+    //   LOGICA REALE (DB) - SOSTITUISCE QUELLA IN-MEMORY
+    // =====================================================
+
+    /**
+     * Registra un RITIRO (Consegna al proprietario).
+     * Chiude la segnalazione e assegna i punti.
+     */
+    public boolean registraRitiro(long idDropPoint, String codiceConsegna) {
+        if (codiceConsegna == null || codiceConsegna.isBlank()) {
+            return false;
+        }
+
+        // 1. Cerca il reclamo associato a questo codice
+        Reclamo r = reclamoDAO.doRetrieveByCodice(codiceConsegna);
+        if (r == null) {
+            return false; // Codice non esistente
+        }
+
+        // 2. Recupera la segnalazione
+        Segnalazione s = segnalazioneDAO.doRetrieveById(r.getIdSegnalazione());
+        if (s == null) return false;
+
+        // 3. Verifica che la segnalazione sia assegnata a QUESTO DropPoint
+        if (s instanceof SegnalazioneOggetto) {
+            SegnalazioneOggetto so = (SegnalazioneOggetto) s;
+
+            boolean isCorrectDP = (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT
+                    && so.getIdDropPoint() != null
+                    && so.getIdDropPoint() == idDropPoint);
+
+            if (isCorrectDP) {
+                // 4. CHIUDI SEGNALAZIONE
+                boolean chiuso = segnalazioneDAO.updateStato(s.getId(), StatoSegnalazione.CHIUSA);
+
+                if (chiuso) {
+                    // 5. ASSEGNA PUNTI AL FINDER
+                    Utente finder = utenteService.trovaPerId(s.getIdUtente());
+                    if (finder != null) {
+                        utenteService.aggiornaPunteggioEBadge(finder, 1);
+                    }
+
+                    // (Opzionale) Aggiorna contatore ritiri DropPoint nel DB
+                    // dropPointDAO.incrementaRitiri(idDropPoint);
+
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Manteniamo questi metodi per compatibilità, ma ora registraRitiro usa il DB
+    // (registraDeposito può rimanere placeholder o essere implementato similarmente)
+    public boolean registraDeposito(long idDropPoint, String codiceConsegna) {
+        // Implementazione base: verifica solo che il codice esista
+        Reclamo r = reclamoDAO.doRetrieveByCodice(codiceConsegna);
+        return r != null;
+    }
+
+    // Contatori (puoi lasciarli a 0 o implementarli con count DB se vuoi)
+    public int countDepositiAttivi(long idDropPoint) { return 0; }
+    public int countConsegneCompletate(long idDropPoint) { return 0; }
+    public int countTotaleOperazioni(long idDropPoint) { return 0; }
+
+    public boolean aggiornaProfilo(DropPoint dropPoint) {
+        return dropPointDAO.updateProfilo(dropPoint);
     }
 }
 </file>

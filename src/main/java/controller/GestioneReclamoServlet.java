@@ -38,7 +38,7 @@ public class GestioneReclamoServlet extends HttpServlet {
             return;
         }
 
-        // --- AZIONE DROP-POINT: CONFERMA RITIRO ---
+        // --- 1. DROP-POINT: Conferma Ritiro con Codice ---
         if ("conferma_ritiro".equals(action)) {
             if (dropPoint == null) { response.sendRedirect("login"); return; }
             try {
@@ -54,7 +54,7 @@ public class GestioneReclamoServlet extends HttpServlet {
             return;
         }
 
-        // --- AZIONI UTENTE (Finder/Owner) ---
+        // --- 2. AZIONI UTENTE (Finder / Owner) ---
         if (utente == null) { response.sendRedirect("login"); return; }
 
         if ("invia".equals(action)) {
@@ -85,19 +85,25 @@ public class GestioneReclamoServlet extends HttpServlet {
 
             String codice = null;
             boolean isDropPoint = false;
+
+            // VERIFICA SE È DROP-POINT PER GENERARE IL CODICE
             if (s instanceof SegnalazioneOggetto) {
                 SegnalazioneOggetto so = (SegnalazioneOggetto) s;
                 if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
                     isDropPoint = true;
+                    // Genera codice univoco (6 caratteri)
                     codice = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
                 }
             }
 
+            // Salva nel DB (se DropPoint salva codice, se Diretta salva null)
             reclamoDAO.accettaReclamo(idReclamo, codice);
 
             if (isDropPoint) {
+                // Reindirizza con un messaggio che la JSP userà per mostrare il codice
                 response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=attesa_ritiro");
             } else {
+                // Scambio diretto: avvia il flusso dei pulsanti
                 response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=scambio_avviato");
             }
 
@@ -108,7 +114,7 @@ public class GestioneReclamoServlet extends HttpServlet {
             response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_rifiutato");
 
         } else if ("conferma_scambio".equals(action)) {
-            // --- NUOVA AZIONE: DOPPIA CONFERMA ---
+            // SCAMBIO DIRETTO
             long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
             long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
 
