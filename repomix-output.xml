@@ -1326,445 +1326,6 @@ public class PasswordUtils {
 }
 </file>
 
-<file path="src/main/webapp/css/area_admin.css">
-.admin-main {
-    max-width: 1100px;
-    margin: 24px auto 40px;
-    padding: 0 24px 40px;
-}
-
-.admin-section {
-    margin-bottom: 32px;
-}
-
-.admin-title {
-    font-size: 1.6rem;
-    font-weight: 600;
-    margin-bottom: 12px;
-    color: #202124;
-}
-
-.admin-card {
-    background-color: #FFFFFF;
-    border-radius: 18px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    padding: 16px 20px 18px;
-}
-
-.admin-subtitle {
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-bottom: 12px;
-    color: #E65100;
-}
-
-.admin-empty {
-    font-size: 0.95rem;
-    color: #757575;
-    padding: 4px 0 8px;
-}
-
-.admin-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-}
-
-.admin-table th,
-.admin-table td {
-    padding: 10px 14px;
-    text-align: left;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.admin-table th {
-    font-weight: 600;
-    color: #5F6368;
-    background-color: #FAFAFA;
-}
-
-.admin-actions {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-}
-
-.inline-form {
-    display: inline-block;
-}
-
-.btn-admin-approve,
-.btn-admin-reject,
-.btn-admin-delete {
-    padding: 4px 10px;
-    border-radius: 999px;
-    border: none;
-    font-size: 0.8rem;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.btn-admin-approve {
-    background-color: #E8F5E9;
-    color: #2E7D32;
-}
-
-.btn-admin-reject {
-    background-color: #FFEBEE;
-    color: #C62828;
-}
-
-.btn-admin-delete {
-    background-color: #FFF3E0;
-    color: #E65100;
-}
-
-.btn-admin-approve:hover {
-    background-color: #C8E6C9;
-}
-
-.btn-admin-reject:hover {
-    background-color: #FFCDD2;
-}
-
-.btn-admin-delete:hover {
-    background-color: #FFE0B2;
-}
-
-.admin-note {
-    font-size: 0.8rem;
-    color: #9E9E9E;
-}
-/* Rimuove la riga di bordo sotto l'ultima riga della tabella utenti
-   così non si vede la linea "spezzata" sotto Elimina / N/D */
-.admin-table tbody tr:last-child td {
-    border-bottom: none;
-}
-</file>
-
-<file path="src/main/webapp/css/area_drop_point.css">
-/* area_drop_point.css */
-
-.dp-area-main {
-    max-width: 1100px;
-    margin: 30px auto 50px auto;
-    padding: 0 20px 40px 20px;
-    font-family: 'Roboto', sans-serif;
-}
-
-/* HEADER */
-
-.dp-area-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-}
-
-.dp-area-title-block {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.dp-area-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 18px;
-    background: #FFF3E0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.dp-area-icon .material-icons {
-    font-size: 28px;
-    color: #E65100;
-}
-
-.dp-area-title {
-    font-size: 1.4rem;
-    margin: 0;
-    color: #202124;
-}
-
-.dp-area-subtitle {
-    font-size: 0.85rem;
-    margin: 2px 0 0 0;
-    color: #5f6368;
-}
-
-.dp-area-status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    border: 1px solid transparent;
-}
-
-.dp-area-status-badge .material-icons {
-    font-size: 16px;
-}
-
-.status-none {
-    background: #f5f5f5;
-    border-color: #e0e0e0;
-    color: #5f6368;
-}
-
-.status-ok {
-    background: #E8F5E9;
-    border-color: #81C784;
-    color: #2E7D32;
-}
-
-.status-pending {
-    background: #FFF3E0;
-    border-color: #FFB74D;
-    color: #E65100;
-}
-
-/* STATS */
-
-.dp-stats-row {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-    margin-bottom: 24px;
-}
-
-.dp-stat-card {
-    background: #FFFFFF;
-    border-radius: 18px;
-    padding: 16px 18px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    position: relative;
-}
-
-.dp-stat-label {
-    font-size: 0.85rem;
-    color: #5f6368;
-    margin-bottom: 4px;
-}
-
-.dp-stat-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-}
-
-.dp-stat-value.warning { color: #FB8C00; }
-.dp-stat-value.success { color: #2E7D32; }
-.dp-stat-value.info    { color: #1E88E5; }
-
-.dp-stat-icon {
-    position: absolute;
-    right: 14px;
-    top: 14px;
-    font-size: 22px;
-    opacity: 0.35;
-}
-
-/* ALERT */
-
-.dp-alert {
-    margin-bottom: 16px;
-    border-radius: 12px;
-    padding: 10px 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-}
-
-.dp-alert .material-icons {
-    font-size: 18px;
-}
-
-.dp-alert-warning {
-    background: #FFF8E1;
-    color: #E65100;
-}
-
-.dp-alert-error {
-    background: #FFEBEE;
-    color: #C62828;
-}
-
-.dp-alert-info {
-    background: #E3F2FD;
-    color: #1565C0;
-}
-
-/* BOTTONI GRANDI AZIONE */
-
-.dp-actions-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
-    margin-bottom: 24px;
-}
-
-.dp-big-action {
-    border: none;
-    border-radius: 20px;
-    padding: 18px 20px;
-    text-align: left;
-    background: #FFFFFF;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-}
-
-.dp-big-action:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    background: #FFFDF8;
-}
-
-.dp-big-action.active {
-    border: 1px solid #FB8C00;
-    box-shadow: 0 4px 12px rgba(251,140,0,0.25);
-    background: #FFF3E0;
-}
-
-.dp-big-icon-wrapper {
-    width: 40px;
-    height: 40px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.dp-action-deposito .dp-big-icon-wrapper {
-    background: #E3F2FD;
-}
-
-.dp-action-ritiro .dp-big-icon-wrapper {
-    background: #E8F5E9;
-}
-
-.dp-big-icon-wrapper .material-icons {
-    font-size: 22px;
-    color: #424242;
-}
-
-.dp-big-action h2 {
-    font-size: 1rem;
-    margin: 0;
-    color: #202124;
-}
-
-.dp-big-action p {
-    font-size: 0.85rem;
-    margin: 0;
-    color: #5f6368;
-}
-
-/* PANNELLI FORM */
-
-.dp-panel-card {
-    display: none;
-    background: #FFFFFF;
-    border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    padding: 18px 20px 20px 20px;
-    margin-bottom: 16px;
-}
-
-.dp-panel-card.active {
-    display: block;
-}
-
-.dp-panel-title {
-    font-size: 1.05rem;
-    margin-bottom: 4px;
-    color: #202124;
-}
-
-.dp-panel-subtitle {
-    font-size: 0.85rem;
-    color: #5f6368;
-    margin-bottom: 16px;
-}
-
-/* FORM */
-
-.dp-form {
-    margin-top: 8px;
-}
-
-.dp-label {
-    display: block;
-    font-size: 0.8rem;
-    margin-bottom: 4px;
-    color: #5f6368;
-}
-
-.dp-input {
-    width: 100%;
-    border-radius: 10px;
-    border: 1px solid #E0E0E0;
-    padding: 10px 12px;
-    font-size: 0.9rem;
-    margin-bottom: 12px;
-}
-
-.dp-input:focus {
-    outline: none;
-    border-color: #FB8C00;
-    box-shadow: 0 0 0 2px rgba(251,140,0,0.15);
-}
-
-.dp-btn-primary {
-    width: 100%;
-    border: none;
-    border-radius: 999px;
-    padding: 10px 18px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    background: #FB8C00;
-    color: #FFFFFF;
-    cursor: pointer;
-    transition: background 0.15s ease, box-shadow 0.15s ease;
-}
-
-.dp-btn-primary:hover {
-    background: #F57C00;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
-}
-
-.dp-btn-primary.disabled,
-.dp-btn-primary[disabled] {
-    background: #FFCC80;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 900px) {
-    .dp-area-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .dp-stats-row {
-        grid-template-columns: 1fr;
-    }
-
-    .dp-actions-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</file>
-
 <file path="src/main/webapp/css/crea_segnalazione.css">
 /* --- OVERRIDE/ADATTAMENTO LAYOUT --- */
 
@@ -2579,112 +2140,6 @@ public class AreaAdminServlet extends HttpServlet {
 }
 </file>
 
-<file path="src/main/java/controller/AreaDropPointServlet.java">
-package controller;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import model.bean.DropPoint;
-import model.bean.enums.StatoDropPoint;
-import model.service.DropPointService;
-
-import java.io.IOException;
-
-@WebServlet(name = "AreaDropPointServlet", value = "/area-drop-point")
-public class AreaDropPointServlet extends HttpServlet {
-
-    private final DropPointService dropPointService = new DropPointService();
-
-    @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response) throws ServletException, IOException {
-
-        HttpSession session = request.getSession(false);
-        DropPoint dp = (session != null) ? (DropPoint) session.getAttribute("dropPoint") : null;
-
-        if (dp != null) {
-            // ricarico dal DB per avere lo stato aggiornato
-            DropPoint fromDb = dropPointService.trovaPerId(dp.getId());
-            if (fromDb != null) {
-                dp = fromDb;
-                session.setAttribute("dropPoint", dp);
-            }
-        }
-
-        request.setAttribute("dropPoint", dp);
-
-        if (dp != null && dp.getStato() == StatoDropPoint.APPROVATO) {
-            long id = dp.getId();
-            request.setAttribute("depositiAttivi",      dropPointService.countDepositiAttivi(id));
-            request.setAttribute("consegneCompletate", dropPointService.countConsegneCompletate(id));
-            request.setAttribute("totaleOperazioni",   dropPointService.countTotaleOperazioni(id));
-        } else {
-            request.setAttribute("depositiAttivi", 0);
-            request.setAttribute("consegneCompletate", 0);
-            request.setAttribute("totaleOperazioni", 0);
-        }
-
-        request.getRequestDispatcher("/WEB-INF/jsp/area_drop_point.jsp")
-                .forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response) throws ServletException, IOException {
-
-        HttpSession session = request.getSession(false);
-        DropPoint dp = (session != null) ? (DropPoint) session.getAttribute("dropPoint") : null;
-
-        if (dp == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        // ricarico stato
-        dp = dropPointService.trovaPerId(dp.getId());
-        session.setAttribute("dropPoint", dp);
-        request.setAttribute("dropPoint", dp);
-
-        String action = request.getParameter("action");
-        String codice = request.getParameter("codice");
-
-        if (dp.getStato() != StatoDropPoint.APPROVATO) {
-            request.setAttribute("erroreGenerale", "Devi avere un Drop-Point approvato per effettuare operazioni.");
-        } else if (action != null && codice != null && !codice.isBlank()) {
-
-            if ("deposito".equals(action)) {
-                boolean ok = dropPointService.registraDeposito(dp.getId(), codice.trim());
-                if (ok) {
-                    request.setAttribute("msgDeposito", "Deposito verificato.");
-                } else {
-                    request.setAttribute("msgDeposito", "Codice non valido o non associato a questo punto.");
-                }
-            } else if ("ritiro".equals(action)) {
-                // QUI AVVIENE LA MAGIA: Chiama il service aggiornato che chiude la segnalazione nel DB
-                boolean ok = dropPointService.registraRitiro(dp.getId(), codice.trim());
-                if (ok) {
-                    request.setAttribute("msgRitiro", "Ritiro confermato! Segnalazione chiusa e punti assegnati.");
-                } else {
-                    request.setAttribute("msgRitiro", "Errore: Codice non valido o segnalazione già chiusa.");
-                }
-            }
-        }
-
-        long id = dp.getId();
-        request.setAttribute("depositiAttivi",      dropPointService.countDepositiAttivi(id));
-        request.setAttribute("consegneCompletate", dropPointService.countConsegneCompletate(id));
-        request.setAttribute("totaleOperazioni",   dropPointService.countTotaleOperazioni(id));
-
-        request.getRequestDispatcher("/WEB-INF/jsp/area_drop_point.jsp")
-                .forward(request, response);
-    }
-}
-</file>
-
 <file path="src/main/java/controller/DettaglioSegnalazioneServlet.java">
 package controller;
 
@@ -3095,6 +2550,439 @@ public class Utente {
 
     public String getBadge() { return badge; }
     public void setBadge(String badge) { this.badge = badge; }
+}
+</file>
+
+<file path="src/main/webapp/css/area_admin.css">
+.admin-main {
+    max-width: 1100px;
+    margin: 24px auto 40px;
+    padding: 0 24px 40px;
+}
+
+.admin-section { margin-bottom: 32px; }
+
+.admin-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #202124;
+}
+
+.admin-card {
+    background-color: #FFFFFF;
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    padding: 16px 20px 18px;
+}
+
+.admin-subtitle {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: #E65100;
+}
+
+.admin-empty {
+    font-size: 0.95rem;
+    color: #757575;
+    padding: 4px 0 8px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;            /* allinea bene testo/pulsanti */
+}
+
+.admin-table th {
+    font-weight: 600;
+    color: #5F6368;
+    background-color: #FAFAFA;
+}
+
+/* --- AZIONI: evita che i pulsanti “sporchino” la riga/bordo --- */
+.admin-table td:last-child {           /* colonna Azioni */
+    white-space: nowrap;               /* niente wrap che “taglia” visivamente */
+}
+
+.admin-actions {
+    display: inline-flex;              /* non prende tutta la larghezza della cella */
+    gap: 8px;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.inline-form {
+    display: inline-flex;              /* evita baseline/line-height strani */
+    margin: 0;
+}
+
+.btn-admin-approve,
+.btn-admin-reject,
+.btn-admin-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;                 /* un filo più “pulito” */
+    border-radius: 999px;
+    border: none;
+    font-size: 0.95rem;
+    cursor: pointer;
+    font-weight: 500;
+    line-height: 1;                    /* evita che la riga sembri spezzata */
+}
+
+/* colori */
+.btn-admin-approve { background-color: #E8F5E9; color: #2E7D32; }
+.btn-admin-reject  { background-color: #FFEBEE; color: #C62828; }
+.btn-admin-delete  { background-color: #FFF3E0; color: #E65100; }
+
+.btn-admin-approve:hover { background-color: #C8E6C9; }
+.btn-admin-reject:hover  { background-color: #FFCDD2; }
+.btn-admin-delete:hover  { background-color: #FFE0B2; }
+
+.admin-note {
+    font-size: 0.8rem;
+    color: #9E9E9E;
+}
+
+/* Rimuove SOLO l'ultima linea della tabella (se vuoi mantenerla, elimina questo blocco) */
+.admin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+</file>
+
+<file path="src/main/webapp/css/area_drop_point.css">
+/* area_drop_point.css */
+
+.dp-area-main {
+    max-width: 1100px;
+    margin: 30px auto 50px auto;
+    padding: 0 20px 40px 20px;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* HEADER */
+
+.dp-area-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.dp-area-title-block {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.dp-area-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 18px;
+    background: #FFF3E0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dp-area-icon .material-icons {
+    font-size: 28px;
+    color: #E65100;
+}
+
+.dp-area-title {
+    font-size: 1.4rem;
+    margin: 0;
+    color: #202124;
+}
+
+.dp-area-subtitle {
+    font-size: 0.85rem;
+    margin: 2px 0 0 0;
+    color: #5f6368;
+}
+
+.dp-area-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    border: 1px solid transparent;
+}
+
+.dp-area-status-badge .material-icons {
+    font-size: 16px;
+}
+
+.status-none {
+    background: #f5f5f5;
+    border-color: #e0e0e0;
+    color: #5f6368;
+}
+
+.status-ok {
+    background: #E8F5E9;
+    border-color: #81C784;
+    color: #2E7D32;
+}
+
+.status-pending {
+    background: #FFF3E0;
+    border-color: #FFB74D;
+    color: #E65100;
+}
+
+/* STATS */
+
+.dp-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.dp-stat-card {
+    background: #FFFFFF;
+    border-radius: 18px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    position: relative;
+}
+
+.dp-stat-label {
+    font-size: 0.85rem;
+    color: #5f6368;
+    margin-bottom: 4px;
+}
+
+.dp-stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.dp-stat-value.warning { color: #FB8C00; }
+.dp-stat-value.success { color: #2E7D32; }
+.dp-stat-value.info    { color: #1E88E5; }
+
+.dp-stat-icon {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+    font-size: 22px;
+    opacity: 0.35;
+}
+
+/* ALERT */
+
+.dp-alert {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+}
+
+.dp-alert .material-icons {
+    font-size: 18px;
+}
+
+.dp-alert-warning {
+    background: #FFF8E1;
+    color: #E65100;
+}
+
+.dp-alert-error {
+    background: #FFEBEE;
+    color: #C62828;
+}
+
+.dp-alert-info {
+    background: #E3F2FD;
+    color: #1565C0;
+}
+
+/* BOTTONI GRANDI AZIONE */
+
+.dp-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.dp-big-action {
+    border: none;
+    border-radius: 20px;
+    padding: 18px 20px;
+    text-align: left;
+    background: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+.dp-big-action:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    background: #FFFDF8;
+}
+
+.dp-big-action.active {
+    border: 1px solid #FB8C00;
+    box-shadow: 0 4px 12px rgba(251,140,0,0.25);
+    background: #FFF3E0;
+}
+
+.dp-big-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dp-action-deposito .dp-big-icon-wrapper {
+    background: #E3F2FD;
+}
+
+.dp-action-ritiro .dp-big-icon-wrapper {
+    background: #E8F5E9;
+}
+
+.dp-big-icon-wrapper .material-icons {
+    font-size: 22px;
+    color: #424242;
+}
+
+.dp-big-action h2 {
+    font-size: 1rem;
+    margin: 0;
+    color: #202124;
+}
+
+.dp-big-action p {
+    font-size: 0.85rem;
+    margin: 0;
+    color: #5f6368;
+}
+
+/* PANNELLI FORM */
+
+.dp-panel-card {
+    display: none;
+    background: #FFFFFF;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding: 18px 20px 20px 20px;
+    margin-bottom: 16px;
+}
+
+.dp-panel-card.active {
+    display: block;
+}
+
+.dp-panel-title {
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+    color: #202124;
+}
+
+.dp-panel-subtitle {
+    font-size: 0.85rem;
+    color: #5f6368;
+    margin-bottom: 16px;
+}
+
+/* FORM */
+
+.dp-form {
+    margin-top: 8px;
+}
+
+.dp-label {
+    display: block;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+    color: #5f6368;
+}
+
+.dp-input {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #E0E0E0;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+.dp-input:focus {
+    outline: none;
+    border-color: #FB8C00;
+    box-shadow: 0 0 0 2px rgba(251,140,0,0.15);
+}
+
+.dp-btn-primary {
+    width: 100%;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: #FB8C00;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dp-btn-primary:hover {
+    background: #F57C00;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+}
+
+.dp-btn-primary.disabled,
+.dp-btn-primary[disabled] {
+    background: #FFCC80;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+    .dp-area-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .dp-stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+    }
+
+    .dp-actions-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </file>
 
@@ -4483,255 +4371,6 @@ public class Utente {
 }
 </file>
 
-<file path="src/main/webapp/WEB-INF/jsp/area_drop_point.jsp">
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="model.bean.DropPoint" %>
-<%@ page import="model.bean.enums.StatoDropPoint" %>
-
-<%
-    DropPoint dropPoint = (DropPoint) request.getAttribute("dropPoint");
-
-    boolean hasDp      = (dropPoint != null);
-    boolean isApproved = hasDp && dropPoint.getStato() == StatoDropPoint.APPROVATO;
-    boolean isPending  = hasDp && dropPoint.getStato() == StatoDropPoint.IN_ATTESA;
-
-    int depositiAttivi      = (request.getAttribute("depositiAttivi")      != null) ? (Integer) request.getAttribute("depositiAttivi")      : 0;
-    int consegneCompletate  = (request.getAttribute("consegneCompletate")  != null) ? (Integer) request.getAttribute("consegneCompletate")  : 0;
-    int totaleOperazioni    = (request.getAttribute("totaleOperazioni")    != null) ? (Integer) request.getAttribute("totaleOperazioni")    : 0;
-
-    String msgDeposito    = (String) request.getAttribute("msgDeposito");
-    String msgRitiro      = (String) request.getAttribute("msgRitiro");
-    String erroreGenerale = (String) request.getAttribute("erroreGenerale");
-%>
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <title>Area Drop-Point - Foundly</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/area_drop_point.css?v=3">
-</head>
-<body class="page-enter">
-
-<jsp:include page="navbar.jsp" />
-
-<main class="dp-area-main">
-
-    <!-- HEADER -->
-    <section class="dp-area-header">
-        <div class="dp-area-title-block">
-            <div class="dp-area-icon">
-                <span class="material-icons">storefront</span>
-            </div>
-            <div>
-                <h1 class="dp-area-title">Area Drop-Point</h1>
-                <p class="dp-area-subtitle">Gestisci i codici di deposito e ritiro dei clienti.</p>
-            </div>
-        </div>
-
-        <div class="dp-area-status-badge
-             <%= !hasDp ? "status-none" : (isApproved ? "status-ok" : "status-pending") %>">
-            <span class="material-icons">
-                <%= !hasDp ? "info" : (isApproved ? "check_circle" : "hourglass_top") %>
-            </span>
-            <span>
-                <% if (!hasDp) { %>
-                    Nessun Drop-Point associato
-                <% } else if (isApproved) { %>
-                    Drop-Point approvato:
-                    <strong><%= dropPoint.getNomeAttivita() %></strong>
-                <% } else { %>
-                    In attesa di approvazione
-                <% } %>
-            </span>
-        </div>
-    </section>
-
-    <!-- CARDS CONTATORI -->
-    <section class="dp-stats-row">
-        <article class="dp-stat-card">
-            <div class="dp-stat-label">Depositi Attivi</div>
-            <div class="dp-stat-value warning"><%= depositiAttivi %></div>
-            <span class="material-icons dp-stat-icon">inventory_2</span>
-        </article>
-
-        <article class="dp-stat-card">
-            <div class="dp-stat-label">Consegne Completate</div>
-            <div class="dp-stat-value success"><%= consegneCompletate %></div>
-            <span class="material-icons dp-stat-icon">check_circle</span>
-        </article>
-
-        <article class="dp-stat-card">
-            <div class="dp-stat-label">Totale Operazioni</div>
-            <div class="dp-stat-value info"><%= totaleOperazioni %></div>
-            <span class="material-icons dp-stat-icon">store</span>
-        </article>
-    </section>
-
-    <% if (erroreGenerale != null) { %>
-    <div class="dp-alert dp-alert-error">
-        <span class="material-icons">error_outline</span>
-        <span><%= erroreGenerale %></span>
-    </div>
-    <% } %>
-
-    <!-- BOTTONI GRANDI AZIONE -->
-    <section class="dp-actions-grid">
-        <button type="button"
-                class="dp-big-action dp-action-deposito active"
-                data-panel="panel-deposito">
-            <div class="dp-big-icon-wrapper">
-                <span class="material-icons">north_east</span>
-            </div>
-            <h2>Registra Deposito</h2>
-            <p>Quando il Finder lascia l’oggetto nel tuo negozio, usa il codice di consegna per registrare il deposito.</p>
-        </button>
-
-        <button type="button"
-                class="dp-big-action dp-action-ritiro"
-                data-panel="panel-ritiro">
-            <div class="dp-big-icon-wrapper">
-                <span class="material-icons">south_west</span>
-            </div>
-            <h2>Registra Ritiro</h2>
-            <p>Quando il proprietario arriva con il codice, conferma il ritiro per chiudere l’operazione.</p>
-        </button>
-    </section>
-
-    <!-- PANNELLI SOTTO I BOTTONI -->
-
-    <!-- PANEL DEPOSITO -->
-    <section class="dp-panel-card active" id="panel-deposito">
-        <h2 class="dp-panel-title">Registra Deposito</h2>
-        <p class="dp-panel-subtitle">
-            Inserisci il codice di consegna a 6 cifre che il Finder ti mostra dall’app.
-        </p>
-
-        <% if (!hasDp) { %>
-        <div class="dp-alert dp-alert-warning">
-            <span class="material-icons">info</span>
-            <span>Devi registrare un Drop-Point per utilizzare questa funzione.</span>
-        </div>
-        <% } else if (!isApproved) { %>
-        <div class="dp-alert dp-alert-warning">
-            <span class="material-icons">hourglass_empty</span>
-            <span>Il tuo Drop-Point è ancora in attesa di approvazione.</span>
-        </div>
-        <% } %>
-
-        <% if (msgDeposito != null) { %>
-        <div class="dp-alert dp-alert-info">
-            <span class="material-icons">info</span>
-            <span><%= msgDeposito %></span>
-        </div>
-        <% } %>
-
-        <form method="post"
-              action="${pageContext.request.contextPath}/area-drop-point"
-              class="dp-form">
-            <input type="hidden" name="action" value="deposito">
-
-            <label class="dp-label">Codice di Consegna (6 cifre)</label>
-            <input type="text"
-                   name="codice"
-                   maxlength="6"
-                   class="dp-input"
-                   placeholder="123456"
-                    <%= (!isApproved ? "disabled" : "") %> />
-
-            <button type="submit"
-                    class="dp-btn-primary <%= (!isApproved ? "disabled" : "") %>"
-                    <%= (!isApproved ? "disabled" : "") %>>
-                Conferma Deposito
-            </button>
-        </form>
-    </section>
-
-    <!-- PANEL RITIRO -->
-    <section class="dp-panel-card" id="panel-ritiro">
-        <h2 class="dp-panel-title">Registra Ritiro</h2>
-        <p class="dp-panel-subtitle">
-            Usa lo stesso codice di consegna per confermare che l’oggetto è stato ritirato dal proprietario.
-        </p>
-
-        <% if (!hasDp) { %>
-        <div class="dp-alert dp-alert-warning">
-            <span class="material-icons">info</span>
-            <span>Devi registrare un Drop-Point per utilizzare questa funzione.</span>
-        </div>
-        <% } else if (!isApproved) { %>
-        <div class="dp-alert dp-alert-warning">
-            <span class="material-icons">hourglass_empty</span>
-            <span>Il tuo Drop-Point è ancora in attesa di approvazione.</span>
-        </div>
-        <% } %>
-
-        <% if (msgRitiro != null) { %>
-        <div class="dp-alert dp-alert-info">
-            <span class="material-icons">info</span>
-            <span><%= msgRitiro %></span>
-        </div>
-        <% } %>
-
-        <form method="post"
-              action="${pageContext.request.contextPath}/area-drop-point"
-              class="dp-form">
-            <input type="hidden" name="action" value="ritiro">
-
-            <label class="dp-label">Codice di Consegna (6 cifre)</label>
-            <input type="text"
-                   name="codice"
-                   maxlength="6"
-                   class="dp-input"
-                   placeholder="123456"
-                    <%= (!isApproved ? "disabled" : "") %> />
-
-            <button type="submit"
-                    class="dp-btn-primary <%= (!isApproved ? "disabled" : "") %>"
-                    <%= (!isApproved ? "disabled" : "") %>>
-                Conferma Ritiro
-            </button>
-        </form>
-    </section>
-
-</main>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Toggle pannelli tramite bottoni grandi
-        const actionButtons = document.querySelectorAll(".dp-big-action");
-        const panels = document.querySelectorAll(".dp-panel-card");
-
-        actionButtons.forEach(btn => {
-            btn.addEventListener("click", () => {
-                const targetId = btn.getAttribute("data-panel");
-
-                // reset bottoni
-                actionButtons.forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
-
-                // reset pannelli
-                panels.forEach(p => p.classList.remove("active"));
-                const targetPanel = document.getElementById(targetId);
-                if (targetPanel) {
-                    targetPanel.classList.add("active");
-                    targetPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-                }
-            });
-        });
-    });
-</script>
-
-
-</body>
-</html>
-</file>
-
 <file path="src/main/webapp/WEB-INF/jsp/home.jsp">
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
@@ -5171,6 +4810,110 @@ SET FOREIGN_KEY_CHECKS = 1;
 SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE drop_point;
 SET FOREIGN_KEY_CHECKS = 1;
+</file>
+
+<file path="src/main/java/controller/AreaDropPointServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.DropPoint;
+import model.bean.enums.StatoDropPoint;
+import model.service.DropPointService;
+
+import java.io.IOException;
+
+@WebServlet(name = "AreaDropPointServlet", value = "/area-drop-point")
+public class AreaDropPointServlet extends HttpServlet {
+
+    private final DropPointService dropPointService = new DropPointService();
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+        DropPoint dp = (session != null) ? (DropPoint) session.getAttribute("dropPoint") : null;
+
+        if (dp != null) {
+            // ricarico dal DB per avere lo stato aggiornato
+            DropPoint fromDb = dropPointService.trovaPerId(dp.getId());
+            if (fromDb != null) {
+                dp = fromDb;
+                session.setAttribute("dropPoint", dp);
+            }
+        }
+
+        request.setAttribute("dropPoint", dp);
+
+        if (dp != null && dp.getStato() == StatoDropPoint.APPROVATO) {
+            long id = dp.getId();
+            request.setAttribute("depositiAttivi",      dropPointService.countDepositiAttivi(id));
+            request.setAttribute("consegneCompletate", dropPointService.countConsegneCompletate(id));
+        } else {
+            request.setAttribute("depositiAttivi", 0);
+            request.setAttribute("consegneCompletate", 0);
+            request.setAttribute("totaleOperazioni", 0);
+        }
+
+        request.getRequestDispatcher("/WEB-INF/jsp/area_drop_point.jsp")
+                .forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+        DropPoint dp = (session != null) ? (DropPoint) session.getAttribute("dropPoint") : null;
+
+        if (dp == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        // ricarico stato
+        dp = dropPointService.trovaPerId(dp.getId());
+        session.setAttribute("dropPoint", dp);
+        request.setAttribute("dropPoint", dp);
+
+        String action = request.getParameter("action");
+        String codice = request.getParameter("codice");
+
+        if (dp.getStato() != StatoDropPoint.APPROVATO) {
+            request.setAttribute("erroreGenerale", "Devi avere un Drop-Point approvato per effettuare operazioni.");
+        } else if (action != null && codice != null && !codice.isBlank()) {
+
+            if ("deposito".equals(action)) {
+                boolean ok = dropPointService.registraDeposito(dp.getId(), codice.trim());
+                if (ok) {
+                    request.setAttribute("msgDeposito", "Deposito verificato.");
+                } else {
+                    request.setAttribute("msgDeposito", "Codice non valido o non associato a questo punto.");
+                }
+            } else if ("ritiro".equals(action)) {
+                // QUI AVVIENE LA MAGIA: Chiama il service aggiornato che chiude la segnalazione nel DB
+                boolean ok = dropPointService.registraRitiro(dp.getId(), codice.trim());
+                if (ok) {
+                    request.setAttribute("msgRitiro", "Ritiro confermato! Segnalazione chiusa e punti assegnati.");
+                } else {
+                    request.setAttribute("msgRitiro", "Errore: Codice non valido o segnalazione già chiusa.");
+                }
+            }
+        }
+
+        long id = dp.getId();
+        request.setAttribute("depositiAttivi",      dropPointService.countDepositiAttivi(id));
+        request.setAttribute("consegneCompletate", dropPointService.countConsegneCompletate(id));
+
+        request.getRequestDispatcher("/WEB-INF/jsp/area_drop_point.jsp")
+                .forward(request, response);
+    }
+}
 </file>
 
 <file path="src/main/java/controller/CreaSegnalazioneServlet.java">
@@ -5849,260 +5592,6 @@ public class Reclamo {
 }
 </file>
 
-<file path="src/main/java/model/service/EmailService.java">
-package model.service;
-
-import jakarta.mail.*;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeBodyPart;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.internet.MimeMultipart;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Properties;
-
-public class EmailService {
-    private final Session session;
-    private final String mittente;
-    private final String nomeMittente = "Foundly";
-
-    // Colori Brand
-    private static final String COLOR_PRIMARY = "#FB8C00"; // Arancione Foundly
-    private static final String COLOR_BG = "#F4F6F8";      // Sfondo Grigio Chiaro
-    private static final String COLOR_CARD = "#FFFFFF";    // Sfondo Card
-    private static final String COLOR_TEXT = "#333333";    // Testo Scuro
-    private static final String COLOR_MUTED = "#757575";   // Testo Secondario
-
-    public EmailService() {
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
-
-        this.mittente = "foundly.app@gmail.com";
-        final String username = "foundly.app@gmail.com";
-        final String password = System.getenv("SMTP_PASSKEY");
-
-        this.session = Session.getInstance(props, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
-            }
-        });
-    }
-
-    // =================================================================================
-    //  METODI PUBBLICI DI INVIO
-    // =================================================================================
-
-    // 1. RECUPERO PASSWORD
-    public void inviaCodiceRecuperoPassword(String destinatario, String codice) {
-        String oggetto = "🔐 Codice di Recupero Password - Foundly";
-        String contenuto =
-                "<p>Hai richiesto di reimpostare la tua password. Utilizza il codice seguente per completare la procedura:</p>" +
-
-                        // Box Codice
-                        "<div style='text-align: center; margin: 30px 0;'>" +
-                        "  <div style='display: inline-block; background-color: #FFF3E0; color: " + COLOR_PRIMARY + "; font-size: 32px; font-weight: 800; letter-spacing: 6px; padding: 15px 40px; border-radius: 8px; border: 1px dashed " + COLOR_PRIMARY + ";'>" +
-                        codice +
-                        "  </div>" +
-                        "</div>" +
-
-                        "<p style='color: " + COLOR_MUTED + "; font-size: 14px;'>Se non hai richiesto tu il recupero della password, ti invitiamo a ignorare questa email.</p>";
-
-        inviaEmail(destinatario, oggetto, "Recupero Password", contenuto);
-    }
-
-    // 2. APPROVAZIONE DROP-POINT (Verso il Drop-Point)
-    public void inviaAccettazioneDropPoint(String destinatario, String nomeAttivita) {
-        String oggetto = "🎉 Drop-Point Approvato! Benvenuto in Foundly";
-        String contenuto =
-                "<p>Ciao <strong>" + nomeAttivita + "</strong>,</p>" +
-                        "<p>Siamo felici di informarti che la tua richiesta di affiliazione è stata <strong>APPROVATA</strong>.</p>" +
-                        "<p>La tua attività è ora ufficialmente un Drop-Point di Foundly. Gli utenti potranno visualizzare il tuo negozio sulla mappa e selezionarlo per depositi e ritiri sicuri.</p>" +
-
-                        "<div style='margin-top: 25px; padding-top: 20px; border-top: 1px solid #EEE;'>" +
-                        "  <p style='margin: 0; font-weight: 600;'>Prossimi passi:</p>" +
-                        "  <p style='margin: 5px 0 0 0;'>Accedi alla tua area riservata sulla piattaforma per iniziare a gestire le operazioni.</p>" +
-                        "</div>";
-
-        inviaEmail(destinatario, oggetto, "Richiesta Approvata", contenuto);
-    }
-
-    // 3. NUOVO RECLAMO RICEVUTO (Verso il Finder)
-    public void inviaNotificaNuovoReclamo(String destinatario, String titoloOggetto, String usernameRichiedente) {
-        String oggetto = "📩 Nuovo Reclamo per: " + titoloOggetto;
-        String contenuto =
-                "<p>Hai ricevuto una nuova richiesta di restituzione.</p>" +
-
-                        // Info Box
-                        "<div style='background-color: #FAFAFA; border-left: 4px solid " + COLOR_PRIMARY + "; padding: 15px; margin: 20px 0; border-radius: 4px;'>" +
-                        "  <div style='margin-bottom: 8px; font-size: 13px; color: " + COLOR_MUTED + "; text-transform: uppercase;'>Oggetto</div>" +
-                        "  <div style='font-size: 16px; font-weight: bold; color: " + COLOR_TEXT + "; margin-bottom: 12px;'>" + titoloOggetto + "</div>" +
-                        "  <div style='margin-bottom: 8px; font-size: 13px; color: " + COLOR_MUTED + "; text-transform: uppercase;'>Richiedente</div>" +
-                        "  <div style='font-size: 16px; font-weight: 600; color: " + COLOR_PRIMARY + ";'>@" + usernameRichiedente + "</div>" +
-                        "</div>" +
-
-                        "<p>L'utente ha risposto alle tue domande di sicurezza. Accedi alla sezione <strong>'Le mie Segnalazioni'</strong> per verificare le risposte e decidere se accettare la richiesta.</p>";
-
-        inviaEmail(destinatario, oggetto, "Nuova Richiesta", contenuto);
-    }
-
-    // 4. RECLAMO ACCETTATO (Verso l'Owner/Richiedente)
-    public void inviaReclamoAccettatoOwner(String destinatario, String titoloOggetto, String nomeFinder, String eventualeCodice) {
-        String oggetto = "✅ Il tuo reclamo è stato accettato!";
-
-        String bloccoCodice = "";
-        if (eventualeCodice != null && !eventualeCodice.isEmpty()) {
-            bloccoCodice =
-                    "<div style='text-align: center; margin: 25px 0;'>" +
-                            "  <div style='font-size: 12px; text-transform: uppercase; color: " + COLOR_MUTED + "; margin-bottom: 5px;'>Codice di Ritiro</div>" +
-                            "  <div style='display: inline-block; background-color: #E8F5E9; color: #2E7D32; font-size: 28px; font-weight: 700; letter-spacing: 4px; padding: 10px 30px; border-radius: 8px; border: 1px dashed #2E7D32;'>" +
-                            eventualeCodice +
-                            "  </div>" +
-                            "  <p style='font-size: 13px; color: " + COLOR_MUTED + "; margin-top: 10px;'>Mostra questo codice al Drop-Point per ritirare l'oggetto.</p>" +
-                            "</div>";
-        } else {
-            bloccoCodice =
-                    "<div style='background-color: #E3F2FD; color: #1565C0; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center; font-weight: 500;'>" +
-                            "  Contatta il Finder per accordarvi sulla consegna diretta." +
-                            "</div>";
-        }
-
-        String contenuto =
-                "<p>Buone notizie! L'utente <strong>" + nomeFinder + "</strong> ha verificato le tue risposte e confermato che l'oggetto è tuo.</p>" +
-
-                        // Info Oggetto
-                        "<div style='margin: 15px 0; font-size: 16px;'>" +
-                        "  Oggetto: <strong>" + titoloOggetto + "</strong>" +
-                        "</div>" +
-
-                        bloccoCodice +
-
-                        "<p>Accedi alla tua area personale per visualizzare i dettagli completi e i contatti.</p>";
-
-        inviaEmail(destinatario, oggetto, "Congratulazioni!", contenuto);
-    }
-
-    // 5. CONFERMA AZIONE ACCETTAZIONE (Verso il Finder)
-    public void inviaConfermaAccettazioneFinder(String destinatario, String titoloOggetto, String nomeRichiedente) {
-        String oggetto = "👍 Hai accettato il reclamo per: " + titoloOggetto;
-        String contenuto =
-                "<p>Hai confermato che l'oggetto <strong>" + titoloOggetto + "</strong> appartiene a <strong>" + nomeRichiedente + "</strong>.</p>" +
-                        "<p>Grazie per la tua onestà! Abbiamo inviato una notifica all'utente con le istruzioni per procedere al ritiro.</p>" +
-                        "<p style='color: " + COLOR_MUTED + "; font-size: 14px; margin-top: 20px;'>Puoi monitorare lo stato della consegna direttamente dalla tua dashboard.</p>";
-
-        inviaEmail(destinatario, oggetto, "Azione Confermata", contenuto);
-    }
-
-    // 6. NUOVA RICHIESTA DROP-POINT (Verso Admin)
-    public void inviaNotificaAdminNuovoDropPoint(String destinatario, String nomeAttivita, String citta) {
-        String oggetto = "🔔 Nuova richiesta Drop-Point: " + nomeAttivita;
-        String contenuto =
-                "<p>Un nuovo Drop-Point ha richiesto l'iscrizione alla piattaforma Foundly.</p>" +
-
-                        "<div style='background-color: #FAFAFA; border: 1px solid #EEEEEE; padding: 15px; border-radius: 8px; margin: 20px 0;'>" +
-                        "  <ul style='list-style: none; padding: 0; margin: 0;'>" +
-                        "    <li style='margin-bottom: 8px;'><strong>Attività:</strong> " + nomeAttivita + "</li>" +
-                        "    <li style='margin-bottom: 0;'><strong>Città:</strong> " + citta + "</li>" +
-                        "  </ul>" +
-                        "</div>" +
-
-                        "<p>Accedi al pannello di amministrazione per esaminare i dettagli completi e approvare o rifiutare la richiesta.</p>";
-
-        inviaEmail(destinatario, oggetto, "Notifica Admin", contenuto);
-    }
-
-    // =================================================================================
-    //  LOGICA INTERNA E TEMPLATE
-    // =================================================================================
-
-    private void inviaEmail(String destinatario, String oggetto, String preHeader, String contenutoHtml) {
-        // ESEGUE IL THREAD QUI - NON c'è bisogno di farlo fuori
-        new Thread(() -> {
-            try {
-                MimeMessage message = new MimeMessage(session);
-                try {
-                    message.setFrom(new InternetAddress(mittente, nomeMittente, StandardCharsets.UTF_8.name()));
-                } catch (Exception e) {
-                    message.setFrom(new InternetAddress(mittente));
-                }
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
-                message.setSubject(oggetto, StandardCharsets.UTF_8.name());
-
-                String templateCompleto = costruisciTemplateHtml(preHeader, contenutoHtml);
-
-                MimeBodyPart htmlPart = new MimeBodyPart();
-                htmlPart.setContent(templateCompleto, "text/html; charset=UTF-8");
-
-                MimeMultipart multipart = new MimeMultipart("alternative");
-                multipart.addBodyPart(htmlPart);
-
-                message.setContent(multipart);
-                Transport.send(message);
-                System.out.println("✅ Email inviata con successo a: " + destinatario);
-
-            } catch (MessagingException e) {
-                e.printStackTrace();
-                System.err.println("❌ Errore invio email a " + destinatario + ": " + e.getMessage());
-            }
-        }).start();
-    }
-
-    private String costruisciTemplateHtml(String titoloPrincipale, String body) {
-        return "<!DOCTYPE html>" +
-                "<html>" +
-                "<head>" +
-                "  <meta charset='UTF-8'>" +
-                "  <meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
-                "</head>" +
-                "<body style='margin: 0; padding: 0; background-color: " + COLOR_BG + "; font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; color: " + COLOR_TEXT + ";'>" +
-                "  <table width='100%' cellpadding='0' cellspacing='0' style='padding: 40px 0;'>" +
-                "    <tr>" +
-                "      <td align='center'>" +
-                "        " +
-                "        <table width='600' cellpadding='0' cellspacing='0' style='background-color: " + COLOR_CARD + "; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #EAEAEA;'>" +
-                "          " +
-                "          " +
-                "          <tr>" +
-                "            <td style='background-color: " + COLOR_CARD + "; padding: 30px 40px; border-bottom: 4px solid " + COLOR_PRIMARY + "; text-align: center;'>" +
-                "              <h1 style='color: " + COLOR_PRIMARY + "; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;'>Foundly</h1>" +
-                "            </td>" +
-                "          </tr>" +
-                "          " +
-                "          " +
-                "          <tr>" +
-                "            <td style='padding: 40px;'>" +
-                "              <h2 style='color: " + COLOR_TEXT + "; margin-top: 0; margin-bottom: 20px; font-size: 22px; font-weight: 700;'>" + titoloPrincipale + "</h2>" +
-                "              <div style='font-size: 16px; line-height: 1.6; color: #555555;'>" +
-                body +
-                "              </div>" +
-                "            </td>" +
-                "          </tr>" +
-                "          " +
-                "          " +
-                "          <tr>" +
-                "            <td style='background-color: #FAFAFA; padding: 25px 40px; text-align: center; border-top: 1px solid #EEEEEE;'>" +
-                "              <p style='margin: 0; font-size: 12px; color: #999999; line-height: 1.5;'>" +
-                "                Questa è una notifica automatica inviata da Foundly.<br>" +
-                "                Ti preghiamo di non rispondere direttamente a questo messaggio." +
-                "              </p>" +
-                "              <p style='margin: 10px 0 0 0; font-size: 12px; color: #BBBBBB;'>" +
-                "                &copy; 2025 Foundly Team" +
-                "              </p>" +
-                "            </td>" +
-                "          </tr>" +
-                "        </table>" +
-                "      </td>" +
-                "    </tr>" +
-                "  </table>" +
-                "</body>" +
-                "</html>";
-    }
-}
-</file>
-
 <file path="src/main/java/model/ConPool.java">
 package model;
 
@@ -6566,394 +6055,247 @@ body {
 }
 </file>
 
-<file path="src/main/webapp/WEB-INF/jsp/area_admin.jsp">
+<file path="src/main/webapp/WEB-INF/jsp/area_drop_point.jsp">
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.List" %>
-<%@ page import="model.bean.Utente" %>
 <%@ page import="model.bean.DropPoint" %>
-<%@ page import="model.bean.enums.Ruolo" %>
+<%@ page import="model.bean.enums.StatoDropPoint" %>
 
 <%
-  Utente utente = (Utente) session.getAttribute("utente");
-  if (utente == null || utente.getRuolo() != Ruolo.ADMIN) {
-    response.sendRedirect(request.getContextPath() + "/login");
-    return;
-  }
+    DropPoint dropPoint = (DropPoint) request.getAttribute("dropPoint");
 
-  List<DropPoint> pendenti  = (List<DropPoint>) request.getAttribute("dropPointsPendenti");
-  List<DropPoint> approvati = (List<DropPoint>) request.getAttribute("dropPointsApprovati");
-  List<Utente> utenti       = (List<Utente>) request.getAttribute("listaUtenti");
+    boolean hasDp      = (dropPoint != null);
+    boolean isApproved = hasDp && dropPoint.getStato() == StatoDropPoint.APPROVATO;
+    boolean isPending  = hasDp && dropPoint.getStato() == StatoDropPoint.IN_ATTESA;
+
+    int depositiAttivi      = (request.getAttribute("depositiAttivi")      != null) ? (Integer) request.getAttribute("depositiAttivi")      : 0;
+    int consegneCompletate  = (request.getAttribute("consegneCompletate")  != null) ? (Integer) request.getAttribute("consegneCompletate")  : 0;
+
+    String msgDeposito    = (String) request.getAttribute("msgDeposito");
+    String msgRitiro      = (String) request.getAttribute("msgRitiro");
+    String erroreGenerale = (String) request.getAttribute("erroreGenerale");
 %>
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Area Admin - Foundly</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/area_admin.css">
+    <meta charset="UTF-8">
+    <title>Area Drop-Point - Foundly</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/area_drop_point.css?v=3">
 </head>
 <body class="page-enter">
 
-<jsp:include page="/WEB-INF/jsp/navbar.jsp"/>
+<jsp:include page="navbar.jsp" />
 
-<main class="admin-main">
+<main class="dp-area-main">
 
-  <!-- Gestione Drop-Point -->
-  <section class="admin-section">
-    <h1 class="admin-title">Gestione Drop-Point</h1>
+    <!-- HEADER -->
+    <section class="dp-area-header">
+        <div class="dp-area-title-block">
+            <div class="dp-area-icon">
+                <span class="material-icons">storefront</span>
+            </div>
+            <div>
+                <h1 class="dp-area-title">Area Drop-Point</h1>
+                <p class="dp-area-subtitle">Gestisci i codici di deposito e ritiro dei clienti.</p>
+            </div>
+        </div>
 
-    <!-- PENDENTI -->
-    <div class="admin-card">
-      <h2 class="admin-subtitle">Richieste in attesa</h2>
+        <div class="dp-area-status-badge
+             <%= !hasDp ? "status-none" : (isApproved ? "status-ok" : "status-pending") %>">
+            <span class="material-icons">
+                <%= !hasDp ? "info" : (isApproved ? "check_circle" : "hourglass_top") %>
+            </span>
+            <span>
+                <% if (!hasDp) { %>
+                    Nessun Drop-Point associato
+                <% } else if (isApproved) { %>
+                    Drop-Point approvato:
+                    <strong><%= dropPoint.getNomeAttivita() %></strong>
+                <% } else { %>
+                    In attesa di approvazione
+                <% } %>
+            </span>
+        </div>
+    </section>
 
-      <%
-        if (pendenti == null || pendenti.isEmpty()) {
-      %>
-      <p class="admin-empty">Nessun Drop-Point in attesa di approvazione.</p>
-      <%
-      } else {
-      %>
-      <table class="admin-table">
-        <thead>
-        <tr>
-          <th>Nome attività</th>
-          <th>Indirizzo</th>
-          <th>Città</th>
-          <th>Provincia</th>
-          <th>Telefono</th>
-          <th>Azioni</th>
-        </tr>
-        </thead>
-        <tbody>
-        <%
-          for (DropPoint dp : pendenti) {
-        %>
-        <tr>
-          <td><%= dp.getNomeAttivita() %></td>
-          <td><%= dp.getIndirizzo() %></td>
-          <td><%= dp.getCitta() %></td>
-          <td><%= dp.getProvincia() %></td>
-          <td><%= dp.getTelefono() != null ? dp.getTelefono() : "-" %></td>
-          <td class="admin-actions">
-            <form method="post" action="${pageContext.request.contextPath}/admin" class="inline-form">
-              <input type="hidden" name="action" value="approveDropPoint">
-              <input type="hidden" name="dropPointId" value="<%= dp.getId() %>">
-              <button type="submit" class="btn-admin-approve">Approva</button>
-            </form>
+    <!-- CARDS CONTATORI -->
+    <section class="dp-stats-row">
+        <article class="dp-stat-card">
+            <div class="dp-stat-label">Depositi Attivi</div>
+            <div class="dp-stat-value warning"><%= depositiAttivi %></div>
+            <span class="material-icons dp-stat-icon">inventory_2</span>
+        </article>
 
-            <form method="post" action="${pageContext.request.contextPath}/admin" class="inline-form">
-              <input type="hidden" name="action" value="rejectDropPoint">
-              <input type="hidden" name="dropPointId" value="<%= dp.getId() %>">
-              <button type="submit" class="btn-admin-reject">Rifiuta</button>
-            </form>
-          </td>
-        </tr>
-        <%
-          }
-        %>
-        </tbody>
-      </table>
-      <%
-        }
-      %>
+        <article class="dp-stat-card">
+            <div class="dp-stat-label">Consegne Completate</div>
+            <div class="dp-stat-value success"><%= consegneCompletate %></div>
+            <span class="material-icons dp-stat-icon">check_circle</span>
+        </article>
+
+    </section>
+
+    <% if (erroreGenerale != null) { %>
+    <div class="dp-alert dp-alert-error">
+        <span class="material-icons">error_outline</span>
+        <span><%= erroreGenerale %></span>
     </div>
+    <% } %>
 
-    <!-- APPROVATI -->
-    <div class="admin-card" style="margin-top:20px;">
-      <h2 class="admin-subtitle">Drop-Point approvati</h2>
+    <!-- BOTTONI GRANDI AZIONE -->
+    <section class="dp-actions-grid">
+        <button type="button"
+                class="dp-big-action dp-action-deposito active"
+                data-panel="panel-deposito">
+            <div class="dp-big-icon-wrapper">
+                <span class="material-icons">north_east</span>
+            </div>
+            <h2>Registra Deposito</h2>
+            <p>Quando il Finder lascia l’oggetto nel tuo negozio, usa il codice di consegna per registrare il deposito.</p>
+        </button>
 
-      <%
-        if (approvati == null || approvati.isEmpty()) {
-      %>
-      <p class="admin-empty">Nessun Drop-Point approvato.</p>
-      <%
-      } else {
-      %>
-      <table class="admin-table">
-        <thead>
-        <tr>
-          <th>Nome attività</th>
-          <th>Indirizzo</th>
-          <th>Città</th>
-          <th>Provincia</th>
-          <th>Email</th>
-          <th>Telefono</th>
-          <th>Azioni</th>
-        </tr>
-        </thead>
-        <tbody>
-        <%
-          for (DropPoint dp : approvati) {
-        %>
-        <tr>
-          <td><%= dp.getNomeAttivita() %></td>
-          <td><%= dp.getIndirizzo() %></td>
-          <td><%= dp.getCitta() %></td>
-          <td><%= dp.getProvincia() %></td>
-          <td><%= dp.getEmail() != null ? dp.getEmail() : "-" %></td>
-          <td><%= dp.getTelefono() != null ? dp.getTelefono() : "-" %></td>
-          <td class="admin-actions">
-            <form method="post"
-                  action="${pageContext.request.contextPath}/admin"
-                  class="inline-form"
-                  onsubmit="return confirm('Eliminare definitivamente questo Drop-Point?');">
-              <input type="hidden" name="action" value="deleteDropPoint">
-              <input type="hidden" name="dropPointId" value="<%= dp.getId() %>">
-              <button type="submit" class="btn-admin-delete">Elimina</button>
-            </form>
-          </td>
-        </tr>
-        <%
-          }
-        %>
-        </tbody>
-      </table>
-      <%
-        }
-      %>
-    </div>
+        <button type="button"
+                class="dp-big-action dp-action-ritiro"
+                data-panel="panel-ritiro">
+            <div class="dp-big-icon-wrapper">
+                <span class="material-icons">south_west</span>
+            </div>
+            <h2>Registra Ritiro</h2>
+            <p>Quando il proprietario arriva con il codice, conferma il ritiro per chiudere l’operazione.</p>
+        </button>
+    </section>
 
-  </section>
+    <!-- PANNELLI SOTTO I BOTTONI -->
 
-  <!-- Gestione Utenti -->
-  <section class="admin-section">
-    <h1 class="admin-title">Gestione Utenti</h1>
+    <!-- PANEL DEPOSITO -->
+    <section class="dp-panel-card active" id="panel-deposito">
+        <h2 class="dp-panel-title">Registra Deposito</h2>
+        <p class="dp-panel-subtitle">
+            Inserisci il codice di consegna a 6 cifre che il Finder ti mostra dall’app.
+        </p>
 
-    <div class="admin-card">
-      <h2 class="admin-subtitle">Lista utenti</h2>
+        <% if (!hasDp) { %>
+        <div class="dp-alert dp-alert-warning">
+            <span class="material-icons">info</span>
+            <span>Devi registrare un Drop-Point per utilizzare questa funzione.</span>
+        </div>
+        <% } else if (!isApproved) { %>
+        <div class="dp-alert dp-alert-warning">
+            <span class="material-icons">hourglass_empty</span>
+            <span>Il tuo Drop-Point è ancora in attesa di approvazione.</span>
+        </div>
+        <% } %>
 
-      <table class="admin-table">
-        <thead>
-        <tr>
-          <th>ID</th>
-          <th>Username</th>
-          <th>Nome</th>
-          <th>Cognome</th>
-          <th>Email</th>
-          <th>Ruolo</th>
-          <th>Azioni</th>
-        </tr>
-        </thead>
-        <tbody>
-        <%
-          if (utenti != null) {
-            for (Utente u : utenti) {
-        %>
-        <tr>
-          <td><%= u.getId() %></td>
-          <td><%= u.getUsername() %></td>
-          <td><%= u.getNome() %></td>
-          <td><%= u.getCognome() %></td>
-          <td><%= u.getEmail() %></td>
-          <td><%= u.getRuolo() %></td>
-          <td class="admin-actions">
-            <%
-              if (u.getId() != utente.getId() && u.getRuolo() == Ruolo.UTENTE_BASE) {
-            %>
-            <form method="post"
-                  action="${pageContext.request.contextPath}/admin"
-                  class="inline-form"
-                  onsubmit="return confirm('Confermi la rimozione di questo utente?');">
-              <input type="hidden" name="action" value="deleteUser">
-              <input type="hidden" name="userId" value="<%= u.getId() %>">
-              <button type="submit" class="btn-admin-delete">Elimina</button>
-            </form>
-            <%
-            } else {
-            %>
-            <span class="admin-note">N/D</span>
-            <%
-              }
-            %>
-          </td>
-        </tr>
-        <%
-            }
-          }
-        %>
-        </tbody>
-      </table>
-    </div>
-  </section>
+        <% if (msgDeposito != null) { %>
+        <div class="dp-alert dp-alert-info">
+            <span class="material-icons">info</span>
+            <span><%= msgDeposito %></span>
+        </div>
+        <% } %>
+
+        <form method="post"
+              action="${pageContext.request.contextPath}/area-drop-point"
+              class="dp-form">
+            <input type="hidden" name="action" value="deposito">
+
+            <label class="dp-label">Codice di Consegna (6 cifre)</label>
+            <input type="text"
+                   name="codice"
+                   maxlength="6"
+                   class="dp-input"
+                   placeholder="123456"
+                    <%= (!isApproved ? "disabled" : "") %> />
+
+            <button type="submit"
+                    class="dp-btn-primary <%= (!isApproved ? "disabled" : "") %>"
+                    <%= (!isApproved ? "disabled" : "") %>>
+                Conferma Deposito
+            </button>
+        </form>
+    </section>
+
+    <!-- PANEL RITIRO -->
+    <section class="dp-panel-card" id="panel-ritiro">
+        <h2 class="dp-panel-title">Registra Ritiro</h2>
+        <p class="dp-panel-subtitle">
+            Usa lo stesso codice di consegna per confermare che l’oggetto è stato ritirato dal proprietario.
+        </p>
+
+        <% if (!hasDp) { %>
+        <div class="dp-alert dp-alert-warning">
+            <span class="material-icons">info</span>
+            <span>Devi registrare un Drop-Point per utilizzare questa funzione.</span>
+        </div>
+        <% } else if (!isApproved) { %>
+        <div class="dp-alert dp-alert-warning">
+            <span class="material-icons">hourglass_empty</span>
+            <span>Il tuo Drop-Point è ancora in attesa di approvazione.</span>
+        </div>
+        <% } %>
+
+        <% if (msgRitiro != null) { %>
+        <div class="dp-alert dp-alert-info">
+            <span class="material-icons">info</span>
+            <span><%= msgRitiro %></span>
+        </div>
+        <% } %>
+
+        <form method="post"
+              action="${pageContext.request.contextPath}/area-drop-point"
+              class="dp-form">
+            <input type="hidden" name="action" value="ritiro">
+
+            <label class="dp-label">Codice di Consegna (6 cifre)</label>
+            <input type="text"
+                   name="codice"
+                   maxlength="6"
+                   class="dp-input"
+                   placeholder="123456"
+                    <%= (!isApproved ? "disabled" : "") %> />
+
+            <button type="submit"
+                    class="dp-btn-primary <%= (!isApproved ? "disabled" : "") %>"
+                    <%= (!isApproved ? "disabled" : "") %>>
+                Conferma Ritiro
+            </button>
+        </form>
+    </section>
 
 </main>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const userMenu = document.querySelector(".user-menu");
-    if (userMenu) {
-      const btn = userMenu.querySelector(".user-avatar-btn");
-      btn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        userMenu.classList.toggle("open");
-      });
-      document.addEventListener("click", function () {
-        userMenu.classList.remove("open");
-      });
-    }
-  });
+    document.addEventListener("DOMContentLoaded", function () {
+        // Toggle pannelli tramite bottoni grandi
+        const actionButtons = document.querySelectorAll(".dp-big-action");
+        const panels = document.querySelectorAll(".dp-panel-card");
+
+        actionButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const targetId = btn.getAttribute("data-panel");
+
+                // reset bottoni
+                actionButtons.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+
+                // reset pannelli
+                panels.forEach(p => p.classList.remove("active"));
+                const targetPanel = document.getElementById(targetId);
+                if (targetPanel) {
+                    targetPanel.classList.add("active");
+                    targetPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            });
+        });
+    });
 </script>
+
 
 </body>
 </html>
-</file>
-
-<file path="src/main/java/controller/GestioneReclamoServlet.java">
-package controller;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import model.bean.DropPoint;
-import model.bean.Reclamo;
-import model.bean.Segnalazione;
-import model.bean.SegnalazioneOggetto;
-import model.bean.Utente;
-import model.bean.enums.ModalitaConsegna;
-import model.bean.enums.StatoSegnalazione;
-import model.dao.ReclamoDAO;
-import model.service.EmailService;
-import model.service.SegnalazioneService;
-import model.service.UtenteService;
-
-import java.io.IOException;
-import java.util.UUID;
-
-@WebServlet(name = "GestioneReclamoServlet", value = "/gestione-reclamo")
-public class GestioneReclamoServlet extends HttpServlet {
-
-    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
-    private final SegnalazioneService segnalazioneService = new SegnalazioneService();
-    private final EmailService emailService = new EmailService();
-    private final UtenteService utenteService = new UtenteService();
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-        HttpSession session = request.getSession(false);
-
-        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
-        DropPoint dropPoint = (session != null) ? (DropPoint) session.getAttribute("dropPoint") : null;
-
-        if (utente == null && dropPoint == null) {
-            response.sendRedirect("login");
-            return;
-        }
-
-        // --- DROP-POINT: Conferma Ritiro ---
-        if ("conferma_ritiro".equals(action)) {
-            if (dropPoint == null) { response.sendRedirect("login"); return; }
-            try {
-                long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
-                long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
-                String codice = request.getParameter("codiceConsegna");
-
-                boolean successo = segnalazioneService.accettaReclamoEChiudiSegnalazione(idReclamo, idSegnalazione, codice);
-                response.sendRedirect("area-drop-point?msg=" + (successo ? "successo_consegna" : "codice_errato"));
-            } catch (Exception e) {
-                response.sendRedirect("area-drop-point?err=errore");
-            }
-            return;
-        }
-
-        // --- UTENTI (Finder/Owner) ---
-        if (utente == null) { response.sendRedirect("login"); return; }
-
-        if ("invia".equals(action)) {
-            // ... invia reclamo ...
-            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
-            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
-
-            if (s == null || s.getStato() != StatoSegnalazione.APERTA) {
-                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=segnalazione_chiusa");
-                return;
-            }
-            if (reclamoDAO.doRetrieveBySegnalazioneAndUtente(idSegnalazione, utente.getId()) != null) {
-                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_esistente");
-                return;
-            }
-
-            Reclamo r = new Reclamo();
-            r.setIdSegnalazione(idSegnalazione);
-            r.setIdUtenteRichiedente(utente.getId());
-            r.setRispostaVerifica1(request.getParameter("risposta1"));
-            r.setRispostaVerifica2(request.getParameter("risposta2"));
-            boolean salvato = reclamoDAO.doSave(r);
-
-            // MAIL AL FINDER (Chiamata Diretta)
-            if (salvato) {
-                Utente finder = utenteService.trovaPerId(s.getIdUtente());
-                if (finder != null) {
-                    emailService.inviaNotificaNuovoReclamo(finder.getEmail(), s.getTitolo(), utente.getUsername());
-                }
-            }
-            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_inviato");
-
-        } else if ("accetta".equals(action)) {
-            // ... accetta reclamo ...
-            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
-            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
-            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
-
-            String codice = null;
-            boolean isDropPoint = false;
-
-            if (s instanceof SegnalazioneOggetto) {
-                SegnalazioneOggetto so = (SegnalazioneOggetto) s;
-                if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
-                    isDropPoint = true;
-                    codice = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-                }
-            }
-
-            boolean ok = reclamoDAO.accettaReclamo(idReclamo, codice);
-
-            if (ok) {
-                Reclamo r = reclamoDAO.doRetrieveById(idReclamo);
-                Utente richiedente = utenteService.trovaPerId(r.getIdUtenteRichiedente());
-                Utente finder = utente;
-
-                // MAIL 1: FINDER (Chiamata Diretta)
-                emailService.inviaConfermaAccettazioneFinder(finder.getEmail(), s.getTitolo(), richiedente.getNome() + " " + richiedente.getCognome());
-
-                // MAIL 2: OWNER (Chiamata Diretta)
-                emailService.inviaReclamoAccettatoOwner(richiedente.getEmail(), s.getTitolo(), finder.getNome() + " " + finder.getCognome(), codice);
-            }
-
-            if (isDropPoint) {
-                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=attesa_ritiro");
-            } else {
-                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=scambio_avviato");
-            }
-
-        } else if ("rifiuta".equals(action)) {
-            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
-            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
-            segnalazioneService.rifiutaReclamo(idReclamo);
-            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_rifiutato");
-
-        } else if ("conferma_scambio".equals(action)) {
-            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
-            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
-            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
-            boolean isFinder = (s.getIdUtente() == utente.getId());
-
-            boolean finito = segnalazioneService.gestisciConfermaScambio(idReclamo, isFinder);
-
-            if (finito) {
-                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=scambio_completato");
-            } else {
-                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=conferma_registrata");
-            }
-        }
-    }
-}
 </file>
 
 <file path="src/main/java/controller/IndexServlet.java">
@@ -7177,297 +6519,258 @@ public class RecuperoPasswordServlet extends HttpServlet {
 }
 </file>
 
-<file path="src/main/webapp/WEB-INF/jsp/classifica.jsp">
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="model.bean.Utente" %>
-<%@ page import="model.bean.DropPoint" %>
-<%@ page import="java.util.List" %>
+<file path="src/main/java/model/service/EmailService.java">
+package model.service;
 
-<%
-    // Controllo sessione: se sei un Drop-Point → Area Drop-Point
-    DropPoint dpSession = (DropPoint) session.getAttribute("dropPoint");
-    Utente utenteLoggato = (Utente) session.getAttribute("utente");
+import jakarta.mail.*;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
-    if (dpSession != null) {
-        response.sendRedirect(request.getContextPath() + "/area-drop-point");
-        return;
+import java.nio.charset.StandardCharsets;
+import java.util.Properties;
+
+public class EmailService {
+    private final Session session;
+    private final String mittente;
+    private final String nomeMittente = "Foundly";
+
+    // Colori Brand
+    private static final String COLOR_PRIMARY = "#FB8C00"; // Arancione Foundly
+    private static final String COLOR_BG = "#F4F6F8";      // Sfondo Grigio Chiaro
+    private static final String COLOR_CARD = "#FFFFFF";    // Sfondo Card
+    private static final String COLOR_TEXT = "#333333";    // Testo Scuro
+    private static final String COLOR_MUTED = "#757575";   // Testo Secondario
+
+    public EmailService() {
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        this.mittente = "foundly.app@gmail.com";
+        final String username = "foundly.app@gmail.com";
+        final String password = System.getenv("SMTP_PASSKEY");
+
+        this.session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
     }
-    if (utenteLoggato == null) {
-        response.sendRedirect(request.getContextPath() + "/login");
-        return;
+
+    // =================================================================================
+    //  METODI PUBBLICI DI INVIO
+    // =================================================================================
+
+    // 1. RECUPERO PASSWORD
+    public void inviaCodiceRecuperoPassword(String destinatario, String codice) {
+        String oggetto = "🔐 Codice di Recupero Password - Foundly";
+        String contenuto =
+                "<p>Hai richiesto di reimpostare la tua password. Utilizza il codice seguente per completare la procedura:</p>" +
+
+                        // Box Codice
+                        "<div style='text-align: center; margin: 30px 0;'>" +
+                        "  <div style='display: inline-block; background-color: #FFF3E0; color: " + COLOR_PRIMARY + "; font-size: 32px; font-weight: 800; letter-spacing: 6px; padding: 15px 40px; border-radius: 8px; border: 1px dashed " + COLOR_PRIMARY + ";'>" +
+                        codice +
+                        "  </div>" +
+                        "</div>" +
+
+                        "<p style='color: " + COLOR_MUTED + "; font-size: 14px;'>Se non hai richiesto tu il recupero della password, ti invitiamo a ignorare questa email.</p>";
+
+        inviaEmail(destinatario, oggetto, "Recupero Password", contenuto);
     }
 
-    // Recupero dati classifica dalla servlet
-    @SuppressWarnings("unchecked")
-    List<Utente> classifica = (List<Utente>) request.getAttribute("classifica");
+    // 2. APPROVAZIONE DROP-POINT (Verso il Drop-Point)
+    public void inviaAccettazioneDropPoint(String destinatario, String nomeAttivita) {
+        String oggetto = "🎉 Drop-Point Approvato! Benvenuto in Foundly";
+        String contenuto =
+                "<p>Ciao <strong>" + nomeAttivita + "</strong>,</p>" +
+                        "<p>Siamo felici di informarti che la tua richiesta di affiliazione è stata <strong>APPROVATA</strong>.</p>" +
+                        "<p>La tua attività è ora ufficialmente un Drop-Point di Foundly. Gli utenti potranno visualizzare il tuo negozio sulla mappa e selezionarlo per depositi e ritiri sicuri.</p>" +
 
-    // Avatar navbar: BLOB byte[]
-    boolean navHasAvatar = utenteLoggato.getImmagineProfilo() != null &&
-            utenteLoggato.getImmagineProfilo().length > 0;
-%>
+                        "<div style='margin-top: 25px; padding-top: 20px; border-top: 1px solid #EEE;'>" +
+                        "  <p style='margin: 0; font-weight: 600;'>Prossimi passi:</p>" +
+                        "  <p style='margin: 5px 0 0 0;'>Accedi alla tua area riservata sulla piattaforma per iniziare a gestire le operazioni.</p>" +
+                        "</div>";
 
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <title>Classifica - Foundly</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        inviaEmail(destinatario, oggetto, "Richiesta Approvata", contenuto);
+    }
 
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    // 3. NUOVO RECLAMO RICEVUTO (Verso il Finder)
+    public void inviaNotificaNuovoReclamo(String destinatario, String titoloOggetto, String usernameRichiedente) {
+        String oggetto = "📩 Nuovo Reclamo per: " + titoloOggetto;
+        String contenuto =
+                "<p>Hai ricevuto una nuova richiesta di restituzione.</p>" +
 
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/classifica.css?v=3">
-</head>
-<body class="page-enter">
+                        // Info Box
+                        "<div style='background-color: #FAFAFA; border-left: 4px solid " + COLOR_PRIMARY + "; padding: 15px; margin: 20px 0; border-radius: 4px;'>" +
+                        "  <div style='margin-bottom: 8px; font-size: 13px; color: " + COLOR_MUTED + "; text-transform: uppercase;'>Oggetto</div>" +
+                        "  <div style='font-size: 16px; font-weight: bold; color: " + COLOR_TEXT + "; margin-bottom: 12px;'>" + titoloOggetto + "</div>" +
+                        "  <div style='margin-bottom: 8px; font-size: 13px; color: " + COLOR_MUTED + "; text-transform: uppercase;'>Richiedente</div>" +
+                        "  <div style='font-size: 16px; font-weight: 600; color: " + COLOR_PRIMARY + ";'>@" + usernameRichiedente + "</div>" +
+                        "</div>" +
 
-<nav class="navbar">
-    <a href="${pageContext.request.contextPath}/index" class="brand">
-        <div class="brand-icon">
-            <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="Foundly">
-        </div>
-    </a>
-    <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/index" class="nav-item">
-            <span class="material-icons">home</span> Home
-        </a>
-        <a href="${pageContext.request.contextPath}/crea-segnalazione" class="nav-item">
-            <span class="material-icons">add_circle_outline</span> Crea Segnalazione
-        </a>
-        <a href="${pageContext.request.contextPath}/le-mie-segnalazioni" class="nav-item">
-            <span class="material-icons">inventory</span> Le mie Segnalazioni
-        </a>
-        <a href="${pageContext.request.contextPath}/drop-point" class="nav-item">
-            <span class="material-icons">place</span> Drop-Point
-        </a>
-        <a href="${pageContext.request.contextPath}/classifica" class="nav-item active">
-            <span class="material-icons">emoji_events</span> Classifica
-        </a>
-    </div>
+                        "<p>L'utente ha risposto alle tue domande di sicurezza. Accedi alla sezione <strong>'Le mie Segnalazioni'</strong> per verificare le risposte e decidere se accettare la richiesta.</p>";
 
-    <div class="user-menu">
-        <button type="button" class="user-avatar-btn">
-            <% if (navHasAvatar) { %>
-            <img src="<%= request.getContextPath() %>/avatar?userId=<%= utenteLoggato.getId() %>"
-                 class="user-avatar-img" alt="">
-            <% } else { %>
-            <div class="user-avatar-placeholder"></div>
-            <% } %>
-        </button>
-        <div class="user-dropdown">
-            <div class="user-dropdown-header">
-                <div class="user-email"><%= utenteLoggato.getEmail() %></div>
-                <div class="user-points-row">
-                    <span class="points-label">punti</span>
-                    <span class="points-value"><%= utenteLoggato.getPunteggio() %></span>
-                </div>
-            </div>
-            <a href="${pageContext.request.contextPath}/profilo" class="user-dropdown-item">
-                <span class="material-icons">person</span><span>Profilo</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/logout" class="user-dropdown-item user-dropdown-item-logout">
-                <span class="material-icons">logout</span><span>Logout</span>
-            </a>
-        </div>
-    </div>
-</nav>
+        inviaEmail(destinatario, oggetto, "Nuova Richiesta", contenuto);
+    }
 
-<main class="classifica-main">
+    // 4. RECLAMO ACCETTATO (Verso l'Owner/Richiedente)
+    public void inviaReclamoAccettatoOwner(String destinatario, String titoloOggetto, String nomeFinder, String eventualeCodice) {
+        String oggetto = "✅ Il tuo reclamo è stato accettato!";
 
-    <header class="classifica-header">
-        <h1>I Campioni di Foundly</h1>
-        <p>Grazie a voi la community cresce e gli oggetti tornano a casa.</p>
-    </header>
-
-    <% if (classifica == null || classifica.isEmpty()) { %>
-    <div class="empty-state">
-        <span class="material-icons empty-icon">emoji_events</span>
-        <h3>La classifica è ancora vuota!</h3>
-        <p>Sii il primo a completare una restituzione.</p>
-    </div>
-    <% } else { %>
-
-    <section class="podium-container">
-        <%
-            Utente first  = classifica.size() > 0 ? classifica.get(0) : null;
-            Utente second = classifica.size() > 1 ? classifica.get(1) : null;
-            Utente third  = classifica.size() > 2 ? classifica.get(2) : null;
-        %>
-
-        <%-- SECONDO POSTO --%>
-        <% if (second != null) {
-            String[] b2 = getBadgeInfo(second.getBadge()); // Calcolo badge
-        %>
-        <div class="podium-step step-silver">
-            <div class="medal-icon">🥈</div>
-            <div class="podium-avatar">
-                <% boolean secondHasAvatar = second.getImmagineProfilo() != null && second.getImmagineProfilo().length > 0; %>
-                <% if (secondHasAvatar) { %>
-                <img src="<%= request.getContextPath() %>/avatar?userId=<%= second.getId() %>" class="podium-img" alt="">
-                <% } else { %>
-                <div class="podium-placeholder"><%= second.getNome().charAt(0) %></div>
-                <% } %>
-            </div>
-            <div class="podium-info">
-                <span class="podium-name"><%= second.getNome() %> <%= second.getCognome() %></span>
-                <span class="badge-tag <%= b2[1] %>" style="margin-top: 4px;"><%= b2[0] %></span>
-                <span class="podium-points"><%= second.getPunteggio() %> pt</span>
-            </div>
-            <div class="podium-base">2</div>
-        </div>
-        <% } %>
-
-        <%-- PRIMO POSTO --%>
-        <% if (first != null) {
-            String[] b1 = getBadgeInfo(first.getBadge()); // Calcolo badge
-        %>
-        <div class="podium-step step-gold">
-            <div class="crown-icon">👑</div>
-            <div class="podium-avatar">
-                <% boolean firstHasAvatar = first.getImmagineProfilo() != null && first.getImmagineProfilo().length > 0; %>
-                <% if (firstHasAvatar) { %>
-                <img src="<%= request.getContextPath() %>/avatar?userId=<%= first.getId() %>" class="podium-img" alt="">
-                <% } else { %>
-                <div class="podium-placeholder"><%= first.getNome().charAt(0) %></div>
-                <% } %>
-            </div>
-            <div class="podium-info">
-                <span class="podium-name"><%= first.getNome() %> <%= first.getCognome() %></span>
-                <span class="podium-badge">🏆 Campione</span>
-                <span class="badge-tag <%= b1[1] %>" style="margin-top: 4px;"><%= b1[0] %></span>
-                <span class="podium-points"><%= first.getPunteggio() %> pt</span>
-            </div>
-            <div class="podium-base">1</div>
-        </div>
-        <% } %>
-
-        <%-- TERZO POSTO --%>
-        <% if (third != null) {
-            String[] b3 = getBadgeInfo(third.getBadge()); // Calcolo badge
-        %>
-        <div class="podium-step step-bronze">
-            <div class="medal-icon">🥉</div>
-            <div class="podium-avatar">
-                <% boolean thirdHasAvatar = third.getImmagineProfilo() != null && third.getImmagineProfilo().length > 0; %>
-                <% if (thirdHasAvatar) { %>
-                <img src="<%= request.getContextPath() %>/avatar?userId=<%= third.getId() %>" class="podium-img" alt="">
-                <% } else { %>
-                <div class="podium-placeholder"><%= third.getNome().charAt(0) %></div>
-                <% } %>
-            </div>
-            <div class="podium-info">
-                <span class="podium-name"><%= third.getNome() %> <%= third.getCognome() %></span>
-                <span class="badge-tag <%= b3[1] %>" style="margin-top: 4px;"><%= b3[0] %></span>
-                <span class="podium-points"><%= third.getPunteggio() %> pt</span>
-            </div>
-            <div class="podium-base">3</div>
-        </div>
-        <% } %>
-    </section>
-
-    <% if (classifica.size() > 3) { %>
-    <section class="ranking-list-section">
-        <h3>Top Contributors</h3>
-        <div class="table-card">
-            <table class="ranking-table">
-                <thead>
-                <tr>
-                    <th class="col-rank">#</th>
-                    <th class="col-user">Utente</th>
-                    <th class="col-badge">Livello</th>
-                    <th class="col-points">Punti</th>
-                </tr>
-                </thead>
-                <tbody>
-                <%
-                    for (int i = 3; i < Math.min(classifica.size(), 15); i++) {
-                        Utente u = classifica.get(i);
-                        int rank = i + 1;
-
-                        // USIAMO LA FUNZIONE HELPER ANCHE QUI
-                        String[] bInfo = getBadgeInfo(u.getBadge());
-                        String badgeName = bInfo[0];
-                        String badgeClass = bInfo[1];
-
-                        boolean isMe = utenteLoggato.getId() == u.getId();
-                        boolean uHasAvatar =
-                                u.getImmagineProfilo() != null &&
-                                        u.getImmagineProfilo().length > 0;
-                %>
-                <tr class="<%= isMe ? "highlight-me" : "" %>">
-                    <td class="col-rank"><span class="rank-circle"><%= rank %></span></td>
-
-                    <td class="col-user">
-                        <div class="user-row-info">
-                            <% if (uHasAvatar) { %>
-                            <img src="<%= request.getContextPath() %>/avatar?userId=<%= u.getId() %>"
-                                 class="mini-avatar-img" alt="">
-                            <% } else { %>
-                            <div class="mini-avatar-placeholder"><%= u.getNome().charAt(0) %></div>
-                            <% } %>
-
-                            <div class="user-data">
-                                <span class="u-name"><%= u.getNome() %> <%= u.getCognome() %></span>
-                                <span class="u-username">@<%= u.getUsername() %></span>
-                            </div>
-                        </div>
-                    </td>
-
-                    <td class="col-badge">
-                        <span class="badge-tag <%= badgeClass %>"><%= badgeName %></span>
-                    </td>
-                    <td class="col-points">
-                        <%= u.getPunteggio() %>
-                    </td>
-                </tr>
-                <% } %>
-                </tbody>
-            </table>
-        </div>
-    </section>
-    <% } %>
-
-    <% } %>
-
-</main>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const userMenu = document.querySelector(".user-menu");
-        if (userMenu) {
-            const btn = userMenu.querySelector(".user-avatar-btn");
-            btn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                userMenu.classList.toggle("open");
-            });
-            document.addEventListener("click", () => userMenu.classList.remove("open"));
-        }
-    });
-</script>
-
-</body>
-</html>
-
-<%!
-    // Metodo helper per calcolare il badge (Nome e Classe CSS)
-    private String[] getBadgeInfo(String rawBadge) {
-        String badgeName = "Novizio";
-        String badgeClass = "bg-gray";
-
-        if ("OCCHIO_DI_FALCO".equals(rawBadge)) {
-            badgeName = "Occhio di Falco";
-            badgeClass = "bg-bronze";
-        } else if ("DETECTIVE".equals(rawBadge)) {
-            badgeName = "Detective";
-            badgeClass = "bg-silver";
-        } else if ("SHERLOCK_HOLMES".equals(rawBadge)) {
-            badgeName = "Sherlock";
-            badgeClass = "bg-gold";
+        String bloccoCodice = "";
+        if (eventualeCodice != null && !eventualeCodice.isEmpty()) {
+            bloccoCodice =
+                    "<div style='text-align: center; margin: 25px 0;'>" +
+                            "  <div style='font-size: 12px; text-transform: uppercase; color: " + COLOR_MUTED + "; margin-bottom: 5px;'>Codice di Ritiro</div>" +
+                            "  <div style='display: inline-block; background-color: #E8F5E9; color: #2E7D32; font-size: 28px; font-weight: 700; letter-spacing: 4px; padding: 10px 30px; border-radius: 8px; border: 1px dashed #2E7D32;'>" +
+                            eventualeCodice +
+                            "  </div>" +
+                            "  <p style='font-size: 13px; color: " + COLOR_MUTED + "; margin-top: 10px;'>Mostra questo codice al Drop-Point per ritirare l'oggetto.</p>" +
+                            "</div>";
+        } else {
+            bloccoCodice =
+                    "<div style='background-color: #E3F2FD; color: #1565C0; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center; font-weight: 500;'>" +
+                            "  Contatta il Finder per accordarvi sulla consegna diretta." +
+                            "</div>";
         }
 
-        return new String[]{badgeName, badgeClass};
+        String contenuto =
+                "<p>Buone notizie! L'utente <strong>" + nomeFinder + "</strong> ha verificato le tue risposte e confermato che l'oggetto è tuo.</p>" +
+
+                        // Info Oggetto
+                        "<div style='margin: 15px 0; font-size: 16px;'>" +
+                        "  Oggetto: <strong>" + titoloOggetto + "</strong>" +
+                        "</div>" +
+
+                        bloccoCodice +
+
+                        "<p>Accedi alla tua area personale per visualizzare i dettagli completi e i contatti.</p>";
+
+        inviaEmail(destinatario, oggetto, "Congratulazioni!", contenuto);
     }
-%>
+
+    // 5. CONFERMA AZIONE ACCETTAZIONE (Verso il Finder)
+    public void inviaConfermaAccettazioneFinder(String destinatario, String titoloOggetto, String nomeRichiedente) {
+        String oggetto = "👍 Hai accettato il reclamo per: " + titoloOggetto;
+        String contenuto =
+                "<p>Hai confermato che l'oggetto <strong>" + titoloOggetto + "</strong> appartiene a <strong>" + nomeRichiedente + "</strong>.</p>" +
+                        "<p>Grazie per la tua onestà! Abbiamo inviato una notifica all'utente con le istruzioni per procedere al ritiro.</p>" +
+                        "<p style='color: " + COLOR_MUTED + "; font-size: 14px; margin-top: 20px;'>Puoi monitorare lo stato della consegna direttamente dalla tua dashboard.</p>";
+
+        inviaEmail(destinatario, oggetto, "Azione Confermata", contenuto);
+    }
+
+    // 6. NUOVA RICHIESTA DROP-POINT (Verso Admin)
+    public void inviaNotificaAdminNuovoDropPoint(String destinatario, String nomeAttivita, String citta) {
+        String oggetto = "🔔 Nuova richiesta Drop-Point: " + nomeAttivita;
+        String contenuto =
+                "<p>Un nuovo Drop-Point ha richiesto l'iscrizione alla piattaforma Foundly.</p>" +
+
+                        "<div style='background-color: #FAFAFA; border: 1px solid #EEEEEE; padding: 15px; border-radius: 8px; margin: 20px 0;'>" +
+                        "  <ul style='list-style: none; padding: 0; margin: 0;'>" +
+                        "    <li style='margin-bottom: 8px;'><strong>Attività:</strong> " + nomeAttivita + "</li>" +
+                        "    <li style='margin-bottom: 0;'><strong>Città:</strong> " + citta + "</li>" +
+                        "  </ul>" +
+                        "</div>" +
+
+                        "<p>Accedi al pannello di amministrazione per esaminare i dettagli completi e approvare o rifiutare la richiesta.</p>";
+
+        inviaEmail(destinatario, oggetto, "Notifica Admin", contenuto);
+    }
+
+    // =================================================================================
+    //  LOGICA INTERNA E TEMPLATE
+    // =================================================================================
+
+    private void inviaEmail(String destinatario, String oggetto, String preHeader, String contenutoHtml) {
+        // ESEGUE IL THREAD QUI - NON c'è bisogno di farlo fuori
+        new Thread(() -> {
+            try {
+                MimeMessage message = new MimeMessage(session);
+                try {
+                    message.setFrom(new InternetAddress(mittente, nomeMittente, StandardCharsets.UTF_8.name()));
+                } catch (Exception e) {
+                    message.setFrom(new InternetAddress(mittente));
+                }
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
+                message.setSubject(oggetto, StandardCharsets.UTF_8.name());
+
+                String templateCompleto = costruisciTemplateHtml(preHeader, contenutoHtml);
+
+                MimeBodyPart htmlPart = new MimeBodyPart();
+                htmlPart.setContent(templateCompleto, "text/html; charset=UTF-8");
+
+                MimeMultipart multipart = new MimeMultipart("alternative");
+                multipart.addBodyPart(htmlPart);
+
+                message.setContent(multipart);
+                Transport.send(message);
+                System.out.println("✅ Email inviata con successo a: " + destinatario);
+
+            } catch (MessagingException e) {
+                e.printStackTrace();
+                System.err.println("❌ Errore invio email a " + destinatario + ": " + e.getMessage());
+            }
+        }).start();
+    }
+
+    private String costruisciTemplateHtml(String titoloPrincipale, String body) {
+        return "<!DOCTYPE html>" +
+                "<html>" +
+                "<head>" +
+                "  <meta charset='UTF-8'>" +
+                "  <meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
+                "</head>" +
+                "<body style='margin: 0; padding: 0; background-color: " + COLOR_BG + "; font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; color: " + COLOR_TEXT + ";'>" +
+                "  <table width='100%' cellpadding='0' cellspacing='0' style='padding: 40px 0;'>" +
+                "    <tr>" +
+                "      <td align='center'>" +
+                "        " +
+                "        <table width='600' cellpadding='0' cellspacing='0' style='background-color: " + COLOR_CARD + "; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #EAEAEA;'>" +
+                "          " +
+                "          " +
+                "          <tr>" +
+                "            <td style='background-color: " + COLOR_CARD + "; padding: 30px 40px; border-bottom: 4px solid " + COLOR_PRIMARY + "; text-align: center;'>" +
+                "              <h1 style='color: " + COLOR_PRIMARY + "; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;'>Foundly</h1>" +
+                "            </td>" +
+                "          </tr>" +
+                "          " +
+                "          " +
+                "          <tr>" +
+                "            <td style='padding: 40px;'>" +
+                "              <h2 style='color: " + COLOR_TEXT + "; margin-top: 0; margin-bottom: 20px; font-size: 22px; font-weight: 700;'>" + titoloPrincipale + "</h2>" +
+                "              <div style='font-size: 16px; line-height: 1.6; color: #555555;'>" +
+                body +
+                "              </div>" +
+                "            </td>" +
+                "          </tr>" +
+                "          " +
+                "          " +
+                "          <tr>" +
+                "            <td style='background-color: #FAFAFA; padding: 25px 40px; text-align: center; border-top: 1px solid #EEEEEE;'>" +
+                "              <p style='margin: 0; font-size: 12px; color: #999999; line-height: 1.5;'>" +
+                "                Questa è una notifica automatica inviata da Foundly.<br>" +
+                "                Ti preghiamo di non rispondere direttamente a questo messaggio." +
+                "              </p>" +
+                "              <p style='margin: 10px 0 0 0; font-size: 12px; color: #BBBBBB;'>" +
+                "                &copy; 2025 Foundly Team" +
+                "              </p>" +
+                "            </td>" +
+                "          </tr>" +
+                "        </table>" +
+                "      </td>" +
+                "    </tr>" +
+                "  </table>" +
+                "</body>" +
+                "</html>";
+    }
+}
 </file>
 
 <file path="src/main/webapp/WEB-INF/jsp/login.jsp">
@@ -7653,6 +6956,161 @@ public class RecuperoPasswordServlet extends HttpServlet {
         </plugins>
     </build>
 </project>
+</file>
+
+<file path="src/main/java/controller/GestioneReclamoServlet.java">
+package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.DropPoint;
+import model.bean.Reclamo;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoSegnalazione;
+import model.dao.ReclamoDAO;
+import model.service.EmailService;
+import model.service.SegnalazioneService;
+import model.service.UtenteService;
+
+import java.io.IOException;
+import java.util.UUID;
+
+@WebServlet(name = "GestioneReclamoServlet", value = "/gestione-reclamo")
+public class GestioneReclamoServlet extends HttpServlet {
+
+    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
+    private final SegnalazioneService segnalazioneService = new SegnalazioneService();
+    private final EmailService emailService = new EmailService();
+    private final UtenteService utenteService = new UtenteService();
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        HttpSession session = request.getSession(false);
+
+        Utente utente = (session != null) ? (Utente) session.getAttribute("utente") : null;
+        DropPoint dropPoint = (session != null) ? (DropPoint) session.getAttribute("dropPoint") : null;
+
+        if (utente == null && dropPoint == null) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        // --- DROP-POINT: Conferma Ritiro ---
+        if ("conferma_ritiro".equals(action)) {
+            if (dropPoint == null) { response.sendRedirect("login"); return; }
+            try {
+                long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
+                long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+                String codice = request.getParameter("codiceConsegna");
+
+                boolean successo = segnalazioneService.accettaReclamoEChiudiSegnalazione(idReclamo, idSegnalazione, codice);
+                response.sendRedirect("area-drop-point?msg=" + (successo ? "successo_consegna" : "codice_errato"));
+            } catch (Exception e) {
+                response.sendRedirect("area-drop-point?err=errore");
+            }
+            return;
+        }
+
+        // --- UTENTI (Finder/Owner) ---
+        if (utente == null) { response.sendRedirect("login"); return; }
+
+        if ("invia".equals(action)) {
+            // ... invia reclamo ...
+            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
+
+            if (s == null || s.getStato() != StatoSegnalazione.APERTA) {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=segnalazione_chiusa");
+                return;
+            }
+            if (reclamoDAO.doRetrieveBySegnalazioneAndUtente(idSegnalazione, utente.getId()) != null) {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_esistente");
+                return;
+            }
+
+            Reclamo r = new Reclamo();
+            r.setIdSegnalazione(idSegnalazione);
+            r.setIdUtenteRichiedente(utente.getId());
+            r.setRispostaVerifica1(request.getParameter("risposta1"));
+            r.setRispostaVerifica2(request.getParameter("risposta2"));
+            boolean salvato = reclamoDAO.doSave(r);
+
+            // MAIL AL FINDER (Chiamata Diretta)
+            if (salvato) {
+                Utente finder = utenteService.trovaPerId(s.getIdUtente());
+                if (finder != null) {
+                    emailService.inviaNotificaNuovoReclamo(finder.getEmail(), s.getTitolo(), utente.getUsername());
+                }
+            }
+            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_inviato");
+
+        } else if ("accetta".equals(action)) {
+            // ... accetta reclamo ...
+            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
+            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
+
+            String codice = null;
+            boolean isDropPoint = false;
+
+            if (s instanceof SegnalazioneOggetto) {
+                SegnalazioneOggetto so = (SegnalazioneOggetto) s;
+                if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
+                    isDropPoint = true;
+                    codice = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+                }
+            }
+
+            boolean ok = reclamoDAO.accettaReclamo(idReclamo, codice);
+
+            if (ok) {
+                Reclamo r = reclamoDAO.doRetrieveById(idReclamo);
+                Utente richiedente = utenteService.trovaPerId(r.getIdUtenteRichiedente());
+                Utente finder = utente;
+
+                // MAIL 1: FINDER (Chiamata Diretta)
+                emailService.inviaConfermaAccettazioneFinder(finder.getEmail(), s.getTitolo(), richiedente.getNome() + " " + richiedente.getCognome());
+
+                // MAIL 2: OWNER (Chiamata Diretta)
+                emailService.inviaReclamoAccettatoOwner(richiedente.getEmail(), s.getTitolo(), finder.getNome() + " " + finder.getCognome(), codice);
+            }
+
+            if (isDropPoint) {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=attesa_ritiro");
+            } else {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=scambio_avviato");
+            }
+
+        } else if ("rifiuta".equals(action)) {
+            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
+            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+            segnalazioneService.rifiutaReclamo(idReclamo);
+            response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_rifiutato");
+
+        } else if ("conferma_scambio".equals(action)) {
+            long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
+            long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
+            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
+            boolean isFinder = (s.getIdUtente() == utente.getId());
+
+            boolean finito = segnalazioneService.gestisciConfermaScambio(idReclamo, isFinder);
+
+            if (finito) {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=scambio_completato");
+            } else {
+                response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=conferma_registrata");
+            }
+        }
+    }
+}
 </file>
 
 <file path="src/main/webapp/css/dettaglio_segnalazione.css">
@@ -8151,6 +7609,435 @@ body {
     0% { transform: scale(0.8); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
 }
+</file>
+
+<file path="src/main/webapp/WEB-INF/jsp/area_admin.jsp">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.List" %>
+<%@ page import="model.bean.Utente" %>
+<%@ page import="model.bean.DropPoint" %>
+<%@ page import="model.bean.enums.Ruolo" %>
+
+<%
+  Utente utente = (Utente) session.getAttribute("utente");
+  if (utente == null || utente.getRuolo() != Ruolo.ADMIN) {
+    response.sendRedirect(request.getContextPath() + "/login");
+    return;
+  }
+
+  List<DropPoint> pendenti  = (List<DropPoint>) request.getAttribute("dropPointsPendenti");
+  List<DropPoint> approvati = (List<DropPoint>) request.getAttribute("dropPointsApprovati");
+  List<Utente> utenti       = (List<Utente>) request.getAttribute("listaUtenti");
+%>
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Area Admin - Foundly</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/area_admin.css">
+</head>
+<body class="page-enter">
+
+<jsp:include page="/WEB-INF/jsp/navbar.jsp"/>
+
+<main class="admin-main">
+
+  <!-- Gestione Drop-Point -->
+  <section class="admin-section">
+    <h1 class="admin-title">Gestione Drop-Point</h1>
+
+    <!-- PENDENTI -->
+    <div class="admin-card">
+      <h2 class="admin-subtitle">Richieste in attesa</h2>
+
+      <%
+        if (pendenti == null || pendenti.isEmpty()) {
+      %>
+      <p class="admin-empty">Nessun Drop-Point in attesa di approvazione.</p>
+      <%
+      } else {
+      %>
+      <table class="admin-table">
+        <thead>
+        <tr>
+          <th>Nome attività</th>
+          <th>Indirizzo</th>
+          <th>Città</th>
+          <th>Provincia</th>
+          <th>Telefono</th>
+          <th>Azioni</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+          for (DropPoint dp : pendenti) {
+        %>
+        <tr>
+          <td><%= dp.getNomeAttivita() %></td>
+          <td><%= dp.getIndirizzo() %></td>
+          <td><%= dp.getCitta() %></td>
+          <td><%= dp.getProvincia() %></td>
+          <td><%= dp.getTelefono() != null ? dp.getTelefono() : "-" %></td>
+          <td class="admin-actions">
+            <form method="post" action="${pageContext.request.contextPath}/admin" class="inline-form">
+              <input type="hidden" name="action" value="approveDropPoint">
+              <input type="hidden" name="dropPointId" value="<%= dp.getId() %>">
+              <button type="submit" class="btn-admin-approve">Approva</button>
+            </form>
+
+            <form method="post" action="${pageContext.request.contextPath}/admin" class="inline-form">
+              <input type="hidden" name="action" value="rejectDropPoint">
+              <input type="hidden" name="dropPointId" value="<%= dp.getId() %>">
+              <button type="submit" class="btn-admin-reject">Rifiuta</button>
+            </form>
+          </td>
+        </tr>
+        <%
+          }
+        %>
+        </tbody>
+      </table>
+      <%
+        }
+      %>
+    </div>
+
+    <!-- APPROVATI -->
+    <div class="admin-card" style="margin-top:20px;">
+      <h2 class="admin-subtitle">Drop-Point approvati</h2>
+
+      <%
+        if (approvati == null || approvati.isEmpty()) {
+      %>
+      <p class="admin-empty">Nessun Drop-Point approvato.</p>
+      <%
+      } else {
+      %>
+      <table class="admin-table">
+        <thead>
+        <tr>
+          <th>Nome attività</th>
+          <th>Indirizzo</th>
+          <th>Città</th>
+          <th>Provincia</th>
+          <th>Email</th>
+          <th>Telefono</th>
+          <th>Azioni</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+          for (DropPoint dp : approvati) {
+        %>
+        <tr>
+          <td><%= dp.getNomeAttivita() %></td>
+          <td><%= dp.getIndirizzo() %></td>
+          <td><%= dp.getCitta() %></td>
+          <td><%= dp.getProvincia() %></td>
+          <td><%= dp.getEmail() != null ? dp.getEmail() : "-" %></td>
+          <td><%= dp.getTelefono() != null ? dp.getTelefono() : "-" %></td>
+          <td class="admin-actions">
+            <form method="post"
+                  action="${pageContext.request.contextPath}/admin"
+                  class="inline-form"
+                  onsubmit="return confirm('Eliminare definitivamente questo Drop-Point?');">
+              <input type="hidden" name="action" value="deleteDropPoint">
+              <input type="hidden" name="dropPointId" value="<%= dp.getId() %>">
+              <button type="submit" class="btn-admin-delete">Elimina</button>
+            </form>
+          </td>
+        </tr>
+        <%
+          }
+        %>
+        </tbody>
+      </table>
+      <%
+        }
+      %>
+    </div>
+
+  </section>
+
+  <!-- Gestione Utenti -->
+  <section class="admin-section">
+    <h1 class="admin-title">Gestione Utenti</h1>
+
+    <div class="admin-card">
+      <h2 class="admin-subtitle">Lista utenti</h2>
+
+      <table class="admin-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Nome</th>
+          <th>Cognome</th>
+          <th>Email</th>
+          <th>Ruolo</th>
+          <th>Azioni</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+          if (utenti != null) {
+            for (Utente u : utenti) {
+        %>
+        <tr>
+          <td><%= u.getId() %></td>
+          <td><%= u.getUsername() %></td>
+          <td><%= u.getNome() %></td>
+          <td><%= u.getCognome() %></td>
+          <td><%= u.getEmail() %></td>
+          <td><%= u.getRuolo() %></td>
+          <td class="admin-actions">
+            <%
+              if (u.getId() != utente.getId() && u.getRuolo() == Ruolo.UTENTE_BASE) {
+            %>
+            <form method="post"
+                  action="${pageContext.request.contextPath}/admin"
+                  class="inline-form"
+                  onsubmit="return confirm('Confermi la rimozione di questo utente?');">
+              <input type="hidden" name="action" value="deleteUser">
+              <input type="hidden" name="userId" value="<%= u.getId() %>">
+              <button type="submit" class="btn-admin-delete">Elimina</button>
+            </form>
+            <%
+            } else {
+            %>
+            <button type="submit" class="btn-admin-delete">Null</button>
+            <%
+              }
+            %>
+          </td>
+        </tr>
+        <%
+            }
+          }
+        %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>
+</file>
+
+<file path="src/main/webapp/WEB-INF/jsp/classifica.jsp">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="model.bean.Utente" %>
+<%@ page import="model.bean.DropPoint" %>
+<%@ page import="java.util.List" %>
+
+<%
+    DropPoint dpSession = (DropPoint) session.getAttribute("dropPoint");
+    Utente utenteLoggato = (Utente) session.getAttribute("utente");
+
+    if (dpSession != null) {
+        response.sendRedirect(request.getContextPath() + "/area-drop-point");
+        return;
+    }
+    if (utenteLoggato == null) {
+        response.sendRedirect(request.getContextPath() + "/login");
+        return;
+    }
+
+    @SuppressWarnings("unchecked")
+    List<Utente> classifica = (List<Utente>) request.getAttribute("classifica");
+%>
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Classifica - Foundly</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/classifica.css?v=3">
+</head>
+<body class="page-enter">
+
+<jsp:include page="/WEB-INF/jsp/navbar.jsp" />
+
+<main class="classifica-main">
+
+    <header class="classifica-header">
+        <h1>I Campioni di Foundly</h1>
+        <p>Grazie a voi la community cresce e gli oggetti tornano a casa.</p>
+    </header>
+
+    <% if (classifica == null || classifica.isEmpty()) { %>
+    <div class="empty-state">
+        <span class="material-icons empty-icon">emoji_events</span>
+        <h3>La classifica è ancora vuota!</h3>
+        <p>Sii il primo a completare una restituzione.</p>
+    </div>
+    <% } else { %>
+
+    <section class="podium-container">
+        <%
+            Utente first  = classifica.size() > 0 ? classifica.get(0) : null;
+            Utente second = classifica.size() > 1 ? classifica.get(1) : null;
+            Utente third  = classifica.size() > 2 ? classifica.get(2) : null;
+        %>
+
+        <% if (second != null) {
+            String[] b2 = getBadgeInfo(second.getBadge());
+        %>
+        <div class="podium-step step-silver">
+            <div class="medal-icon">🥈</div>
+            <div class="podium-avatar">
+                <% boolean secondHasAvatar = second.getImmagineProfilo() != null && second.getImmagineProfilo().length > 0; %>
+                <% if (secondHasAvatar) { %>
+                <img src="<%= request.getContextPath() %>/avatar?userId=<%= second.getId() %>" class="podium-img" alt="">
+                <% } else { %>
+                <div class="podium-placeholder"><%= second.getNome().charAt(0) %></div>
+                <% } %>
+            </div>
+            <div class="podium-info">
+                <span class="podium-name"><%= second.getNome() %> <%= second.getCognome() %></span>
+                <span class="badge-tag <%= b2[1] %>" style="margin-top:4px;"><%= b2[0] %></span>
+                <span class="podium-points"><%= second.getPunteggio() %> pt</span>
+            </div>
+            <div class="podium-base">2</div>
+        </div>
+        <% } %>
+
+        <% if (first != null) {
+            String[] b1 = getBadgeInfo(first.getBadge());
+        %>
+        <div class="podium-step step-gold">
+            <div class="crown-icon">👑</div>
+            <div class="podium-avatar">
+                <% boolean firstHasAvatar = first.getImmagineProfilo() != null && first.getImmagineProfilo().length > 0; %>
+                <% if (firstHasAvatar) { %>
+                <img src="<%= request.getContextPath() %>/avatar?userId=<%= first.getId() %>" class="podium-img" alt="">
+                <% } else { %>
+                <div class="podium-placeholder"><%= first.getNome().charAt(0) %></div>
+                <% } %>
+            </div>
+            <div class="podium-info">
+                <span class="podium-name"><%= first.getNome() %> <%= first.getCognome() %></span>
+                <span class="podium-badge">🏆 Campione</span>
+                <span class="badge-tag <%= b1[1] %>" style="margin-top:4px;"><%= b1[0] %></span>
+                <span class="podium-points"><%= first.getPunteggio() %> pt</span>
+            </div>
+            <div class="podium-base">1</div>
+        </div>
+        <% } %>
+
+        <% if (third != null) {
+            String[] b3 = getBadgeInfo(third.getBadge());
+        %>
+        <div class="podium-step step-bronze">
+            <div class="medal-icon">🥉</div>
+            <div class="podium-avatar">
+                <% boolean thirdHasAvatar = third.getImmagineProfilo() != null && third.getImmagineProfilo().length > 0; %>
+                <% if (thirdHasAvatar) { %>
+                <img src="<%= request.getContextPath() %>/avatar?userId=<%= third.getId() %>" class="podium-img" alt="">
+                <% } else { %>
+                <div class="podium-placeholder"><%= third.getNome().charAt(0) %></div>
+                <% } %>
+            </div>
+            <div class="podium-info">
+                <span class="podium-name"><%= third.getNome() %> <%= third.getCognome() %></span>
+                <span class="badge-tag <%= b3[1] %>" style="margin-top:4px;"><%= b3[0] %></span>
+                <span class="podium-points"><%= third.getPunteggio() %> pt</span>
+            </div>
+            <div class="podium-base">3</div>
+        </div>
+        <% } %>
+    </section>
+
+    <% if (classifica.size() > 3) { %>
+    <section class="ranking-list-section">
+        <h3>Top Contributors</h3>
+        <div class="table-card">
+            <table class="ranking-table">
+                <thead>
+                <tr>
+                    <th class="col-rank">#</th>
+                    <th class="col-user">Utente</th>
+                    <th class="col-badge">Livello</th>
+                    <th class="col-points">Punti</th>
+                </tr>
+                </thead>
+                <tbody>
+                <%
+                    for (int i = 3; i < Math.min(classifica.size(), 15); i++) {
+                        Utente u = classifica.get(i);
+                        int rank = i + 1;
+
+                        String[] bInfo = getBadgeInfo(u.getBadge());
+                        String badgeName = bInfo[0];
+                        String badgeClass = bInfo[1];
+
+                        boolean isMe = utenteLoggato.getId() == u.getId();
+                        boolean uHasAvatar = u.getImmagineProfilo() != null && u.getImmagineProfilo().length > 0;
+                %>
+                <tr class="<%= isMe ? "highlight-me" : "" %>">
+                    <td class="col-rank"><span class="rank-circle"><%= rank %></span></td>
+                    <td class="col-user">
+                        <div class="user-row-info">
+                            <% if (uHasAvatar) { %>
+                            <img src="<%= request.getContextPath() %>/avatar?userId=<%= u.getId() %>" class="mini-avatar-img" alt="">
+                            <% } else { %>
+                            <div class="mini-avatar-placeholder"><%= u.getNome().charAt(0) %></div>
+                            <% } %>
+
+                            <div class="user-data">
+                                <span class="u-name"><%= u.getNome() %> <%= u.getCognome() %></span>
+                                <span class="u-username">@<%= u.getUsername() %></span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="col-badge">
+                        <span class="badge-tag <%= badgeClass %>"><%= badgeName %></span>
+                    </td>
+                    <td class="col-points"><%= u.getPunteggio() %></td>
+                </tr>
+                <% } %>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <% } %>
+
+    <% } %>
+
+</main>
+</body>
+</html>
+
+<%!
+    private String[] getBadgeInfo(String rawBadge) {
+        String badgeName = "Novizio";
+        String badgeClass = "bg-gray";
+
+        if ("OCCHIO_DI_FALCO".equals(rawBadge)) {
+            badgeName = "Occhio di Falco";
+            badgeClass = "bg-bronze";
+        } else if ("DETECTIVE".equals(rawBadge)) {
+            badgeName = "Detective";
+            badgeClass = "bg-silver";
+        } else if ("SHERLOCK_HOLMES".equals(rawBadge)) {
+            badgeName = "Sherlock";
+            badgeClass = "bg-gold";
+        }
+        return new String[]{badgeName, badgeClass};
+    }
+%>
 </file>
 
 <file path="src/main/webapp/WEB-INF/jsp/crea_segnalazione.jsp">
@@ -9106,374 +8993,6 @@ body {
 </html>
 </file>
 
-<file path="src/main/java/model/dao/ReclamoDAO.java">
-package model.dao;
-
-import model.ConPool;
-import model.bean.Reclamo;
-import model.bean.enums.StatoReclamo;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-
-public class ReclamoDAO {
-
-    public boolean doSave(Reclamo r) {
-        String query = "INSERT INTO reclamo (" +
-                "id_segnalazione, id_utente_richiedente, " +
-                "risposta_verifica1, risposta_verifica2, " +
-                "stato, data_richiesta" +
-                ") VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setLong(1, r.getIdSegnalazione());
-            ps.setLong(2, r.getIdUtenteRichiedente());
-            ps.setString(3, r.getRispostaVerifica1());
-            ps.setString(4, r.getRispostaVerifica2());
-            ps.setString(5, StatoReclamo.IN_ATTESA.toString());
-            ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
-
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // --- NUOVI METODI PER SCAMBIO DIRETTO ---
-    public boolean confermaFinder(long idReclamo) {
-        String sql = "UPDATE reclamo SET conferma_finder = 1 WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setLong(1, idReclamo);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean confermaOwner(long idReclamo) {
-        String sql = "UPDATE reclamo SET conferma_owner = 1 WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setLong(1, idReclamo);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    // ----------------------------------------
-
-    // --- NUOVO METODO PER DROP-POINT (CERCA PER CODICE) ---
-    public Reclamo doRetrieveByCodice(String codice) {
-        String query = "SELECT * FROM reclamo WHERE codice_consegna = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setString(1, codice);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return mapRow(rs);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    // -----------------------------------------------------
-
-    public List<Reclamo> doRetrieveBySegnalazione(long idSegnalazione) {
-        List<Reclamo> list = new ArrayList<>();
-        String query = "SELECT * FROM reclamo WHERE id_segnalazione = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setLong(1, idSegnalazione);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public Reclamo doRetrieveBySegnalazioneAndUtente(long idSegnalazione, long idUtente) {
-        String query = "SELECT * FROM reclamo WHERE id_segnalazione = ? AND id_utente_richiedente = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setLong(1, idSegnalazione);
-            ps.setLong(2, idUtente);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public boolean accettaReclamo(long idReclamo, String codice) {
-        String query = "UPDATE reclamo SET stato = 'ACCETTATO', codice_consegna = ? WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setString(1, codice);
-            ps.setLong(2, idReclamo);
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public Reclamo doRetrieveById(long id) {
-        String query = "SELECT * FROM reclamo WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setLong(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public boolean rifiutaReclamo(long idReclamo) {
-        String query = "UPDATE reclamo SET stato = 'RIFIUTATO' WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setLong(1, idReclamo);
-            return ps.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public List<Reclamo> doRetrieveByRichiedente(long idUtenteRichiedente) {
-        List<Reclamo> list = new ArrayList<>();
-        String query = "SELECT r.*, s.titolo AS seg_titolo, s.immagine AS seg_immagine " +
-                "FROM reclamo r " +
-                "JOIN segnalazione s ON r.id_segnalazione = s.id " +
-                "WHERE r.id_utente_richiedente = ? " +
-                "ORDER BY r.data_richiesta DESC";
-
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-
-            ps.setLong(1, idUtenteRichiedente);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Reclamo r = mapRow(rs);
-                    r.setTitoloSegnalazione(rs.getString("seg_titolo"));
-                    String imgPath = rs.getString("seg_immagine");
-                    if (imgPath != null) {
-                        r.setImmagineSegnalazione(imgPath.getBytes());
-                    }
-                    list.add(r);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    private Reclamo mapRow(ResultSet rs) throws SQLException {
-        Reclamo r = new Reclamo();
-        r.setId(rs.getLong("id"));
-        r.setIdSegnalazione(rs.getLong("id_segnalazione"));
-        r.setIdUtenteRichiedente(rs.getLong("id_utente_richiedente"));
-        r.setRispostaVerifica1(rs.getString("risposta_verifica1"));
-        r.setRispostaVerifica2(rs.getString("risposta_verifica2"));
-        r.setDataRichiesta(rs.getTimestamp("data_richiesta"));
-        r.setDataDeposito(rs.getTimestamp("data_deposito"));
-        r.setDataRitiro(rs.getTimestamp("data_ritiro"));
-        r.setConfermaFinder(rs.getBoolean("conferma_finder"));
-        r.setConfermaOwner(rs.getBoolean("conferma_owner"));
-        r.setCodiceConsegna(rs.getString("codice_consegna"));
-        try {
-            r.setStato(StatoReclamo.valueOf(rs.getString("stato")));
-        } catch (Exception e) {
-            r.setStato(StatoReclamo.IN_ATTESA);
-        }
-        return r;
-    }
-}
-</file>
-
-<file path="src/main/webapp/WEB-INF/jsp/navbar.jsp">
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="model.bean.Utente" %>
-<%@ page import="model.bean.DropPoint" %>
-<%@ page import="model.bean.enums.Ruolo" %>
-
-<%
-    String ctx = request.getContextPath();
-
-    // Chi è loggato?
-    Utente    utenteLoggatoNav   = (Utente)    session.getAttribute("utente");
-    DropPoint dropPointLoggato   = (DropPoint) session.getAttribute("dropPoint");
-
-    boolean isDropPoint = (dropPointLoggato != null);
-    boolean isUtente    = (!isDropPoint && utenteLoggatoNav != null);
-
-    // Avatar (unico flag per entrambi i casi)
-    boolean navHasAvatar = false;
-    String  navAvatarUrl = null;
-
-    if (isUtente) {
-        if (utenteLoggatoNav.getImmagineProfilo() != null &&
-                utenteLoggatoNav.getImmagineProfilo().length > 0) {
-
-            navHasAvatar = true;
-            navAvatarUrl = ctx + "/avatar?userId=" + utenteLoggatoNav.getId();
-        }
-    } else if (isDropPoint) {
-        if (dropPointLoggato.getImmagine() != null &&
-                dropPointLoggato.getImmagine().length > 0) {
-
-            navHasAvatar = true;
-            navAvatarUrl = ctx + "/drop-point-avatar?dpId=" + dropPointLoggato.getId();
-        }
-    }
-%>
-
-<nav class="navbar">
-    <!-- Logo -->
-    <a href="<%= ctx %>/index" class="brand">
-        <div class="brand-icon">
-            <img src="<%= ctx %>/assets/images/logo.png" alt="logo_foundly">
-        </div>
-    </a>
-
-    <!-- Link centrali -->
-    <div class="nav-links">
-        <% if (isDropPoint) { %>
-        <!-- Drop-Point: solo Area Drop-Point -->
-        <a href="<%= ctx %>/area-drop-point" class="nav-item">
-            <span class="material-icons">storefront</span> Area Drop-Point
-        </a>
-        <% } else { %>
-        <!-- Utente normale -->
-        <a href="<%= ctx %>/index" class="nav-item">
-            <span class="material-icons">home</span> Home
-        </a>
-        <a href="<%= ctx %>/crea-segnalazione" class="nav-item">
-            <span class="material-icons">add_circle_outline</span> Crea Segnalazione
-        </a>
-        <a href="<%= ctx %>/le-mie-segnalazioni" class="nav-item">
-            <span class="material-icons">inventory</span> Segnalazioni e Reclami
-        </a>
-        <a href="<%= ctx %>/drop-point" class="nav-item">
-            <span class="material-icons">place</span> Drop-Point
-        </a>
-        <a href="<%= ctx %>/classifica" class="nav-item">
-            <span class="material-icons">emoji_events</span> Classifica
-        </a>
-        <% } %>
-    </div>
-
-    <!-- Lato destro: menu utente / drop-point -->
-    <% if (isUtente || isDropPoint) { %>
-    <div class="user-menu">
-        <button type="button" class="user-avatar-btn" onclick="toggleUserMenu(event)">
-            <% if (navHasAvatar) { %>
-            <img src="<%= navAvatarUrl %>" alt="" class="user-avatar-img">
-            <% } else { %>
-            <div class="user-avatar-placeholder"></div>
-            <% } %>
-        </button>
-
-        <div class="user-dropdown">
-            <% if (isUtente) { %>
-            <!-- Header per cittadino -->
-            <div class="user-dropdown-header">
-                <div class="user-email"><%= utenteLoggatoNav.getEmail() %></div>
-                <div class="user-points-row">
-                    <span class="points-label">punti</span>
-                    <span class="points-value"><%= utenteLoggatoNav.getPunteggio() %></span>
-                </div>
-            </div>
-
-            <a href="<%= ctx %>/profilo" class="user-dropdown-item">
-                <span class="material-icons">person</span>
-                <span>Profilo</span>
-            </a>
-
-            <% if (utenteLoggatoNav.getRuolo() == Ruolo.ADMIN) { %>
-            <a href="<%= ctx %>/admin" class="user-dropdown-item">
-                <span class="material-icons">admin_panel_settings</span>
-                <span>Area Admin</span>
-            </a>
-            <% } %>
-
-            <% } else { %>
-            <!-- Header per Drop-Point -->
-            <div class="user-dropdown-header">
-                <div class="user-email"><%= dropPointLoggato.getEmail() %></div>
-                <div class="user-dp-row">
-                    <span class="user-dp-label">Drop-Point</span>
-                    <span class="user-dp-name"><%= dropPointLoggato.getNomeAttivita() %></span>
-                </div>
-            </div>
-
-            <a href="<%= ctx %>/profilo-drop-point" class="user-dropdown-item">
-                <span class="material-icons">storefront</span>
-                <span>Profilo Drop-Point</span>
-            </a>
-            <% } %>
-
-            <a href="<%= ctx %>/logout" class="user-dropdown-item user-dropdown-item-logout">
-                <span class="material-icons">logout</span>
-                <span>Logout</span>
-            </a>
-        </div>
-    </div>
-    <% } else { %>
-    <!-- Nessuno loggato -->
-    <a href="<%= ctx %>/login" class="btn-login-nav">
-        <span class="material-icons">login</span>
-        <span>Accedi</span>
-    </a>
-    <% } %>
-</nav>
-
-<script>
-    function toggleUserMenu(event) {
-        if (event) {
-            event.stopPropagation();
-        }
-        var menu = document.querySelector(".user-menu");
-        if (menu) {
-            menu.classList.toggle("open");
-        }
-    }
-
-    document.addEventListener("click", function () {
-        var menu = document.querySelector(".user-menu");
-        if (menu) {
-            menu.classList.remove("open");
-        }
-    });
-</script>
-</file>
-
 <file path="src/main/webapp/WEB-INF/jsp/profilo.jsp">
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="model.bean.Utente" %>
@@ -9776,6 +9295,323 @@ public class ReclamoDAO {
 
 </body>
 </html>
+</file>
+
+<file path="src/main/java/model/dao/ReclamoDAO.java">
+package model.dao;
+
+import model.ConPool;
+import model.bean.Reclamo;
+import model.bean.enums.StatoReclamo;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ReclamoDAO {
+
+    public boolean doSave(Reclamo r) {
+        String query = "INSERT INTO reclamo (" +
+                "id_segnalazione, id_utente_richiedente, " +
+                "risposta_verifica1, risposta_verifica2, " +
+                "stato, data_richiesta" +
+                ") VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setLong(1, r.getIdSegnalazione());
+            ps.setLong(2, r.getIdUtenteRichiedente());
+            ps.setString(3, r.getRispostaVerifica1());
+            ps.setString(4, r.getRispostaVerifica2());
+            ps.setString(5, StatoReclamo.IN_ATTESA.toString());
+            ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // --- NUOVI METODI PER SCAMBIO DIRETTO ---
+    public boolean confermaFinder(long idReclamo) {
+        String sql = "UPDATE reclamo SET conferma_finder = 1 WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean confermaOwner(long idReclamo) {
+        String sql = "UPDATE reclamo SET conferma_owner = 1 WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    // ----------------------------------------
+
+    // --- NUOVO METODO PER DROP-POINT (CERCA PER CODICE) ---
+    public Reclamo doRetrieveByCodice(String codice) {
+        String query = "SELECT * FROM reclamo WHERE codice_consegna = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, codice);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    // -----------------------------------------------------
+
+    public List<Reclamo> doRetrieveBySegnalazione(long idSegnalazione) {
+        List<Reclamo> list = new ArrayList<>();
+        String query = "SELECT * FROM reclamo WHERE id_segnalazione = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setLong(1, idSegnalazione);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public Reclamo doRetrieveBySegnalazioneAndUtente(long idSegnalazione, long idUtente) {
+        String query = "SELECT * FROM reclamo WHERE id_segnalazione = ? AND id_utente_richiedente = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setLong(1, idSegnalazione);
+            ps.setLong(2, idUtente);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean accettaReclamo(long idReclamo, String codice) {
+        String query = "UPDATE reclamo SET stato = 'ACCETTATO', codice_consegna = ? WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, codice);
+            ps.setLong(2, idReclamo);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Reclamo doRetrieveById(long id) {
+        String query = "SELECT * FROM reclamo WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean rifiutaReclamo(long idReclamo) {
+        String query = "UPDATE reclamo SET stato = 'RIFIUTATO' WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<Reclamo> doRetrieveByRichiedente(long idUtenteRichiedente) {
+        List<Reclamo> list = new ArrayList<>();
+        String query = "SELECT r.*, s.titolo AS seg_titolo, s.immagine AS seg_immagine " +
+                "FROM reclamo r " +
+                "JOIN segnalazione s ON r.id_segnalazione = s.id " +
+                "WHERE r.id_utente_richiedente = ? " +
+                "ORDER BY r.data_richiesta DESC";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setLong(1, idUtenteRichiedente);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Reclamo r = mapRow(rs);
+                    r.setTitoloSegnalazione(rs.getString("seg_titolo"));
+                    String imgPath = rs.getString("seg_immagine");
+                    if (imgPath != null) {
+                        r.setImmagineSegnalazione(imgPath.getBytes());
+                    }
+                    list.add(r);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    private Reclamo mapRow(ResultSet rs) throws SQLException {
+        Reclamo r = new Reclamo();
+        r.setId(rs.getLong("id"));
+        r.setIdSegnalazione(rs.getLong("id_segnalazione"));
+        r.setIdUtenteRichiedente(rs.getLong("id_utente_richiedente"));
+        r.setRispostaVerifica1(rs.getString("risposta_verifica1"));
+        r.setRispostaVerifica2(rs.getString("risposta_verifica2"));
+        r.setDataRichiesta(rs.getTimestamp("data_richiesta"));
+        r.setDataDeposito(rs.getTimestamp("data_deposito"));
+        r.setDataRitiro(rs.getTimestamp("data_ritiro"));
+        r.setConfermaFinder(rs.getBoolean("conferma_finder"));
+        r.setConfermaOwner(rs.getBoolean("conferma_owner"));
+        r.setCodiceConsegna(rs.getString("codice_consegna"));
+        try {
+            r.setStato(StatoReclamo.valueOf(rs.getString("stato")));
+        } catch (Exception e) {
+            r.setStato(StatoReclamo.IN_ATTESA);
+        }
+        return r;
+    }
+    public Reclamo doRetrieveByCodiceAndDropPoint(String codice, long idDropPoint) {
+        String sql = """
+        SELECT r.*
+        FROM reclamo r
+        JOIN segnalazione_oggetto so ON so.id_segnalazione = r.id_segnalazione
+        WHERE r.codice_consegna = ?
+          AND so.modalita_consegna = 'DROP_POINT'
+          AND so.id_drop_point = ?
+        """;
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, codice);
+            ps.setLong(2, idDropPoint);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public boolean marcaDeposito(long idReclamo) {
+        String sql = "UPDATE reclamo SET data_deposito = CURRENT_TIMESTAMP WHERE id = ? AND data_deposito IS NULL";
+        try (Connection con = ConPool.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
+
+    public boolean marcaRitiro(long idReclamo) {
+        String sql = "UPDATE reclamo SET data_ritiro = CURRENT_TIMESTAMP WHERE id = ? AND data_ritiro IS NULL";
+        try (Connection con = ConPool.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
+    public boolean setDataDepositoIfNull(long idReclamo) {
+        String sql = "UPDATE reclamo SET data_deposito = NOW() WHERE id = ? AND data_deposito IS NULL";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean setDataRitiroIfNull(long idReclamo) {
+        String sql = "UPDATE reclamo SET data_ritiro = NOW() WHERE id = ? AND data_ritiro IS NULL";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public int countDepositiAttiviByDropPoint(long idDropPoint) {
+        String sql = """
+        SELECT COUNT(*) AS cnt
+        FROM reclamo r
+        JOIN segnalazione_oggetto so ON so.id_segnalazione = r.id_segnalazione
+        WHERE so.modalita_consegna = 'DROP_POINT'
+          AND so.id_drop_point = ?
+          AND r.data_deposito IS NOT NULL
+          AND r.data_ritiro IS NULL
+        """;
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idDropPoint);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt("cnt") : 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public int countConsegneCompletateByDropPoint(long idDropPoint) {
+        String sql = """
+        SELECT COUNT(*) AS cnt
+        FROM reclamo r
+        JOIN segnalazione_oggetto so ON so.id_segnalazione = r.id_segnalazione
+        WHERE so.modalita_consegna = 'DROP_POINT'
+          AND so.id_drop_point = ?
+          AND r.data_ritiro IS NOT NULL
+        """;
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idDropPoint);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt("cnt") : 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+}
 </file>
 
 <file path="src/main/java/model/dao/SegnalazioneDAO.java">
@@ -10083,128 +9919,162 @@ public class SegnalazioneDAO {
 }
 </file>
 
-<file path="src/main/java/model/service/SegnalazioneService.java">
-package model.service;
+<file path="src/main/webapp/WEB-INF/jsp/navbar.jsp">
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="model.bean.Utente" %>
+<%@ page import="model.bean.DropPoint" %>
+<%@ page import="model.bean.enums.Ruolo" %>
 
-import model.bean.Reclamo;
-import model.bean.Segnalazione;
-import model.bean.SegnalazioneOggetto;
-import model.bean.Utente;
-import model.bean.enums.ModalitaConsegna;
-import model.bean.enums.StatoSegnalazione;
-import model.dao.ReclamoDAO;
-import model.dao.SegnalazioneDAO;
-import model.utils.GeocodingUtils;
+<%
+    String ctx = request.getContextPath();
 
-import java.util.List;
+    // Chi è loggato?
+    Utente    utenteLoggatoNav   = (Utente)    session.getAttribute("utente");
+    DropPoint dropPointLoggato   = (DropPoint) session.getAttribute("dropPoint");
 
-public class SegnalazioneService {
+    boolean isDropPoint = (dropPointLoggato != null);
+    boolean isUtente    = (!isDropPoint && utenteLoggatoNav != null);
 
-    private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
-    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
-    private final UtenteService utenteService = new UtenteService(); // Per gestire i punti
+    // Avatar (unico flag per entrambi i casi)
+    boolean navHasAvatar = false;
+    String  navAvatarUrl = null;
 
-    public boolean creaSegnalazione(Segnalazione segnalazione) {
-        if (segnalazione.getLuogoRitrovamento() != null && !segnalazione.getLuogoRitrovamento().isEmpty() &&
-                segnalazione.getCitta() != null && !segnalazione.getCitta().isEmpty()) {
-            double[] coords = GeocodingUtils.getCoordinates(
-                    segnalazione.getLuogoRitrovamento(),
-                    segnalazione.getCitta(),
-                    segnalazione.getProvincia()
-            );
-            segnalazione.setLatitudine(coords[0]);
-            segnalazione.setLongitudine(coords[1]);
+    if (isUtente) {
+        if (utenteLoggatoNav.getImmagineProfilo() != null &&
+                utenteLoggatoNav.getImmagineProfilo().length > 0) {
+
+            navHasAvatar = true;
+            navAvatarUrl = ctx + "/avatar?userId=" + utenteLoggatoNav.getId();
         }
-        return segnalazioneDAO.doSave(segnalazione);
+    } else if (isDropPoint) {
+        if (dropPointLoggato.getImmagine() != null &&
+                dropPointLoggato.getImmagine().length > 0) {
+
+            navHasAvatar = true;
+            navAvatarUrl = ctx + "/drop-point-avatar?dpId=" + dropPointLoggato.getId();
+        }
     }
+%>
 
-    public List<Segnalazione> getUltimeSegnalazioni() {
-        return segnalazioneDAO.doRetrieveLatest(8);
-    }
+<nav class="navbar">
+    <!-- Logo -->
+    <a href="<%= ctx %>/index" class="brand">
+        <div class="brand-icon">
+            <img src="<%= ctx %>/assets/images/logo.png" alt="logo_foundly">
+        </div>
+    </a>
 
-    public Segnalazione trovaPerId(long id) {
-        return segnalazioneDAO.doRetrieveById(id);
-    }
+    <!-- Link centrali -->
+    <div class="nav-links">
+        <% if (isDropPoint) { %>
+        <a href="<%= ctx %>/area-drop-point" class="nav-item">
+            <span class="material-icons">storefront</span> Area Drop-Point
+        </a>
+        <% } else { %>
+        <a href="<%= ctx %>/index" class="nav-item">
+            <span class="material-icons">home</span> Home
+        </a>
+        <a href="<%= ctx %>/crea-segnalazione" class="nav-item">
+            <span class="material-icons">add_circle_outline</span> Crea Segnalazione
+        </a>
+        <a href="<%= ctx %>/le-mie-segnalazioni" class="nav-item">
+            <span class="material-icons">inventory</span> Segnalazioni e Reclami
+        </a>
+        <a href="<%= ctx %>/drop-point" class="nav-item">
+            <span class="material-icons">place</span> Drop-Point
+        </a>
+        <a href="<%= ctx %>/classifica" class="nav-item">
+            <span class="material-icons">emoji_events</span> Classifica
+        </a>
+        <% } %>
+    </div>
 
-    public List<Segnalazione> trovaPerUtente(long idUtente) {
-        return segnalazioneDAO.doRetrieveByUtente(idUtente);
-    }
+    <% if (isUtente || isDropPoint) { %>
+    <div class="user-menu">
+        <button type="button" class="user-avatar-btn">
+            <% if (navHasAvatar) { %>
+            <img src="<%= navAvatarUrl %>" alt="" class="user-avatar-img">
+            <% } else { %>
+            <div class="user-avatar-placeholder"></div>
+            <% } %>
+        </button>
 
-    public boolean eliminaSegnalazione(long id) {
-        return segnalazioneDAO.doDelete(id);
-    }
+        <div class="user-dropdown">
+            <% if (isUtente) { %>
+            <div class="user-dropdown-header">
+                <div class="user-email"><%= utenteLoggatoNav.getEmail() %></div>
+                <div class="user-points-row">
+                    <span class="points-label">punti</span>
+                    <span class="points-value"><%= utenteLoggatoNav.getPunteggio() %></span>
+                </div>
+            </div>
 
-    // --- LOGICA DROP-POINT (Con Codice) ---
-    public boolean accettaReclamoEChiudiSegnalazione(long idReclamo, long idSegnalazione, String codice) {
-        boolean successoReclamo = reclamoDAO.accettaReclamo(idReclamo, codice);
+            <a href="<%= ctx %>/profilo" class="user-dropdown-item">
+                <span class="material-icons">person</span><span>Profilo</span>
+            </a>
 
-        if (successoReclamo) {
-            boolean successoSegnalazione = segnalazioneDAO.updateStato(idSegnalazione, StatoSegnalazione.CHIUSA);
+            <% if (utenteLoggatoNav.getRuolo() == Ruolo.ADMIN) { %>
+            <a href="<%= ctx %>/admin" class="user-dropdown-item">
+                <span class="material-icons">admin_panel_settings</span><span>Area Admin</span>
+            </a>
+            <% } %>
 
-            if (successoSegnalazione) {
-                // Se è DropPoint, assegna il punto
-                Segnalazione s = segnalazioneDAO.doRetrieveById(idSegnalazione);
-                if (s != null) {
-                    boolean isDropPoint = false;
-                    if (s instanceof SegnalazioneOggetto) {
-                        SegnalazioneOggetto so = (SegnalazioneOggetto) s;
-                        if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
-                            isDropPoint = true;
-                        }
-                    }
-                    if (isDropPoint) {
-                        Utente finder = utenteService.trovaPerId(s.getIdUtente());
-                        if (finder != null) {
-                            utenteService.aggiornaPunteggioEBadge(finder, 1);
-                        }
-                    }
-                }
-                return true;
+            <% } else { %>
+            <div class="user-dropdown-header">
+                <div class="user-email"><%= dropPointLoggato.getEmail() %></div>
+                <div class="user-dp-row">
+                    <span class="user-dp-label">Drop-Point</span>
+                    <span class="user-dp-name"><%= dropPointLoggato.getNomeAttivita() %></span>
+                </div>
+            </div>
+
+            <a href="<%= ctx %>/profilo-drop-point" class="user-dropdown-item">
+                <span class="material-icons">storefront</span><span>Profilo Drop-Point</span>
+            </a>
+            <% } %>
+
+            <a href="<%= ctx %>/logout" class="user-dropdown-item user-dropdown-item-logout">
+                <span class="material-icons">logout</span><span>Logout</span>
+            </a>
+        </div>
+    </div>
+    <% } else { %>
+    <a href="<%= ctx %>/login" class="btn-login-nav">
+        <span class="material-icons">login</span><span>Accedi</span>
+    </a>
+    <% } %>
+</nav>
+
+<script>
+    (function () {
+        // evita doppia inizializzazione (navbar incluso più volte o script duplicati)
+        if (window.__FOUNDLY_NAVBAR_DROPDOWN__) return;
+        window.__FOUNDLY_NAVBAR_DROPDOWN__ = true;
+
+        document.addEventListener("click", function (e) {
+            const userMenu = document.querySelector(".user-menu");
+            if (!userMenu) return;
+
+            const btn = userMenu.querySelector(".user-avatar-btn");
+            if (btn && btn.contains(e.target)) {
+                e.stopPropagation();
+                userMenu.classList.toggle("open");
+                return;
             }
-        }
-        return false;
-    }
 
-    // --- LOGICA SCAMBIO DIRETTO (Doppia Conferma) ---
-    public boolean gestisciConfermaScambio(long idReclamo, boolean isFinder) {
-        // 1. Registra la conferma singola
-        if (isFinder) {
-            reclamoDAO.confermaFinder(idReclamo);
-        } else {
-            reclamoDAO.confermaOwner(idReclamo);
-        }
+            // click fuori -> chiudi
+            userMenu.classList.remove("open");
+        });
 
-        // 2. Controlla se ORA sono entrambi confermati
-        Reclamo r = reclamoDAO.doRetrieveById(idReclamo);
-        if (r != null && r.isConfermaFinder() && r.isConfermaOwner()) {
-
-            // Entrambi hanno confermato: Chiudi e dai punti
-            segnalazioneDAO.updateStato(r.getIdSegnalazione(), StatoSegnalazione.CHIUSA);
-
-            Segnalazione s = segnalazioneDAO.doRetrieveById(r.getIdSegnalazione());
-            if (s != null) {
-                Utente finder = utenteService.trovaPerId(s.getIdUtente());
-                if (finder != null) {
-                    utenteService.aggiornaPunteggioEBadge(finder, 1);
-                }
+        // click dentro dropdown non deve chiudere prima di cliccare i link
+        document.addEventListener("click", function (e) {
+            const dropdown = document.querySelector(".user-menu .user-dropdown");
+            if (dropdown && dropdown.contains(e.target)) {
+                e.stopPropagation();
             }
-            return true; // Scambio completato
-        }
-        return false; // Manca l'altro utente
-    }
-
-    public boolean rifiutaReclamo(long idReclamo) {
-        return reclamoDAO.rifiutaReclamo(idReclamo);
-    }
-
-    public List<Segnalazione> cercaSegnalazioni(String q, String tipo, String categoria) {
-        return segnalazioneDAO.doRetrieveByFiltri(q, tipo, categoria);
-    }
-
-    public List<Reclamo> trovaReclamiFattiDaUtente(long idUtente) {
-        return reclamoDAO.doRetrieveByRichiedente(idUtente);
-    }
-}
+        }, true);
+    })();
+</script>
 </file>
 
 <file path="src/main/webapp/WEB-INF/jsp/registrazione_droppoint.jsp">
@@ -10795,6 +10665,108 @@ public class UtenteDAO {
 }
 </file>
 
+<file path="src/main/java/model/service/SegnalazioneService.java">
+package model.service;
+
+import model.bean.Reclamo;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoSegnalazione;
+import model.dao.ReclamoDAO;
+import model.dao.SegnalazioneDAO;
+import model.utils.GeocodingUtils;
+
+import java.util.List;
+
+public class SegnalazioneService {
+
+    private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
+    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
+    private final UtenteService utenteService = new UtenteService(); // Per gestire i punti
+
+    public boolean creaSegnalazione(Segnalazione segnalazione) {
+        if (segnalazione.getLuogoRitrovamento() != null && !segnalazione.getLuogoRitrovamento().isEmpty() &&
+                segnalazione.getCitta() != null && !segnalazione.getCitta().isEmpty()) {
+            double[] coords = GeocodingUtils.getCoordinates(
+                    segnalazione.getLuogoRitrovamento(),
+                    segnalazione.getCitta(),
+                    segnalazione.getProvincia()
+            );
+            segnalazione.setLatitudine(coords[0]);
+            segnalazione.setLongitudine(coords[1]);
+        }
+        return segnalazioneDAO.doSave(segnalazione);
+    }
+
+    public List<Segnalazione> getUltimeSegnalazioni() {
+        return segnalazioneDAO.doRetrieveLatest(8);
+    }
+
+    public Segnalazione trovaPerId(long id) {
+        return segnalazioneDAO.doRetrieveById(id);
+    }
+
+    public List<Segnalazione> trovaPerUtente(long idUtente) {
+        return segnalazioneDAO.doRetrieveByUtente(idUtente);
+    }
+
+    public boolean eliminaSegnalazione(long id) {
+        return segnalazioneDAO.doDelete(id);
+    }
+
+    // --- LOGICA DROP-POINT (Con Codice) ---
+    public boolean accettaReclamoEChiudiSegnalazione(long idReclamo, long idSegnalazione, String codice) {
+        boolean okReclamo = reclamoDAO.accettaReclamo(idReclamo, codice);
+        if (!okReclamo) return false;
+
+        // NON chiudere qui: verrà chiusa dal DropPoint quando registra il ritiro
+        return segnalazioneDAO.updateStato(idSegnalazione, StatoSegnalazione.IN_CONSEGNA);
+    }
+
+    // --- LOGICA SCAMBIO DIRETTO (Doppia Conferma) ---
+    public boolean gestisciConfermaScambio(long idReclamo, boolean isFinder) {
+        // 1. Registra la conferma singola
+        if (isFinder) {
+            reclamoDAO.confermaFinder(idReclamo);
+        } else {
+            reclamoDAO.confermaOwner(idReclamo);
+        }
+
+        // 2. Controlla se ORA sono entrambi confermati
+        Reclamo r = reclamoDAO.doRetrieveById(idReclamo);
+        if (r != null && r.isConfermaFinder() && r.isConfermaOwner()) {
+
+            // Entrambi hanno confermato: Chiudi e dai punti
+            segnalazioneDAO.updateStato(r.getIdSegnalazione(), StatoSegnalazione.CHIUSA);
+
+            Segnalazione s = segnalazioneDAO.doRetrieveById(r.getIdSegnalazione());
+            if (s != null) {
+                Utente finder = utenteService.trovaPerId(s.getIdUtente());
+                if (finder != null) {
+                    utenteService.aggiornaPunteggioEBadge(finder, 1);
+                }
+            }
+            return true; // Scambio completato
+        }
+        return false; // Manca l'altro utente
+    }
+
+    public boolean rifiutaReclamo(long idReclamo) {
+        return reclamoDAO.rifiutaReclamo(idReclamo);
+    }
+
+    public List<Segnalazione> cercaSegnalazioni(String q, String tipo, String categoria) {
+        return segnalazioneDAO.doRetrieveByFiltri(q, tipo, categoria);
+    }
+
+    public List<Reclamo> trovaReclamiFattiDaUtente(long idUtente) {
+        return reclamoDAO.doRetrieveByRichiedente(idUtente);
+    }
+}
+</file>
+
 <file path="src/main/java/controller/LoginServlet.java">
 package controller;
 
@@ -11199,149 +11171,6 @@ This project was developed by the **NC05 Team** for the Bachelor's Degree in Com
 <p align="right">
   <i>Supervisor: Prof. Carmine Gravino</i>
 </p>
-</file>
-
-<file path="src/main/java/model/service/DropPointService.java">
-package model.service;
-
-import model.bean.DropPoint;
-import model.bean.Reclamo;
-import model.bean.Segnalazione;
-import model.bean.SegnalazioneOggetto;
-import model.bean.Utente;
-import model.bean.enums.ModalitaConsegna;
-import model.bean.enums.StatoDropPoint;
-import model.bean.enums.StatoSegnalazione;
-import model.dao.DropPointDAO;
-import model.dao.ReclamoDAO;
-import model.dao.SegnalazioneDAO;
-import model.utils.PasswordUtils;
-
-import java.util.List;
-
-public class DropPointService {
-
-    private final DropPointDAO dropPointDAO = new DropPointDAO();
-    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
-    private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
-    private final UtenteService utenteService = new UtenteService();
-    private final EmailService emailService = new EmailService();
-
-    // ==========================
-    //  REGISTRAZIONE / LOGIN
-    // ==========================
-
-    public boolean registraDropPoint(String nomeAttivita, String email, String password,
-                                     String indirizzo, String citta, String provincia,
-                                     String telefono, String orari,
-                                     Double latitudine, Double longitudine) {
-
-        if (dropPointDAO.doRetrieveByEmail(email) != null) return false;
-
-        DropPoint dp = new DropPoint();
-        dp.setNomeAttivita(nomeAttivita);
-        dp.setEmail(email);
-        dp.setPasswordHash(PasswordUtils.hashPassword(password));
-        dp.setIndirizzo(indirizzo);
-        dp.setCitta(citta);
-        dp.setProvincia(provincia);
-        dp.setTelefono(telefono);
-        dp.setOrariApertura(orari);
-        dp.setLatitudine(latitudine);
-        dp.setLongitudine(longitudine);
-        dp.setStato(StatoDropPoint.IN_ATTESA);
-        dp.setRitiriEffettuati(0);
-        dp.setImmagine(null);
-        dp.setImmagineContentType(null);
-
-        boolean salvato = dropPointDAO.doSave(dp);
-
-        // NOTIFICA ADMIN (chiamata diretta, EmailService gestisce il thread)
-        if (salvato) {
-            List<String> admins = utenteService.getEmailAdmins();
-            for (String adminEmail : admins) {
-                emailService.inviaNotificaAdminNuovoDropPoint(adminEmail, nomeAttivita, citta);
-            }
-        }
-        return salvato;
-    }
-
-    public DropPoint login(String email, String password) {
-        DropPoint dp = dropPointDAO.doRetrieveByEmail(email);
-        if (dp == null) return null;
-        if (!PasswordUtils.checkPassword(password, dp.getPasswordHash())) return null;
-        return dropPointDAO.doRetrieveById(dp.getId());
-    }
-
-    // ==========================
-    //   GESTIONE APPROVAZIONE
-    // ==========================
-
-    public boolean approvaDropPoint(long id) {
-        boolean aggiornato = dropPointDAO.updateStato(id, StatoDropPoint.APPROVATO);
-
-        // NOTIFICA DROP-POINT (chiamata diretta)
-        if (aggiornato) {
-            DropPoint dp = dropPointDAO.doRetrieveById(id);
-            if (dp != null) {
-                emailService.inviaAccettazioneDropPoint(dp.getEmail(), dp.getNomeAttivita());
-            }
-        }
-        return aggiornato;
-    }
-
-    public boolean rifiutaDropPoint(long id) {
-        return dropPointDAO.updateStato(id, StatoDropPoint.RIFIUTATO);
-    }
-
-    public DropPoint trovaPerId(long id) {
-        return dropPointDAO.doRetrieveById(id);
-    }
-
-    // ==========================
-    //   ALTRI METODI INVARIATI
-    // ==========================
-
-    public boolean registraRitiro(long idDropPoint, String codiceConsegna) {
-        if (codiceConsegna == null || codiceConsegna.isBlank()) return false;
-        Reclamo r = reclamoDAO.doRetrieveByCodice(codiceConsegna);
-        if (r == null) return false;
-        Segnalazione s = segnalazioneDAO.doRetrieveById(r.getIdSegnalazione());
-        if (s == null) return false;
-
-        if (s instanceof SegnalazioneOggetto) {
-            SegnalazioneOggetto so = (SegnalazioneOggetto) s;
-            boolean isCorrectDP = (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT
-                    && so.getIdDropPoint() != null
-                    && so.getIdDropPoint() == idDropPoint);
-
-            if (isCorrectDP) {
-                boolean chiuso = segnalazioneDAO.updateStato(s.getId(), StatoSegnalazione.CHIUSA);
-                if (chiuso) {
-                    Utente finder = utenteService.trovaPerId(s.getIdUtente());
-                    if (finder != null) {
-                        utenteService.aggiornaPunteggioEBadge(finder, 1);
-                    }
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean registraDeposito(long idDropPoint, String codiceConsegna) {
-        Reclamo r = reclamoDAO.doRetrieveByCodice(codiceConsegna);
-        return r != null;
-    }
-
-    public int countDepositiAttivi(long id) { return 0; }
-    public int countConsegneCompletate(long id) { return 0; }
-    public int countTotaleOperazioni(long id) { return 0; }
-    public boolean aggiornaProfilo(DropPoint dp) { return dropPointDAO.updateProfilo(dp); }
-    public boolean eliminaDropPoint(long id) { return dropPointDAO.doDeleteById(id); }
-    public List<DropPoint> findAllApprovati() { return dropPointDAO.doRetrieveAllApprovati(); }
-    public List<DropPoint> findAllInAttesa() { return dropPointDAO.doRetrieveByStato(StatoDropPoint.IN_ATTESA); }
-}
 </file>
 
 <file path="src/main/java/model/dao/DropPointDAO.java">
@@ -12100,6 +11929,160 @@ body {
 .cards-grid .card:nth-child(2) { animation-delay: 0.35s; }
 .cards-grid .card:nth-child(3) { animation-delay: 0.5s; }
 @keyframes cardFadeIn { to { opacity: 1; transform: translateY(0); } }
+</file>
+
+<file path="src/main/java/model/service/DropPointService.java">
+package model.service;
+
+import model.bean.DropPoint;
+import model.bean.Reclamo;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoDropPoint;
+import model.bean.enums.StatoReclamo;
+import model.bean.enums.StatoSegnalazione;
+import model.dao.DropPointDAO;
+import model.dao.ReclamoDAO;
+import model.dao.SegnalazioneDAO;
+import model.utils.PasswordUtils;
+
+import java.util.List;
+
+public class DropPointService {
+
+    private final DropPointDAO dropPointDAO = new DropPointDAO();
+    private final ReclamoDAO reclamoDAO = new ReclamoDAO();
+    private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
+    private final UtenteService utenteService = new UtenteService();
+    private final EmailService emailService = new EmailService();
+
+    // ==========================
+    //  REGISTRAZIONE / LOGIN
+    // ==========================
+
+    public boolean registraDropPoint(String nomeAttivita, String email, String password,
+                                     String indirizzo, String citta, String provincia,
+                                     String telefono, String orari,
+                                     Double latitudine, Double longitudine) {
+
+        if (dropPointDAO.doRetrieveByEmail(email) != null) return false;
+
+        DropPoint dp = new DropPoint();
+        dp.setNomeAttivita(nomeAttivita);
+        dp.setEmail(email);
+        dp.setPasswordHash(PasswordUtils.hashPassword(password));
+        dp.setIndirizzo(indirizzo);
+        dp.setCitta(citta);
+        dp.setProvincia(provincia);
+        dp.setTelefono(telefono);
+        dp.setOrariApertura(orari);
+        dp.setLatitudine(latitudine);
+        dp.setLongitudine(longitudine);
+        dp.setStato(StatoDropPoint.IN_ATTESA);
+        dp.setRitiriEffettuati(0);
+        dp.setImmagine(null);
+        dp.setImmagineContentType(null);
+
+        boolean salvato = dropPointDAO.doSave(dp);
+
+        // NOTIFICA ADMIN (chiamata diretta, EmailService gestisce il thread)
+        if (salvato) {
+            List<String> admins = utenteService.getEmailAdmins();
+            for (String adminEmail : admins) {
+                emailService.inviaNotificaAdminNuovoDropPoint(adminEmail, nomeAttivita, citta);
+            }
+        }
+        return salvato;
+    }
+
+    public DropPoint login(String email, String password) {
+        DropPoint dp = dropPointDAO.doRetrieveByEmail(email);
+        if (dp == null) return null;
+        if (!PasswordUtils.checkPassword(password, dp.getPasswordHash())) return null;
+        return dropPointDAO.doRetrieveById(dp.getId());
+    }
+
+    // ==========================
+    //   GESTIONE APPROVAZIONE
+    // ==========================
+
+    public boolean approvaDropPoint(long id) {
+        boolean aggiornato = dropPointDAO.updateStato(id, StatoDropPoint.APPROVATO);
+
+        // NOTIFICA DROP-POINT (chiamata diretta)
+        if (aggiornato) {
+            DropPoint dp = dropPointDAO.doRetrieveById(id);
+            if (dp != null) {
+                emailService.inviaAccettazioneDropPoint(dp.getEmail(), dp.getNomeAttivita());
+            }
+        }
+        return aggiornato;
+    }
+
+    public boolean rifiutaDropPoint(long id) {
+        return dropPointDAO.updateStato(id, StatoDropPoint.RIFIUTATO);
+    }
+
+    public DropPoint trovaPerId(long id) {
+        return dropPointDAO.doRetrieveById(id);
+    }
+
+    // ==========================
+    //   ALTRI METODI INVARIATI
+    // ==========================
+
+    public boolean registraRitiro(long idDropPoint, String codiceRitiro) {
+        Reclamo r = reclamoDAO.doRetrieveByCodiceAndDropPoint(codiceRitiro, idDropPoint);
+        if (r == null) return false;
+
+        // deve essere stato depositato prima
+        if (r.getDataDeposito() == null) return false;
+
+        // evita doppie registrazioni
+        if (r.getDataRitiro() != null) return false;
+
+        // 1) marca ritiro
+        boolean okRitiro = reclamoDAO.marcaRitiro(r.getId());
+        if (!okRitiro) return false;
+
+        // 2) chiudi segnalazione
+        boolean okChiusa = segnalazioneDAO.updateStato(r.getIdSegnalazione(), StatoSegnalazione.CHIUSA);
+        if (!okChiusa) return false;
+
+        // 3) assegna punto al finder
+        Segnalazione s = segnalazioneDAO.doRetrieveById(r.getIdSegnalazione());
+        if (s != null) {
+            Utente finder = utenteService.trovaPerId(s.getIdUtente());
+            if (finder != null) utenteService.aggiornaPunteggioEBadge(finder, 1);
+        }
+
+        return true;
+    }
+
+    public boolean registraDeposito(long idDropPoint, String codiceConsegna) {
+        Reclamo r = reclamoDAO.doRetrieveByCodiceAndDropPoint(codiceConsegna, idDropPoint);
+        if (r == null) return false;
+
+        // evita doppie registrazioni
+        if (r.getDataDeposito() != null) return false;
+
+        return reclamoDAO.marcaDeposito(r.getId());
+    }
+
+
+    public int countDepositiAttivi(long idDropPoint) {
+        return reclamoDAO.countDepositiAttiviByDropPoint(idDropPoint);
+    }
+    public int countConsegneCompletate(long idDropPoint) {
+        return reclamoDAO.countConsegneCompletateByDropPoint(idDropPoint);
+    }
+    public boolean aggiornaProfilo(DropPoint dp) { return dropPointDAO.updateProfilo(dp); }
+    public boolean eliminaDropPoint(long id) { return dropPointDAO.doDeleteById(id); }
+    public List<DropPoint> findAllApprovati() { return dropPointDAO.doRetrieveAllApprovati(); }
+    public List<DropPoint> findAllInAttesa() { return dropPointDAO.doRetrieveByStato(StatoDropPoint.IN_ATTESA); }
+}
 </file>
 
 <file path="src/main/webapp/WEB-INF/jsp/dettaglio_segnalazione.jsp">
