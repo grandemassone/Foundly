@@ -159,4 +159,8 @@ public class DropPointService {
     public boolean aggiornaProfilo(DropPoint dropPoint) {
         return dropPointDAO.updateProfilo(dropPoint);
     }
+    public boolean eliminaDropPoint(long id) {
+        return dropPointDAO.doDeleteById(id);
+    }
+
 }

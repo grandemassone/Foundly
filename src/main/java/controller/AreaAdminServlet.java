@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import model.bean.DropPoint;
 import model.bean.Utente;
 import model.bean.enums.Ruolo;
 import model.service.DropPointService;
@@ -33,11 +32,9 @@ public class AreaAdminServlet extends HttpServlet {
             return;
         }
 
-        List<DropPoint> pendenti = dropPointService.findAllInAttesa();
-        List<Utente> utenti = utenteService.trovaTutti();
-
-        request.setAttribute("dropPointsPendenti", pendenti);
-        request.setAttribute("listaUtenti", utenti);
+        request.setAttribute("dropPointsPendenti", dropPointService.findAllInAttesa());
+        request.setAttribute("dropPointsApprovati", dropPointService.findAllApprovati());
+        request.setAttribute("listaUtenti", utenteService.trovaTutti());
 
         request.getRequestDispatcher("/WEB-INF/jsp/area_admin.jsp")
                 .forward(request, response);
@@ -56,22 +53,39 @@ public class AreaAdminServlet extends HttpServlet {
         }
 
         String action = request.getParameter("action");
+        if (action == null || action.isBlank()) {
+            response.sendRedirect(request.getContextPath() + "/admin");
+            return;
+        }
 
         try {
-            if ("approveDropPoint".equals(action)) {
-                long id = Long.parseLong(request.getParameter("dropPointId"));
-                dropPointService.approvaDropPoint(id);
-
-            } else if ("rejectDropPoint".equals(action)) {
-                long id = Long.parseLong(request.getParameter("dropPointId"));
-                dropPointService.rifiutaDropPoint(id);
-
-            } else if ("deleteUser".equals(action)) {
-                long userId = Long.parseLong(request.getParameter("userId"));
-                // Non permetto all'admin di cancellare se stesso
-                if (userId != admin.getId()) {
-                    utenteService.cancellaUtente(userId);
+            switch (action) {
+                case "approveDropPoint": {
+                    long id = Long.parseLong(request.getParameter("dropPointId"));
+                    dropPointService.approvaDropPoint(id);
+                    break;
                 }
+                case "rejectDropPoint": {
+                    long id = Long.parseLong(request.getParameter("dropPointId"));
+                    dropPointService.rifiutaDropPoint(id);
+                    break;
+                }
+                case "deleteDropPoint": {
+                    long id = Long.parseLong(request.getParameter("dropPointId"));
+                    dropPointService.eliminaDropPoint(id);
+                    break;
+                }
+                case "deleteUser": {
+                    long userId = Long.parseLong(request.getParameter("userId"));
+                    // Non permetto all'admin di cancellare se stesso
+                    if (userId != admin.getId()) {
+                        utenteService.cancellaUtente(userId);
+                    }
+                    break;
+                }
+                default:
+                    // azione non riconosciuta -> ignora
+                    break;
             }
         } catch (NumberFormatException ignore) {
             // input non valido, ignoro

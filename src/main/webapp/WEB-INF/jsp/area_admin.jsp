@@ -3,7 +3,6 @@
 <%@ page import="model.bean.Utente" %>
 <%@ page import="model.bean.DropPoint" %>
 <%@ page import="model.bean.enums.Ruolo" %>
-<%@ page import="java.util.Arrays" %>
 
 <%
   Utente utente = (Utente) session.getAttribute("utente");
@@ -12,11 +11,9 @@
     return;
   }
 
-  List<DropPoint> pendenti = (List<DropPoint>) request.getAttribute("dropPointsPendenti");
-  List<Utente> utenti = (List<Utente>) request.getAttribute("listaUtenti");
-
-  String navAvatarPath = Arrays.toString(utente.getImmagineProfilo());
-  boolean navHasAvatar = navAvatarPath != null && !navAvatarPath.trim().isEmpty();
+  List<DropPoint> pendenti  = (List<DropPoint>) request.getAttribute("dropPointsPendenti");
+  List<DropPoint> approvati = (List<DropPoint>) request.getAttribute("dropPointsApprovati");
+  List<Utente> utenti       = (List<Utente>) request.getAttribute("listaUtenti");
 %>
 
 <!DOCTYPE html>
@@ -39,6 +36,7 @@
   <section class="admin-section">
     <h1 class="admin-title">Gestione Drop-Point</h1>
 
+    <!-- PENDENTI -->
     <div class="admin-card">
       <h2 class="admin-subtitle">Richieste in attesa</h2>
 
@@ -71,17 +69,13 @@
           <td><%= dp.getProvincia() %></td>
           <td><%= dp.getTelefono() != null ? dp.getTelefono() : "-" %></td>
           <td class="admin-actions">
-            <form method="post"
-                  action="${pageContext.request.contextPath}/admin"
-                  class="inline-form">
+            <form method="post" action="${pageContext.request.contextPath}/admin" class="inline-form">
               <input type="hidden" name="action" value="approveDropPoint">
               <input type="hidden" name="dropPointId" value="<%= dp.getId() %>">
               <button type="submit" class="btn-admin-approve">Approva</button>
             </form>
 
-            <form method="post"
-                  action="${pageContext.request.contextPath}/admin"
-                  class="inline-form">
+            <form method="post" action="${pageContext.request.contextPath}/admin" class="inline-form">
               <input type="hidden" name="action" value="rejectDropPoint">
               <input type="hidden" name="dropPointId" value="<%= dp.getId() %>">
               <button type="submit" class="btn-admin-reject">Rifiuta</button>
@@ -97,6 +91,62 @@
         }
       %>
     </div>
+
+    <!-- APPROVATI -->
+    <div class="admin-card" style="margin-top:20px;">
+      <h2 class="admin-subtitle">Drop-Point approvati</h2>
+
+      <%
+        if (approvati == null || approvati.isEmpty()) {
+      %>
+      <p class="admin-empty">Nessun Drop-Point approvato.</p>
+      <%
+      } else {
+      %>
+      <table class="admin-table">
+        <thead>
+        <tr>
+          <th>Nome attività</th>
+          <th>Indirizzo</th>
+          <th>Città</th>
+          <th>Provincia</th>
+          <th>Email</th>
+          <th>Telefono</th>
+          <th>Azioni</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+          for (DropPoint dp : approvati) {
+        %>
+        <tr>
+          <td><%= dp.getNomeAttivita() %></td>
+          <td><%= dp.getIndirizzo() %></td>
+          <td><%= dp.getCitta() %></td>
+          <td><%= dp.getProvincia() %></td>
+          <td><%= dp.getEmail() != null ? dp.getEmail() : "-" %></td>
+          <td><%= dp.getTelefono() != null ? dp.getTelefono() : "-" %></td>
+          <td class="admin-actions">
+            <form method="post"
+                  action="${pageContext.request.contextPath}/admin"
+                  class="inline-form"
+                  onsubmit="return confirm('Eliminare definitivamente questo Drop-Point?');">
+              <input type="hidden" name="action" value="deleteDropPoint">
+              <input type="hidden" name="dropPointId" value="<%= dp.getId() %>">
+              <button type="submit" class="btn-admin-delete">Elimina</button>
+            </form>
+          </td>
+        </tr>
+        <%
+          }
+        %>
+        </tbody>
+      </table>
+      <%
+        }
+      %>
+    </div>
+
   </section>
 
   <!-- Gestione Utenti -->
@@ -132,7 +182,6 @@
           <td><%= u.getRuolo() %></td>
           <td class="admin-actions">
             <%
-              // Non permetto di cancellare se stesso e, volendo, altri ADMIN
               if (u.getId() != utente.getId() && u.getRuolo() == Ruolo.UTENTE_BASE) {
             %>
             <form method="post"
