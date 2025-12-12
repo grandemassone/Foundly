@@ -11,7 +11,7 @@
 <%@ page import="java.util.Map" %>
 
 <%
-    // Recupero Sessione e Controlli Preliminari
+    // --- 1. CONTROLLI DI SICUREZZA E SESSIONE ---
     model.bean.DropPoint dp = (model.bean.DropPoint) session.getAttribute("dropPoint");
     model.bean.Utente u = (model.bean.Utente) session.getAttribute("utente");
 
@@ -23,7 +23,7 @@
     boolean isLogged = (utente != null);
     boolean isOwner = (isLogged && s != null && s.getIdUtente() == utente.getId());
 
-    // Controllo Modalità Consegna (DropPoint o Diretta)
+    // --- 2. GESTIONE MODALITÀ CONSEGNA ---
     boolean isDropPoint = false;
     if (s instanceof SegnalazioneOggetto) {
         SegnalazioneOggetto so = (SegnalazioneOggetto) s;
@@ -32,7 +32,7 @@
         }
     }
 
-    // Recupero l'eventuale Reclamo Accettato (vincente)
+    // --- 3. RECUPERO RECLAMO ACCETTATO (LO SCAMBIO ATTIVO) ---
     @SuppressWarnings("unchecked")
     List<Reclamo> reclami = (List<Reclamo>) request.getAttribute("reclamiRicevuti");
     Reclamo reclamoAccettato = null;
@@ -42,7 +42,7 @@
             if(r.getStato() == StatoReclamo.ACCETTATO) { reclamoAccettato = r; break; }
         }
     }
-    // Se sono il richiedente (non owner), controllo il mio reclamo personale
+    // Se sono il richiedente (non il proprietario della segnalazione)
     if(reclamoAccettato == null) {
         Reclamo mio = (Reclamo) request.getAttribute("mioReclamo");
         if(mio != null && mio.getStato() == StatoReclamo.ACCETTATO) {
@@ -50,13 +50,13 @@
         }
     }
 
-    // --- LOGICA RECUPERO CONTATTI CONTROPARTE ---
+    // --- 4. RECUPERO DATI DELLA CONTROPARTE (CHI DEVO INCONTRARE?) ---
     Utente controparte = null;
     String etichettaControparte = "Utente";
 
     if (reclamoAccettato != null) {
         if (isOwner) {
-            // Se sono il Finder -> Recupero i dati dell'Owner (Richiedente) dalla mappa
+            // Sono il Finder -> Mi servono i dati dell'Owner (colui che ha fatto il reclamo)
             @SuppressWarnings("unchecked")
             Map<Long, Utente> mappa = (Map<Long, Utente>) request.getAttribute("mappaRichiedenti");
             if (mappa != null) {
@@ -64,7 +64,7 @@
             }
             etichettaControparte = "Contatti Proprietario";
         } else {
-            // Se sono il Richiedente -> Voglio i dati del Finder
+            // Sono l'Owner -> Mi servono i dati del Finder (proprietario segnalazione)
             controparte = (Utente) request.getAttribute("proprietarioSegnalazione");
             etichettaControparte = "Contatti Finder";
         }
@@ -82,7 +82,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css?v=9">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css?v=12">
 </head>
 
 <body>
@@ -256,7 +256,7 @@
                                         <span class="material-icons">check_circle</span> Ricezione Confermata
                                     </button>
                                     <% } else { %>
-                                    <div style="margin-bottom:10px; font-size:1rem; color:#333; font-weight:700; text-align:center;">
+                                    <div style="margin-bottom:12px; font-size:1.15rem; color:#E65100; font-weight:800; text-align:center; text-transform:uppercase; letter-spacing:0.5px;">
                                         Clicca dopo aver ricevuto l'oggetto
                                     </div>
                                     <button type="submit" class="btn-primary btn-action-large">
@@ -363,22 +363,22 @@
                 <c:if test="<%= isOwner %>">
                     <div class="sidebar-card">
 
-                            <%-- 1. MESSAGGIO PUNTI GUADAGNATI (Appare solo a scambio finito) --%>
+                            <%-- 1. MESSAGGIO PUNTI GUADAGNATI (Appare SOLO dopo che tutto è finito) --%>
                         <c:if test="${param.msg == 'scambio_completato'}">
                             <div class="points-earned-card">
                                 <span class="material-icons points-icon-large">emoji_events</span>
                                 <div class="points-title">Ottimo Lavoro!</div>
                                 <p class="points-text">
-                                    Grazie per la tua onestà.<br>
-                                    È stato aggiunto <strong>+1 Punto</strong> al tuo punteggio.
+                                    Tutto è andato a buon fine.<br>
+                                    Hai guadagnato <strong>+1 Punto</strong> per la tua onestà.
                                 </p>
                                 <a href="${pageContext.request.contextPath}/profilo" class="btn-profile-link">
-                                    Visualizza Profilo <span class="material-icons" style="font-size:16px;">arrow_forward</span>
+                                    Vedi il tuo profilo <span class="material-icons" style="font-size:16px;">arrow_forward</span>
                                 </a>
                             </div>
                         </c:if>
 
-                            <%-- 2. AZIONE CONFERMA CONSEGNA (Per il finder, in alto) --%>
+                            <%-- 2. AZIONE CONFERMA CONSEGNA (Per il finder, in alto, solo se aperto) --%>
                         <% if (!isDropPoint && s.getStato() == StatoSegnalazione.APERTA && reclamoAccettato != null) { %>
                         <div class="action-highlight-box">
                             <h3 class="sidebar-title" style="color:#2E7D32;">Scambio in Corso</h3>
@@ -395,7 +395,7 @@
                                     <span class="material-icons">check_circle</span> Consegna Confermata
                                 </button>
                                 <% } else { %>
-                                <div style="margin-bottom:10px; font-size:1.1rem; color:#333; font-weight:700; text-align:center;">
+                                <div style="margin-bottom:12px; font-size:1.15rem; color:#E65100; font-weight:800; text-align:center; text-transform:uppercase; letter-spacing:0.5px;">
                                     Clicca dopo aver consegnato l'oggetto
                                 </div>
                                 <button type="submit" class="btn-primary btn-action-large" style="background: linear-gradient(135deg, #2E7D32, #1B5E20);">
