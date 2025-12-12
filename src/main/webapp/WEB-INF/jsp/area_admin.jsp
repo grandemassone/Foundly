@@ -195,7 +195,7 @@
             <%
             } else {
             %>
-            <span class="admin-note">N/D</span>
+            <button type="submit" class="btn-admin-delete">Null</button>
             <%
               }
             %>
