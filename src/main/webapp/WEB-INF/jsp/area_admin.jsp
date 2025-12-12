@@ -212,21 +212,5 @@
 
 </main>
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const userMenu = document.querySelector(".user-menu");
-    if (userMenu) {
-      const btn = userMenu.querySelector(".user-avatar-btn");
-      btn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        userMenu.classList.toggle("open");
-      });
-      document.addEventListener("click", function () {
-        userMenu.classList.remove("open");
-      });
-    }
-  });
-</script>
-
 </body>
 </html>

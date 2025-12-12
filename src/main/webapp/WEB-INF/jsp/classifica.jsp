@@ -4,7 +4,6 @@
 <%@ page import="java.util.List" %>
 
 <%
-    // Controllo sessione: se sei un Drop-Point → Area Drop-Point
     DropPoint dpSession = (DropPoint) session.getAttribute("dropPoint");
     Utente utenteLoggato = (Utente) session.getAttribute("utente");
 
@@ -17,13 +16,8 @@
         return;
     }
 
-    // Recupero dati classifica dalla servlet
     @SuppressWarnings("unchecked")
     List<Utente> classifica = (List<Utente>) request.getAttribute("classifica");
-
-    // Avatar navbar: BLOB byte[]
-    boolean navHasAvatar = utenteLoggato.getImmagineProfilo() != null &&
-            utenteLoggato.getImmagineProfilo().length > 0;
 %>
 
 <!DOCTYPE html>
@@ -41,56 +35,7 @@
 </head>
 <body class="page-enter">
 
-<nav class="navbar">
-    <a href="${pageContext.request.contextPath}/index" class="brand">
-        <div class="brand-icon">
-            <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="Foundly">
-        </div>
-    </a>
-    <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/index" class="nav-item">
-            <span class="material-icons">home</span> Home
-        </a>
-        <a href="${pageContext.request.contextPath}/crea-segnalazione" class="nav-item">
-            <span class="material-icons">add_circle_outline</span> Crea Segnalazione
-        </a>
-        <a href="${pageContext.request.contextPath}/le-mie-segnalazioni" class="nav-item">
-            <span class="material-icons">inventory</span> Le mie Segnalazioni
-        </a>
-        <a href="${pageContext.request.contextPath}/drop-point" class="nav-item">
-            <span class="material-icons">place</span> Drop-Point
-        </a>
-        <a href="${pageContext.request.contextPath}/classifica" class="nav-item active">
-            <span class="material-icons">emoji_events</span> Classifica
-        </a>
-    </div>
-
-    <div class="user-menu">
-        <button type="button" class="user-avatar-btn">
-            <% if (navHasAvatar) { %>
-            <img src="<%= request.getContextPath() %>/avatar?userId=<%= utenteLoggato.getId() %>"
-                 class="user-avatar-img" alt="">
-            <% } else { %>
-            <div class="user-avatar-placeholder"></div>
-            <% } %>
-        </button>
-        <div class="user-dropdown">
-            <div class="user-dropdown-header">
-                <div class="user-email"><%= utenteLoggato.getEmail() %></div>
-                <div class="user-points-row">
-                    <span class="points-label">punti</span>
-                    <span class="points-value"><%= utenteLoggato.getPunteggio() %></span>
-                </div>
-            </div>
-            <a href="${pageContext.request.contextPath}/profilo" class="user-dropdown-item">
-                <span class="material-icons">person</span><span>Profilo</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/logout" class="user-dropdown-item user-dropdown-item-logout">
-                <span class="material-icons">logout</span><span>Logout</span>
-            </a>
-        </div>
-    </div>
-</nav>
+<jsp:include page="/WEB-INF/jsp/navbar.jsp" />
 
 <main class="classifica-main">
 
@@ -114,9 +59,8 @@
             Utente third  = classifica.size() > 2 ? classifica.get(2) : null;
         %>
 
-        <%-- SECONDO POSTO --%>
         <% if (second != null) {
-            String[] b2 = getBadgeInfo(second.getBadge()); // Calcolo badge
+            String[] b2 = getBadgeInfo(second.getBadge());
         %>
         <div class="podium-step step-silver">
             <div class="medal-icon">🥈</div>
@@ -130,16 +74,15 @@
             </div>
             <div class="podium-info">
                 <span class="podium-name"><%= second.getNome() %> <%= second.getCognome() %></span>
-                <span class="badge-tag <%= b2[1] %>" style="margin-top: 4px;"><%= b2[0] %></span>
+                <span class="badge-tag <%= b2[1] %>" style="margin-top:4px;"><%= b2[0] %></span>
                 <span class="podium-points"><%= second.getPunteggio() %> pt</span>
             </div>
             <div class="podium-base">2</div>
         </div>
         <% } %>
 
-        <%-- PRIMO POSTO --%>
         <% if (first != null) {
-            String[] b1 = getBadgeInfo(first.getBadge()); // Calcolo badge
+            String[] b1 = getBadgeInfo(first.getBadge());
         %>
         <div class="podium-step step-gold">
             <div class="crown-icon">👑</div>
@@ -154,16 +97,15 @@
             <div class="podium-info">
                 <span class="podium-name"><%= first.getNome() %> <%= first.getCognome() %></span>
                 <span class="podium-badge">🏆 Campione</span>
-                <span class="badge-tag <%= b1[1] %>" style="margin-top: 4px;"><%= b1[0] %></span>
+                <span class="badge-tag <%= b1[1] %>" style="margin-top:4px;"><%= b1[0] %></span>
                 <span class="podium-points"><%= first.getPunteggio() %> pt</span>
             </div>
             <div class="podium-base">1</div>
         </div>
         <% } %>
 
-        <%-- TERZO POSTO --%>
         <% if (third != null) {
-            String[] b3 = getBadgeInfo(third.getBadge()); // Calcolo badge
+            String[] b3 = getBadgeInfo(third.getBadge());
         %>
         <div class="podium-step step-bronze">
             <div class="medal-icon">🥉</div>
@@ -177,7 +119,7 @@
             </div>
             <div class="podium-info">
                 <span class="podium-name"><%= third.getNome() %> <%= third.getCognome() %></span>
-                <span class="badge-tag <%= b3[1] %>" style="margin-top: 4px;"><%= b3[0] %></span>
+                <span class="badge-tag <%= b3[1] %>" style="margin-top:4px;"><%= b3[0] %></span>
                 <span class="podium-points"><%= third.getPunteggio() %> pt</span>
             </div>
             <div class="podium-base">3</div>
@@ -204,24 +146,19 @@
                         Utente u = classifica.get(i);
                         int rank = i + 1;
 
-                        // USIAMO LA FUNZIONE HELPER ANCHE QUI
                         String[] bInfo = getBadgeInfo(u.getBadge());
                         String badgeName = bInfo[0];
                         String badgeClass = bInfo[1];
 
                         boolean isMe = utenteLoggato.getId() == u.getId();
-                        boolean uHasAvatar =
-                                u.getImmagineProfilo() != null &&
-                                        u.getImmagineProfilo().length > 0;
+                        boolean uHasAvatar = u.getImmagineProfilo() != null && u.getImmagineProfilo().length > 0;
                 %>
                 <tr class="<%= isMe ? "highlight-me" : "" %>">
                     <td class="col-rank"><span class="rank-circle"><%= rank %></span></td>
-
                     <td class="col-user">
                         <div class="user-row-info">
                             <% if (uHasAvatar) { %>
-                            <img src="<%= request.getContextPath() %>/avatar?userId=<%= u.getId() %>"
-                                 class="mini-avatar-img" alt="">
+                            <img src="<%= request.getContextPath() %>/avatar?userId=<%= u.getId() %>" class="mini-avatar-img" alt="">
                             <% } else { %>
                             <div class="mini-avatar-placeholder"><%= u.getNome().charAt(0) %></div>
                             <% } %>
@@ -232,13 +169,10 @@
                             </div>
                         </div>
                     </td>
-
                     <td class="col-badge">
                         <span class="badge-tag <%= badgeClass %>"><%= badgeName %></span>
                     </td>
-                    <td class="col-points">
-                        <%= u.getPunteggio() %>
-                    </td>
+                    <td class="col-points"><%= u.getPunteggio() %></td>
                 </tr>
                 <% } %>
                 </tbody>
@@ -250,26 +184,10 @@
     <% } %>
 
 </main>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const userMenu = document.querySelector(".user-menu");
-        if (userMenu) {
-            const btn = userMenu.querySelector(".user-avatar-btn");
-            btn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                userMenu.classList.toggle("open");
-            });
-            document.addEventListener("click", () => userMenu.classList.remove("open"));
-        }
-    });
-</script>
-
 </body>
 </html>
 
 <%!
-    // Metodo helper per calcolare il badge (Nome e Classe CSS)
     private String[] getBadgeInfo(String rawBadge) {
         String badgeName = "Novizio";
         String badgeClass = "bg-gray";
@@ -284,7 +202,6 @@
             badgeName = "Sherlock";
             badgeClass = "bg-gold";
         }
-
         return new String[]{badgeName, badgeClass};
     }
 %>
