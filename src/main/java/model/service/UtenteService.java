@@ -204,4 +204,11 @@ public class UtenteService {
     public boolean cancellaUtente(long id) {
         return utenteDAO.deleteById(id);
     }
+
+    public List<String> getEmailAdmins() {
+        return utenteDAO.doRetrieveAll().stream()
+                .filter(u -> u.getRuolo() == model.bean.enums.Ruolo.ADMIN)
+                .map(Utente::getEmail)
+                .toList();
+    }
 }

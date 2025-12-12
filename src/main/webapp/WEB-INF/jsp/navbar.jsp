@@ -45,12 +45,10 @@
     <!-- Link centrali -->
     <div class="nav-links">
         <% if (isDropPoint) { %>
-        <!-- Drop-Point: solo Area Drop-Point -->
         <a href="<%= ctx %>/area-drop-point" class="nav-item">
             <span class="material-icons">storefront</span> Area Drop-Point
         </a>
         <% } else { %>
-        <!-- Utente normale -->
         <a href="<%= ctx %>/index" class="nav-item">
             <span class="material-icons">home</span> Home
         </a>
@@ -69,10 +67,9 @@
         <% } %>
     </div>
 
-    <!-- Lato destro: menu utente / drop-point -->
     <% if (isUtente || isDropPoint) { %>
     <div class="user-menu">
-        <button type="button" class="user-avatar-btn" onclick="toggleUserMenu(event)">
+        <button type="button" class="user-avatar-btn">
             <% if (navHasAvatar) { %>
             <img src="<%= navAvatarUrl %>" alt="" class="user-avatar-img">
             <% } else { %>
@@ -82,7 +79,6 @@
 
         <div class="user-dropdown">
             <% if (isUtente) { %>
-            <!-- Header per cittadino -->
             <div class="user-dropdown-header">
                 <div class="user-email"><%= utenteLoggatoNav.getEmail() %></div>
                 <div class="user-points-row">
@@ -92,19 +88,16 @@
             </div>
 
             <a href="<%= ctx %>/profilo" class="user-dropdown-item">
-                <span class="material-icons">person</span>
-                <span>Profilo</span>
+                <span class="material-icons">person</span><span>Profilo</span>
             </a>
 
             <% if (utenteLoggatoNav.getRuolo() == Ruolo.ADMIN) { %>
             <a href="<%= ctx %>/admin" class="user-dropdown-item">
-                <span class="material-icons">admin_panel_settings</span>
-                <span>Area Admin</span>
+                <span class="material-icons">admin_panel_settings</span><span>Area Admin</span>
             </a>
             <% } %>
 
             <% } else { %>
-            <!-- Header per Drop-Point -->
             <div class="user-dropdown-header">
                 <div class="user-email"><%= dropPointLoggato.getEmail() %></div>
                 <div class="user-dp-row">
@@ -114,42 +107,50 @@
             </div>
 
             <a href="<%= ctx %>/profilo-drop-point" class="user-dropdown-item">
-                <span class="material-icons">storefront</span>
-                <span>Profilo Drop-Point</span>
+                <span class="material-icons">storefront</span><span>Profilo Drop-Point</span>
             </a>
             <% } %>
 
             <a href="<%= ctx %>/logout" class="user-dropdown-item user-dropdown-item-logout">
-                <span class="material-icons">logout</span>
-                <span>Logout</span>
+                <span class="material-icons">logout</span><span>Logout</span>
             </a>
         </div>
     </div>
     <% } else { %>
-    <!-- Nessuno loggato -->
     <a href="<%= ctx %>/login" class="btn-login-nav">
-        <span class="material-icons">login</span>
-        <span>Accedi</span>
+        <span class="material-icons">login</span><span>Accedi</span>
     </a>
     <% } %>
 </nav>
 
 <script>
-    function toggleUserMenu(event) {
-        if (event) {
-            event.stopPropagation();
-        }
-        var menu = document.querySelector(".user-menu");
-        if (menu) {
-            menu.classList.toggle("open");
-        }
-    }
+    (function () {
+        // evita doppia inizializzazione (navbar incluso più volte o script duplicati)
+        if (window.__FOUNDLY_NAVBAR_DROPDOWN__) return;
+        window.__FOUNDLY_NAVBAR_DROPDOWN__ = true;
 
-    document.addEventListener("click", function () {
-        var menu = document.querySelector(".user-menu");
-        if (menu) {
-            menu.classList.remove("open");
-        }
-    });
+        document.addEventListener("click", function (e) {
+            const userMenu = document.querySelector(".user-menu");
+            if (!userMenu) return;
+
+            const btn = userMenu.querySelector(".user-avatar-btn");
+            if (btn && btn.contains(e.target)) {
+                e.stopPropagation();
+                userMenu.classList.toggle("open");
+                return;
+            }
+
+            // click fuori -> chiudi
+            userMenu.classList.remove("open");
+        });
+
+        // click dentro dropdown non deve chiudere prima di cliccare i link
+        document.addEventListener("click", function (e) {
+            const dropdown = document.querySelector(".user-menu .user-dropdown");
+            if (dropdown && dropdown.contains(e.target)) {
+                e.stopPropagation();
+            }
+        }, true);
+    })();
 </script>
 

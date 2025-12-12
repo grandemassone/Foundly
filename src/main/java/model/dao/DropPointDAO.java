@@ -221,6 +221,18 @@ public class DropPointDAO {
             return false;
         }
     }
+    public boolean doDeleteById(long id) {
+        String sql = "DELETE FROM drop_point WHERE id = ?";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            return ps.executeUpdate() == 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean doUpdateProfilo(DropPoint dp) {
         String sql = "UPDATE drop_point " +
                 "SET nome_attivita = ?, " +

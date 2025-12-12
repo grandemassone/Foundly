@@ -74,11 +74,11 @@
         </div>
 
         <div class="dp-view-toggle">
-            <button class="dp-toggle-btn dp-toggle-btn-active" id="btnViewMap">
+            <button class="dp-toggle-btn dp-toggle-btn-active" id="btnViewMap" type="button">
                 <span class="material-icons">map</span>
                 <span>Mappa</span>
             </button>
-            <button class="dp-toggle-btn" id="btnViewList">
+            <button class="dp-toggle-btn" id="btnViewList" type="button">
                 <span class="material-icons">list</span>
                 <span>Elenco</span>
             </button>
@@ -168,13 +168,9 @@
     ];
 
     // ====== MAPPA LEAFLET ======
+    const map = L.map('dpMapContainer');
     const defaultCenter = [41.9028, 12.4964]; // Roma
-    let mapCenter = defaultCenter;
-    if (dropPointsData.length > 0 && dropPointsData[0].lat != null && dropPointsData[0].lng != null) {
-        mapCenter = [dropPointsData[0].lat, dropPointsData[0].lng];
-    }
-
-    const map = L.map('dpMapContainer').setView(mapCenter, 13);
+    map.setView(defaultCenter, 6); // fallback iniziale
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
@@ -186,20 +182,32 @@
         const q = (filterText || "").toLowerCase();
         markersLayer.clearLayers();
 
+        const bounds = L.latLngBounds([]);
+        let added = 0;
+
         dropPointsData.forEach(dp => {
             if (dp.lat == null || dp.lng == null) return;
 
             const haystack = (dp.name + " " + dp.address + " " + dp.city).toLowerCase();
             if (!q || haystack.includes(q)) {
-                L.marker([dp.lat, dp.lng])
+                const marker = L.marker([dp.lat, dp.lng])
                     .addTo(markersLayer)
                     .bindPopup(
                         '<strong>' + dp.name + '</strong><br>' +
                         dp.address + '<br>' +
                         dp.city
                     );
+
+                bounds.extend(marker.getLatLng());
+                added++;
             }
         });
+
+        if (added > 0) {
+            map.fitBounds(bounds, { padding: [30, 30] });
+        } else {
+            map.setView(defaultCenter, 6);
+        }
     }
 
     // ====== TOGGLE MAPPA / ELENCO ======
@@ -243,7 +251,7 @@
                 item.style.display = (!q || text.includes(q)) ? "block" : "none";
             });
 
-            // filtra marker
+            // filtra marker + fit bounds
             renderMarkers(q);
         });
     }

@@ -14,8 +14,6 @@ import model.dao.SegnalazioneDAO;
 import model.utils.PasswordUtils;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DropPointService {
 
@@ -23,6 +21,7 @@ public class DropPointService {
     private final ReclamoDAO reclamoDAO = new ReclamoDAO();
     private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();
     private final UtenteService utenteService = new UtenteService();
+    private final EmailService emailService = new EmailService();
 
     // ==========================
     //  REGISTRAZIONE / LOGIN
@@ -33,9 +32,7 @@ public class DropPointService {
                                      String telefono, String orari,
                                      Double latitudine, Double longitudine) {
 
-        if (dropPointDAO.doRetrieveByEmail(email) != null) {
-            return false;
-        }
+        if (dropPointDAO.doRetrieveByEmail(email) != null) return false;
 
         DropPoint dp = new DropPoint();
         dp.setNomeAttivita(nomeAttivita);
@@ -48,39 +45,45 @@ public class DropPointService {
         dp.setOrariApertura(orari);
         dp.setLatitudine(latitudine);
         dp.setLongitudine(longitudine);
-
         dp.setStato(StatoDropPoint.IN_ATTESA);
         dp.setRitiriEffettuati(0);
         dp.setImmagine(null);
         dp.setImmagineContentType(null);
 
-        return dropPointDAO.doSave(dp);
+        boolean salvato = dropPointDAO.doSave(dp);
+
+        // NOTIFICA ADMIN (chiamata diretta, EmailService gestisce il thread)
+        if (salvato) {
+            List<String> admins = utenteService.getEmailAdmins();
+            for (String adminEmail : admins) {
+                emailService.inviaNotificaAdminNuovoDropPoint(adminEmail, nomeAttivita, citta);
+            }
+        }
+        return salvato;
     }
 
     public DropPoint login(String email, String password) {
         DropPoint dp = dropPointDAO.doRetrieveByEmail(email);
         if (dp == null) return null;
-
-        if (!PasswordUtils.checkPassword(password, dp.getPasswordHash())) {
-            return null;
-        }
+        if (!PasswordUtils.checkPassword(password, dp.getPasswordHash())) return null;
         return dropPointDAO.doRetrieveById(dp.getId());
     }
 
     // ==========================
-    //   QUERY DI SUPPORTO
+    //   GESTIONE APPROVAZIONE
     // ==========================
 
-    public List<DropPoint> findAllApprovati() {
-        return dropPointDAO.doRetrieveAllApprovati();
-    }
-
-    public List<DropPoint> findAllInAttesa() {
-        return dropPointDAO.doRetrieveByStato(StatoDropPoint.IN_ATTESA);
-    }
-
     public boolean approvaDropPoint(long id) {
-        return dropPointDAO.updateStato(id, StatoDropPoint.APPROVATO);
+        boolean aggiornato = dropPointDAO.updateStato(id, StatoDropPoint.APPROVATO);
+
+        // NOTIFICA DROP-POINT (chiamata diretta)
+        if (aggiornato) {
+            DropPoint dp = dropPointDAO.doRetrieveById(id);
+            if (dp != null) {
+                emailService.inviaAccettazioneDropPoint(dp.getEmail(), dp.getNomeAttivita());
+            }
+        }
+        return aggiornato;
     }
 
     public boolean rifiutaDropPoint(long id) {
@@ -91,51 +94,30 @@ public class DropPointService {
         return dropPointDAO.doRetrieveById(id);
     }
 
-    // =====================================================
-    //   LOGICA REALE (DB) - SOSTITUISCE QUELLA IN-MEMORY
-    // =====================================================
+    // ==========================
+    //   ALTRI METODI INVARIATI
+    // ==========================
 
-    /**
-     * Registra un RITIRO (Consegna al proprietario).
-     * Chiude la segnalazione e assegna i punti.
-     */
     public boolean registraRitiro(long idDropPoint, String codiceConsegna) {
-        if (codiceConsegna == null || codiceConsegna.isBlank()) {
-            return false;
-        }
-
-        // 1. Cerca il reclamo associato a questo codice
+        if (codiceConsegna == null || codiceConsegna.isBlank()) return false;
         Reclamo r = reclamoDAO.doRetrieveByCodice(codiceConsegna);
-        if (r == null) {
-            return false; // Codice non esistente
-        }
-
-        // 2. Recupera la segnalazione
+        if (r == null) return false;
         Segnalazione s = segnalazioneDAO.doRetrieveById(r.getIdSegnalazione());
         if (s == null) return false;
 
-        // 3. Verifica che la segnalazione sia assegnata a QUESTO DropPoint
         if (s instanceof SegnalazioneOggetto) {
             SegnalazioneOggetto so = (SegnalazioneOggetto) s;
-
             boolean isCorrectDP = (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT
                     && so.getIdDropPoint() != null
                     && so.getIdDropPoint() == idDropPoint);
 
             if (isCorrectDP) {
-                // 4. CHIUDI SEGNALAZIONE
                 boolean chiuso = segnalazioneDAO.updateStato(s.getId(), StatoSegnalazione.CHIUSA);
-
                 if (chiuso) {
-                    // 5. ASSEGNA PUNTI AL FINDER
                     Utente finder = utenteService.trovaPerId(s.getIdUtente());
                     if (finder != null) {
                         utenteService.aggiornaPunteggioEBadge(finder, 1);
                     }
-
-                    // (Opzionale) Aggiorna contatore ritiri DropPoint nel DB
-                    // dropPointDAO.incrementaRitiri(idDropPoint);
-
                     return true;
                 }
             }
@@ -143,20 +125,16 @@ public class DropPointService {
         return false;
     }
 
-    // Manteniamo questi metodi per compatibilità, ma ora registraRitiro usa il DB
-    // (registraDeposito può rimanere placeholder o essere implementato similarmente)
     public boolean registraDeposito(long idDropPoint, String codiceConsegna) {
-        // Implementazione base: verifica solo che il codice esista
         Reclamo r = reclamoDAO.doRetrieveByCodice(codiceConsegna);
         return r != null;
     }
 
-    // Contatori (puoi lasciarli a 0 o implementarli con count DB se vuoi)
-    public int countDepositiAttivi(long idDropPoint) { return 0; }
-    public int countConsegneCompletate(long idDropPoint) { return 0; }
-    public int countTotaleOperazioni(long idDropPoint) { return 0; }
-
-    public boolean aggiornaProfilo(DropPoint dropPoint) {
-        return dropPointDAO.updateProfilo(dropPoint);
-    }
+    public int countDepositiAttivi(long id) { return 0; }
+    public int countConsegneCompletate(long id) { return 0; }
+    public int countTotaleOperazioni(long id) { return 0; }
+    public boolean aggiornaProfilo(DropPoint dp) { return dropPointDAO.updateProfilo(dp); }
+    public boolean eliminaDropPoint(long id) { return dropPointDAO.doDeleteById(id); }
+    public List<DropPoint> findAllApprovati() { return dropPointDAO.doRetrieveAllApprovati(); }
+    public List<DropPoint> findAllInAttesa() { return dropPointDAO.doRetrieveByStato(StatoDropPoint.IN_ATTESA); }
 }
