@@ -311,7 +311,9 @@
     }
 
     .dp-stats-row {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
     }
 
     .dp-actions-grid {

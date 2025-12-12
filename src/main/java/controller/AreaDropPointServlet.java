@@ -39,7 +39,6 @@ public class AreaDropPointServlet extends HttpServlet {
             long id = dp.getId();
             request.setAttribute("depositiAttivi",      dropPointService.countDepositiAttivi(id));
             request.setAttribute("consegneCompletate", dropPointService.countConsegneCompletate(id));
-            request.setAttribute("totaleOperazioni",   dropPointService.countTotaleOperazioni(id));
         } else {
             request.setAttribute("depositiAttivi", 0);
             request.setAttribute("consegneCompletate", 0);
@@ -95,7 +94,6 @@ public class AreaDropPointServlet extends HttpServlet {
         long id = dp.getId();
         request.setAttribute("depositiAttivi",      dropPointService.countDepositiAttivi(id));
         request.setAttribute("consegneCompletate", dropPointService.countConsegneCompletate(id));
-        request.setAttribute("totaleOperazioni",   dropPointService.countTotaleOperazioni(id));
 
         request.getRequestDispatcher("/WEB-INF/jsp/area_drop_point.jsp")
                 .forward(request, response);

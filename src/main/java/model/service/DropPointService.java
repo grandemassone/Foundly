@@ -7,6 +7,7 @@ import model.bean.SegnalazioneOggetto;
 import model.bean.Utente;
 import model.bean.enums.ModalitaConsegna;
 import model.bean.enums.StatoDropPoint;
+import model.bean.enums.StatoReclamo;
 import model.bean.enums.StatoSegnalazione;
 import model.dao.DropPointDAO;
 import model.dao.ReclamoDAO;
@@ -98,41 +99,51 @@ public class DropPointService {
     //   ALTRI METODI INVARIATI
     // ==========================
 
-    public boolean registraRitiro(long idDropPoint, String codiceConsegna) {
-        if (codiceConsegna == null || codiceConsegna.isBlank()) return false;
-        Reclamo r = reclamoDAO.doRetrieveByCodice(codiceConsegna);
+    public boolean registraRitiro(long idDropPoint, String codiceRitiro) {
+        Reclamo r = reclamoDAO.doRetrieveByCodiceAndDropPoint(codiceRitiro, idDropPoint);
         if (r == null) return false;
+
+        // deve essere stato depositato prima
+        if (r.getDataDeposito() == null) return false;
+
+        // evita doppie registrazioni
+        if (r.getDataRitiro() != null) return false;
+
+        // 1) marca ritiro
+        boolean okRitiro = reclamoDAO.marcaRitiro(r.getId());
+        if (!okRitiro) return false;
+
+        // 2) chiudi segnalazione
+        boolean okChiusa = segnalazioneDAO.updateStato(r.getIdSegnalazione(), StatoSegnalazione.CHIUSA);
+        if (!okChiusa) return false;
+
+        // 3) assegna punto al finder
         Segnalazione s = segnalazioneDAO.doRetrieveById(r.getIdSegnalazione());
-        if (s == null) return false;
-
-        if (s instanceof SegnalazioneOggetto) {
-            SegnalazioneOggetto so = (SegnalazioneOggetto) s;
-            boolean isCorrectDP = (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT
-                    && so.getIdDropPoint() != null
-                    && so.getIdDropPoint() == idDropPoint);
-
-            if (isCorrectDP) {
-                boolean chiuso = segnalazioneDAO.updateStato(s.getId(), StatoSegnalazione.CHIUSA);
-                if (chiuso) {
-                    Utente finder = utenteService.trovaPerId(s.getIdUtente());
-                    if (finder != null) {
-                        utenteService.aggiornaPunteggioEBadge(finder, 1);
-                    }
-                    return true;
-                }
-            }
+        if (s != null) {
+            Utente finder = utenteService.trovaPerId(s.getIdUtente());
+            if (finder != null) utenteService.aggiornaPunteggioEBadge(finder, 1);
         }
-        return false;
+
+        return true;
     }
 
     public boolean registraDeposito(long idDropPoint, String codiceConsegna) {
-        Reclamo r = reclamoDAO.doRetrieveByCodice(codiceConsegna);
-        return r != null;
+        Reclamo r = reclamoDAO.doRetrieveByCodiceAndDropPoint(codiceConsegna, idDropPoint);
+        if (r == null) return false;
+
+        // evita doppie registrazioni
+        if (r.getDataDeposito() != null) return false;
+
+        return reclamoDAO.marcaDeposito(r.getId());
     }
 
-    public int countDepositiAttivi(long id) { return 0; }
-    public int countConsegneCompletate(long id) { return 0; }
-    public int countTotaleOperazioni(long id) { return 0; }
+
+    public int countDepositiAttivi(long idDropPoint) {
+        return reclamoDAO.countDepositiAttiviByDropPoint(idDropPoint);
+    }
+    public int countConsegneCompletate(long idDropPoint) {
+        return reclamoDAO.countConsegneCompletateByDropPoint(idDropPoint);
+    }
     public boolean aggiornaProfilo(DropPoint dp) { return dropPointDAO.updateProfilo(dp); }
     public boolean eliminaDropPoint(long id) { return dropPointDAO.doDeleteById(id); }
     public List<DropPoint> findAllApprovati() { return dropPointDAO.doRetrieveAllApprovati(); }

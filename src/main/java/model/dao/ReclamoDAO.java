@@ -205,4 +205,110 @@ public class ReclamoDAO {
         }
         return r;
     }
+    public Reclamo doRetrieveByCodiceAndDropPoint(String codice, long idDropPoint) {
+        String sql = """
+        SELECT r.*
+        FROM reclamo r
+        JOIN segnalazione_oggetto so ON so.id_segnalazione = r.id_segnalazione
+        WHERE r.codice_consegna = ?
+          AND so.modalita_consegna = 'DROP_POINT'
+          AND so.id_drop_point = ?
+        """;
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, codice);
+            ps.setLong(2, idDropPoint);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public boolean marcaDeposito(long idReclamo) {
+        String sql = "UPDATE reclamo SET data_deposito = CURRENT_TIMESTAMP WHERE id = ? AND data_deposito IS NULL";
+        try (Connection con = ConPool.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
+
+    public boolean marcaRitiro(long idReclamo) {
+        String sql = "UPDATE reclamo SET data_ritiro = CURRENT_TIMESTAMP WHERE id = ? AND data_ritiro IS NULL";
+        try (Connection con = ConPool.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
+    public boolean setDataDepositoIfNull(long idReclamo) {
+        String sql = "UPDATE reclamo SET data_deposito = NOW() WHERE id = ? AND data_deposito IS NULL";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean setDataRitiroIfNull(long idReclamo) {
+        String sql = "UPDATE reclamo SET data_ritiro = NOW() WHERE id = ? AND data_ritiro IS NULL";
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idReclamo);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public int countDepositiAttiviByDropPoint(long idDropPoint) {
+        String sql = """
+        SELECT COUNT(*) AS cnt
+        FROM reclamo r
+        JOIN segnalazione_oggetto so ON so.id_segnalazione = r.id_segnalazione
+        WHERE so.modalita_consegna = 'DROP_POINT'
+          AND so.id_drop_point = ?
+          AND r.data_deposito IS NOT NULL
+          AND r.data_ritiro IS NULL
+        """;
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idDropPoint);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt("cnt") : 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public int countConsegneCompletateByDropPoint(long idDropPoint) {
+        String sql = """
+        SELECT COUNT(*) AS cnt
+        FROM reclamo r
+        JOIN segnalazione_oggetto so ON so.id_segnalazione = r.id_segnalazione
+        WHERE so.modalita_consegna = 'DROP_POINT'
+          AND so.id_drop_point = ?
+          AND r.data_ritiro IS NOT NULL
+        """;
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, idDropPoint);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt("cnt") : 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
 }

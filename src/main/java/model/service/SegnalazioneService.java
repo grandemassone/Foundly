@@ -50,33 +50,11 @@ public class SegnalazioneService {
 
     // --- LOGICA DROP-POINT (Con Codice) ---
     public boolean accettaReclamoEChiudiSegnalazione(long idReclamo, long idSegnalazione, String codice) {
-        boolean successoReclamo = reclamoDAO.accettaReclamo(idReclamo, codice);
+        boolean okReclamo = reclamoDAO.accettaReclamo(idReclamo, codice);
+        if (!okReclamo) return false;
 
-        if (successoReclamo) {
-            boolean successoSegnalazione = segnalazioneDAO.updateStato(idSegnalazione, StatoSegnalazione.CHIUSA);
-
-            if (successoSegnalazione) {
-                // Se è DropPoint, assegna il punto
-                Segnalazione s = segnalazioneDAO.doRetrieveById(idSegnalazione);
-                if (s != null) {
-                    boolean isDropPoint = false;
-                    if (s instanceof SegnalazioneOggetto) {
-                        SegnalazioneOggetto so = (SegnalazioneOggetto) s;
-                        if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
-                            isDropPoint = true;
-                        }
-                    }
-                    if (isDropPoint) {
-                        Utente finder = utenteService.trovaPerId(s.getIdUtente());
-                        if (finder != null) {
-                            utenteService.aggiornaPunteggioEBadge(finder, 1);
-                        }
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
+        // NON chiudere qui: verrà chiusa dal DropPoint quando registra il ritiro
+        return segnalazioneDAO.updateStato(idSegnalazione, StatoSegnalazione.IN_CONSEGNA);
     }
 
     // --- LOGICA SCAMBIO DIRETTO (Doppia Conferma) ---

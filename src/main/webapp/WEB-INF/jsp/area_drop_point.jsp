@@ -11,7 +11,6 @@
 
     int depositiAttivi      = (request.getAttribute("depositiAttivi")      != null) ? (Integer) request.getAttribute("depositiAttivi")      : 0;
     int consegneCompletate  = (request.getAttribute("consegneCompletate")  != null) ? (Integer) request.getAttribute("consegneCompletate")  : 0;
-    int totaleOperazioni    = (request.getAttribute("totaleOperazioni")    != null) ? (Integer) request.getAttribute("totaleOperazioni")    : 0;
 
     String msgDeposito    = (String) request.getAttribute("msgDeposito");
     String msgRitiro      = (String) request.getAttribute("msgRitiro");
@@ -80,11 +79,6 @@
             <span class="material-icons dp-stat-icon">check_circle</span>
         </article>
 
-        <article class="dp-stat-card">
-            <div class="dp-stat-label">Totale Operazioni</div>
-            <div class="dp-stat-value info"><%= totaleOperazioni %></div>
-            <span class="material-icons dp-stat-icon">store</span>
-        </article>
     </section>
 
     <% if (erroreGenerale != null) { %>
