@@ -11,7 +11,7 @@
 <%@ page import="java.util.Map" %>
 
 <%
-    // --- 1. CONTROLLI DI SICUREZZA E SESSIONE ---
+    // --- CONTROLLI ---
     model.bean.DropPoint dp = (model.bean.DropPoint) session.getAttribute("dropPoint");
     model.bean.Utente u = (model.bean.Utente) session.getAttribute("utente");
 
@@ -23,7 +23,7 @@
     boolean isLogged = (utente != null);
     boolean isOwner = (isLogged && s != null && s.getIdUtente() == utente.getId());
 
-    // --- 2. GESTIONE MODALITÀ CONSEGNA ---
+    // --- MODALITÀ ---
     boolean isDropPoint = false;
     if (s instanceof SegnalazioneOggetto) {
         SegnalazioneOggetto so = (SegnalazioneOggetto) s;
@@ -32,7 +32,7 @@
         }
     }
 
-    // --- 3. RECUPERO RECLAMO ACCETTATO (LO SCAMBIO ATTIVO) ---
+    // --- RECLAMI ---
     @SuppressWarnings("unchecked")
     List<Reclamo> reclami = (List<Reclamo>) request.getAttribute("reclamiRicevuti");
     Reclamo reclamoAccettato = null;
@@ -42,7 +42,6 @@
             if(r.getStato() == StatoReclamo.ACCETTATO) { reclamoAccettato = r; break; }
         }
     }
-    // Se sono il richiedente (non il proprietario della segnalazione)
     if(reclamoAccettato == null) {
         Reclamo mio = (Reclamo) request.getAttribute("mioReclamo");
         if(mio != null && mio.getStato() == StatoReclamo.ACCETTATO) {
@@ -50,21 +49,17 @@
         }
     }
 
-    // --- 4. RECUPERO DATI DELLA CONTROPARTE (CHI DEVO INCONTRARE?) ---
+    // --- CONTROPARTE ---
     Utente controparte = null;
     String etichettaControparte = "Utente";
 
     if (reclamoAccettato != null) {
         if (isOwner) {
-            // Sono il Finder -> Mi servono i dati dell'Owner (colui che ha fatto il reclamo)
             @SuppressWarnings("unchecked")
             Map<Long, Utente> mappa = (Map<Long, Utente>) request.getAttribute("mappaRichiedenti");
-            if (mappa != null) {
-                controparte = mappa.get(reclamoAccettato.getIdUtenteRichiedente());
-            }
-            etichettaControparte = "Contatti Proprietario";
+            if (mappa != null) controparte = mappa.get(reclamoAccettato.getIdUtenteRichiedente());
+            etichettaControparte = "Restituito a";
         } else {
-            // Sono l'Owner -> Mi servono i dati del Finder (proprietario segnalazione)
             controparte = (Utente) request.getAttribute("proprietarioSegnalazione");
             etichettaControparte = "Contatti Finder";
         }
@@ -76,13 +71,11 @@
 <head>
     <title>${segnalazione.titolo != null ? segnalazione.titolo : "Dettaglio"} - Foundly</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css?v=12">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css?v=16">
 </head>
 
 <body>
@@ -95,17 +88,13 @@
         <span class="material-icons">arrow_back</span> Torna alla Home
     </a>
 
-    <%-- CASO 1: SEGNALAZIONE NON TROVATA --%>
     <c:if test="${segnalazione == null}">
         <div class="local-card empty-card" style="text-align:center; padding:60px 40px;">
-            <span class="material-icons" style="font-size:60px; color:#ddd; margin-bottom:20px;">search_off</span>
             <h2>Segnalazione non trovata</h2>
-            <p style="color:#666; margin-bottom:20px;">Potrebbe essere stata rimossa o il link non è corretto.</p>
-            <a href="${pageContext.request.contextPath}/index" class="btn-primary" style="max-width:200px; margin:0 auto;">Vai alla Home</a>
+            <a href="${pageContext.request.contextPath}/index" class="btn-primary">Vai alla Home</a>
         </div>
     </c:if>
 
-    <%-- CASO 2: SEGNALAZIONE TROVATA --%>
     <c:if test="${segnalazione != null}">
         <div class="local-grid">
 
@@ -114,13 +103,12 @@
                     <div class="image-container">
                         <c:choose>
                             <c:when test="${not empty segnalazione.immagine}">
-                                <img src="${pageContext.request.contextPath}/segnalazione-img?id=${segnalazione.id}" class="local-hero-img" alt="Foto Oggetto">
+                                <img src="${pageContext.request.contextPath}/segnalazione-img?id=${segnalazione.id}" class="local-hero-img" alt="Foto">
                             </c:when>
                             <c:otherwise>
                                 <div class="local-hero-placeholder"><span class="material-icons">image_not_supported</span></div>
                             </c:otherwise>
                         </c:choose>
-
                         <div class="status-overlay">
                             <span class="status-badge ${segnalazione.stato == 'CHIUSA' ? 'status-closed' : 'status-open'}">
                                     ${segnalazione.stato}
@@ -139,9 +127,7 @@
                                     <span class="tag-pill outline">${segnalazione.specie}</span>
                                 </c:if>
                             </div>
-                            <span class="date-text">
-                                Pubblicato il <fmt:formatDate value="${segnalazione.dataPubblicazione}" pattern="dd MMM yyyy"/>
-                            </span>
+                            <span class="date-text">Pubblicato il <fmt:formatDate value="${segnalazione.dataPubblicazione}" pattern="dd MMM yyyy"/></span>
                         </div>
 
                         <h1 class="local-title">${segnalazione.titolo}</h1>
@@ -150,18 +136,11 @@
                         <div class="info-grid">
                             <div class="info-item">
                                 <div class="icon-wrap"><span class="material-icons">calendar_today</span></div>
-                                <div>
-                                    <span class="label">Data Ritrovamento</span>
-                                    <div class="value"><fmt:formatDate value="${segnalazione.dataRitrovamento}" pattern="dd MMMM yyyy"/></div>
-                                </div>
+                                <div><span class="label">Data Ritrovamento</span><div class="value"><fmt:formatDate value="${segnalazione.dataRitrovamento}" pattern="dd MMM yyyy"/></div></div>
                             </div>
                             <div class="info-item">
                                 <div class="icon-wrap"><span class="material-icons">location_on</span></div>
-                                <div>
-                                    <span class="label">Luogo</span>
-                                    <div class="value">${segnalazione.luogoRitrovamento}</div>
-                                    <div class="sub-value">${segnalazione.citta} (${segnalazione.provincia})</div>
-                                </div>
+                                <div><span class="label">Luogo</span><div class="value">${segnalazione.luogoRitrovamento}</div></div>
                             </div>
                         </div>
 
@@ -170,46 +149,12 @@
                         <% if (isDropPoint) { %>
                         <div class="delivery-box purple">
                             <div class="icon-box"><span class="material-icons">store</span></div>
-                            <div>
-                                <h4 style="margin:0; font-size:1.1rem; margin-bottom:4px;">Drop-Point Partner</h4>
-                                <p style="margin:0; opacity:0.8;">L'oggetto è custodito presso un negozio autorizzato.</p>
-                            </div>
+                            <div><h4>Drop-Point Partner</h4><p>L'oggetto è custodito presso un negozio autorizzato.</p></div>
                         </div>
                         <% } else { %>
                         <div class="delivery-box green">
                             <div class="icon-box"><span class="material-icons">handshake</span></div>
-                            <div>
-                                <h4 style="margin:0; font-size:1.1rem; margin-bottom:4px;">Scambio Diretto</h4>
-                                <p style="margin:0; opacity:0.8;">L'incontro avverrà direttamente tra Finder e Proprietario.</p>
-                            </div>
-                        </div>
-                        <% } %>
-
-                        <% if (reclamoAccettato != null && !isDropPoint && s.getStato() == StatoSegnalazione.APERTA) { %>
-                        <div class="scambio-action-box">
-                            <h3 class="scambio-title">
-                                <span class="material-icons" style="color:#FB8C00;">published_with_changes</span>
-                                Scambio in Corso
-                            </h3>
-                            <p style="color:#555; margin-bottom:20px; font-size:0.95rem;">
-                                Il reclamo è stato accettato! Incontratevi nel luogo concordato.<br>
-                                <strong>Per completare la restituzione e ricevere i punti, entrambi dovete confermare.</strong>
-                            </p>
-
-                            <div class="scambio-status">
-                                <span class="status-pill <%= reclamoAccettato.isConfermaFinder() ? "done" : "" %>">
-                                    <span class="material-icons" style="font-size:16px">
-                                        <%= reclamoAccettato.isConfermaFinder() ? "check_circle" : "radio_button_unchecked" %>
-                                    </span>
-                                    Finder <%= reclamoAccettato.isConfermaFinder() ? "Pronto" : "In attesa" %>
-                                </span>
-                                <span class="status-pill <%= reclamoAccettato.isConfermaOwner() ? "done" : "" %>">
-                                    <span class="material-icons" style="font-size:16px">
-                                        <%= reclamoAccettato.isConfermaOwner() ? "check_circle" : "radio_button_unchecked" %>
-                                    </span>
-                                    Owner <%= reclamoAccettato.isConfermaOwner() ? "Pronto" : "In attesa" %>
-                                </span>
-                            </div>
+                            <div><h4>Scambio Diretto</h4><p>Incontro diretto tra Finder e Proprietario.</p></div>
                         </div>
                         <% } %>
                     </div>
@@ -218,250 +163,126 @@
 
             <aside class="sidebar">
 
-                    <%-- ================================================================= --%>
-                    <%-- VISTA RICHIEDENTE (Utente che cerca l'oggetto / Owner)            --%>
-                    <%-- ================================================================= --%>
                 <c:if test="<%= !isOwner %>">
                     <c:choose>
-
-                        <%-- SCENARIO A: RECLAMO ACCETTATO (WINNER) --%>
                         <c:when test="${not empty mioReclamo && mioReclamo.stato == 'ACCETTATO'}">
                             <div class="winner-card">
                                 <div class="confetti-icon">🎉</div>
-                                <h3 style="color:#2E7D32; margin:0 0 8px 0;">Congratulazioni!</h3>
-                                <p style="color:#558B2F; margin:0; font-size:0.95rem;">L'oggetto è ufficialmente tuo.</p>
+                                <h3 class="winner-title">Congratulazioni!</h3>
+                                <p class="winner-subtitle">L'oggetto è ufficialmente tuo.</p>
 
-                                    <%-- Drop Point Code (Se applicabile) --%>
                                 <c:if test="${not empty mioReclamo.codiceConsegna}">
-                                    <div class="code-box">
-                                        <div class="code-label">Codice Ritiro Drop-Point</div>
+                                    <div class="code-ticket">
+                                        <span class="code-label">CODICE RITIRO DROP-POINT</span>
                                         <div class="the-code">${mioReclamo.codiceConsegna}</div>
                                     </div>
-                                    <p style="font-size:0.85rem; color:#666;">
-                                        Mostra questo codice al gestore del negozio per ritirare il tuo oggetto.
-                                    </p>
+                                    <p class="winner-note">Mostra questo codice al negozio.</p>
+
+                                    <c:if test="${not empty dropPointRitiro}">
+                                        <div class="pickup-location-card">
+                                            <div class="pickup-header">RITIRA PRESSO</div>
+                                            <div class="pickup-name">${dropPointRitiro.nomeAttivita}</div>
+                                            <div class="pickup-address">
+                                                    ${dropPointRitiro.indirizzo}, ${dropPointRitiro.citta}
+                                            </div>
+
+                                            <div class="pickup-details-row">
+                                                <span class="material-icons">schedule</span>
+                                                <span>${dropPointRitiro.orariApertura}</span>
+                                            </div>
+
+                                            <c:if test="${not empty dropPointRitiro.telefono}">
+                                                <div class="pickup-details-row">
+                                                    <span class="material-icons">call</span>
+                                                    <span>${dropPointRitiro.telefono}</span>
+                                                </div>
+                                            </c:if>
+                                        </div>
+                                    </c:if>
                                 </c:if>
 
-                                    <%-- PULSANTE CONFERMA RICEZIONE (Solo scambio diretto aperto) --%>
+                                    <%-- Scambio diretto --%>
                                 <% if (!isDropPoint && s.getStato() == StatoSegnalazione.APERTA && reclamoAccettato != null) { %>
-                                <div class="sidebar-action-separator"></div>
+                                <div style="margin-top:20px;"></div>
                                 <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post">
                                     <input type="hidden" name="action" value="conferma_scambio">
                                     <input type="hidden" name="idReclamo" value="${mioReclamo.id}">
                                     <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
 
                                     <% if (reclamoAccettato.isConfermaOwner()) { %>
-                                    <div style="margin-bottom:8px; font-size:0.95rem; color:#666; font-weight:600; text-align:center;">In attesa del Finder...</div>
-                                    <button type="button" class="btn-disabled status-pill done">
-                                        <span class="material-icons">check_circle</span> Ricezione Confermata
-                                    </button>
+                                    <div style="text-align:center; color:#2E7D32; font-weight:600; margin-bottom:5px;">Ricezione confermata!</div>
+                                    <button type="button" class="btn-disabled status-pill done" style="width:100%;">In attesa del Finder...</button>
                                     <% } else { %>
-                                    <div style="margin-bottom:12px; font-size:1.15rem; color:#E65100; font-weight:800; text-align:center; text-transform:uppercase; letter-spacing:0.5px;">
-                                        Clicca dopo aver ricevuto l'oggetto
-                                    </div>
-                                    <button type="submit" class="btn-primary btn-action-large">
-                                        <span class="material-icons">inventory</span> Conferma Ricezione
-                                    </button>
+                                    <button type="submit" class="btn-primary">Conferma Ricezione</button>
                                     <% } %>
                                 </form>
-                                <% } %>
-
-                                    <%-- BOX CONTATTI (Dati Finder) --%>
-                                <% if (controparte != null) { %>
-                                <div class="contact-box-white">
-                                    <div style="font-size:0.8rem; text-transform:uppercase; color:#E65100; font-weight:700; margin-bottom:10px;">
-                                        <%= etichettaControparte %>
-                                    </div>
-                                    <div class="contact-row">
-                                        <span class="material-icons">account_circle</span>
-                                        <strong><%= controparte.getNome() %> <%= controparte.getCognome() %></strong>
-                                    </div>
-                                    <div class="contact-row">
-                                        <span class="material-icons">email</span>
-                                        <a href="mailto:<%= controparte.getEmail() %>"><%= controparte.getEmail() %></a>
-                                    </div>
-                                    <div class="contact-row">
-                                        <span class="material-icons">phone</span>
-                                        <a href="tel:<%= controparte.getTelefono() %>"><%= controparte.getTelefono() %></a>
-                                    </div>
-                                </div>
                                 <% } %>
                             </div>
                         </c:when>
 
-                        <%-- SCENARIO B: NESSUN RECLAMO O IN ATTESA --%>
                         <c:otherwise>
                             <div class="sidebar-card">
                                 <h3 class="sidebar-title">È tuo questo oggetto?</h3>
 
-                                    <%-- BOX STATO RECLAMO (Senza underscore) --%>
                                 <c:if test="${not empty mioReclamo}">
-                                    <c:set var="stClass" value="pending" />
-                                    <c:set var="stIcon" value="hourglass_top" />
-                                    <c:set var="stText" value="In Valutazione" />
-
                                     <c:choose>
-                                        <c:when test="${mioReclamo.stato == 'ACCETTATO'}">
-                                            <c:set var="stClass" value="accepted" />
-                                            <c:set var="stIcon" value="check_circle" />
-                                            <c:set var="stText" value="Richiesta Accettata" />
-                                        </c:when>
                                         <c:when test="${mioReclamo.stato == 'RIFIUTATO'}">
-                                            <c:set var="stClass" value="rejected" />
-                                            <c:set var="stIcon" value="cancel" />
-                                            <c:set var="stText" value="Richiesta Rifiutata" />
+                                            <div style="background:#FFEBEE; color:#C62828; padding:20px; border-radius:12px; text-align:center; border:1px solid #FFCDD2;">
+                                                <span class="material-icons" style="font-size:32px; display:block; margin-bottom:8px;">cancel</span>
+                                                <strong>Richiesta Rifiutata</strong>
+                                            </div>
                                         </c:when>
+                                        <c:otherwise>
+                                            <div class="user-status-card pending">
+                                                <div class="st-icon-wrapper"><span class="material-icons">hourglass_top</span></div>
+                                                <div class="st-info">
+                                                    <span class="st-label">Stato Richiesta</span>
+                                                    <span class="st-value">In Valutazione</span>
+                                                </div>
+                                            </div>
+                                        </c:otherwise>
                                     </c:choose>
-
-                                    <div class="user-status-card ${stClass}">
-                                        <div class="st-icon-wrapper">
-                                            <span class="material-icons">${stIcon}</span>
-                                        </div>
-                                        <div class="st-info">
-                                            <span class="st-label">Stato Richiesta</span>
-                                            <span class="st-value">${stText}</span>
-                                        </div>
-                                    </div>
                                 </c:if>
 
                                 <c:if test="${empty mioReclamo && segnalazione.stato == 'APERTA'}">
-                                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">
-                                        Rispondi alle domande di sicurezza per dimostrare di essere il proprietario.
-                                    </p>
+                                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">Rispondi alle domande di sicurezza.</p>
                                     <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post">
                                         <input type="hidden" name="action" value="invia">
                                         <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-
-                                        <label style="display:block; font-weight:600; font-size:0.85rem; margin-bottom:6px; color:#333;">
-                                            1. ${segnalazione.domandaVerifica1}
-                                        </label>
-                                        <input type="text" name="risposta1" required class="form-input" placeholder="La tua risposta...">
-
-                                        <label style="display:block; font-weight:600; font-size:0.85rem; margin-bottom:6px; color:#333;">
-                                            2. ${segnalazione.domandaVerifica2}
-                                        </label>
-                                        <input type="text" name="risposta2" required class="form-input" placeholder="La tua risposta...">
-
-                                        <button class="btn-primary">Invia Reclamo</button>
+                                        <label style="display:block; font-size:0.8rem; font-weight:700; color:#555; margin-bottom:5px;">1. ${segnalazione.domandaVerifica1}</label>
+                                        <input type="text" name="risposta1" required class="form-input" style="margin-bottom:15px;">
+                                        <label style="display:block; font-size:0.8rem; font-weight:700; color:#555; margin-bottom:5px;">2. ${segnalazione.domandaVerifica2}</label>
+                                        <input type="text" name="risposta2" required class="form-input" style="margin-bottom:20px;">
+                                        <button class="btn-primary full-width">Invia Reclamo</button>
                                     </form>
-                                </c:if>
-
-                                <c:if test="${segnalazione.stato == 'CHIUSA' && empty mioReclamo}">
-                                    <div style="text-align:center; color:#999; padding:20px 0;">
-                                        <span class="material-icons" style="font-size:40px;">lock</span>
-                                        <p>Segnalazione conclusa.</p>
-                                    </div>
                                 </c:if>
                             </div>
                         </c:otherwise>
                     </c:choose>
                 </c:if>
 
-                    <%-- ================================================================= --%>
-                    <%-- VISTA FINDER (Proprietario Segnalazione)                          --%>
-                    <%-- ================================================================= --%>
                 <c:if test="<%= isOwner %>">
                     <div class="sidebar-card">
-
-                            <%-- 1. MESSAGGIO PUNTI GUADAGNATI (Appare SOLO dopo che tutto è finito) --%>
-                        <c:if test="${param.msg == 'scambio_completato'}">
-                            <div class="points-earned-card">
-                                <span class="material-icons points-icon-large">emoji_events</span>
-                                <div class="points-title">Ottimo Lavoro!</div>
-                                <p class="points-text">
-                                    Tutto è andato a buon fine.<br>
-                                    Hai guadagnato <strong>+1 Punto</strong> per la tua onestà.
-                                </p>
-                                <a href="${pageContext.request.contextPath}/profilo" class="btn-profile-link">
-                                    Vedi il tuo profilo <span class="material-icons" style="font-size:16px;">arrow_forward</span>
-                                </a>
-                            </div>
-                        </c:if>
-
-                            <%-- 2. AZIONE CONFERMA CONSEGNA (Per il finder, in alto, solo se aperto) --%>
-                        <% if (!isDropPoint && s.getStato() == StatoSegnalazione.APERTA && reclamoAccettato != null) { %>
-                        <div class="action-highlight-box">
-                            <h3 class="sidebar-title" style="color:#2E7D32;">Scambio in Corso</h3>
-                            <p style="font-size:0.9rem; color:#555; margin-bottom:15px;">Hai accettato un reclamo. Incontra il proprietario per lo scambio.</p>
-
-                            <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post">
-                                <input type="hidden" name="action" value="conferma_scambio">
-                                <input type="hidden" name="idReclamo" value="<%= reclamoAccettato.getId() %>">
-                                <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-
-                                <% if (reclamoAccettato.isConfermaFinder()) { %>
-                                <div style="margin-bottom:8px; font-size:0.95rem; color:#666; font-weight:600; text-align:center;">In attesa dell'Owner...</div>
-                                <button type="button" class="btn-disabled status-pill done">
-                                    <span class="material-icons">check_circle</span> Consegna Confermata
-                                </button>
-                                <% } else { %>
-                                <div style="margin-bottom:12px; font-size:1.15rem; color:#E65100; font-weight:800; text-align:center; text-transform:uppercase; letter-spacing:0.5px;">
-                                    Clicca dopo aver consegnato l'oggetto
-                                </div>
-                                <button type="submit" class="btn-primary btn-action-large" style="background: linear-gradient(135deg, #2E7D32, #1B5E20);">
-                                    <span class="material-icons">how_to_reg</span> Conferma Consegna
-                                </button>
-                                <% } %>
-                            </form>
-
-                                <%-- Contact Info (Dati Owner/Richiedente) --%>
-                            <% if (controparte != null) { %>
-                            <div class="sidebar-action-separator"></div>
-                            <div class="contact-box-white" style="background: rgba(255,255,255,0.6);">
-                                <div style="font-size:0.8rem; text-transform:uppercase; color:#2E7D32; font-weight:700; margin-bottom:10px;">
-                                    <%= etichettaControparte %>
-                                </div>
-                                <div class="contact-row">
-                                    <span class="material-icons" style="color: #2E7D32;">account_circle</span>
-                                    <strong><%= controparte.getNome() %> <%= controparte.getCognome() %></strong>
-                                </div>
-                                <div class="contact-row">
-                                    <span class="material-icons" style="color: #2E7D32;">email</span>
-                                    <a href="mailto:<%= controparte.getEmail() %>" style="color:#1B5E20;"><%= controparte.getEmail() %></a>
-                                </div>
-                                <div class="contact-row">
-                                    <span class="material-icons" style="color: #2E7D32;">phone</span>
-                                    <a href="tel:<%= controparte.getTelefono() %>" style="color:#1B5E20;"><%= controparte.getTelefono() %></a>
-                                </div>
-                            </div>
-                            <% } %>
-
-                        </div>
-                        <% } %>
-
-                            <%-- LISTA RECLAMI --%>
                         <h3 class="sidebar-title" style="display:flex; align-items:center; gap:8px;">
                             <span class="material-icons" style="color:var(--primary);">admin_panel_settings</span>
                             Gestione Reclami
                         </h3>
 
-                        <c:if test="${empty reclamiRicevuti}">
-                            <div style="text-align:center; padding:30px 0; color:#999;">
-                                <span class="material-icons" style="font-size:40px; margin-bottom:10px;">inbox</span>
-                                <p>Non hai ancora ricevuto richieste.</p>
-                            </div>
-                        </c:if>
-
                         <c:forEach var="r" items="${reclamiRicevuti}">
-                            <%-- Recupero Utente Richiedente dalla Mappa --%>
                             <c:set var="userRichiedente" value="${mappaRichiedenti[r.idUtenteRichiedente]}" />
 
                             <div class="claim-card">
                                 <div class="claim-header">
-                                    <span style="display:flex; align-items:center; gap:6px;">
-                                        <span class="material-icons" style="font-size:18px; color:#5F6368;">person</span>
-                                        <span style="font-weight:700; color:#333; font-size:0.95rem;">
-                                                ${userRichiedente.username}
-                                        </span>
+                                    <span style="display:flex; align-items:center; gap:6px; font-weight:700;">
+                                        <span class="material-icons" style="font-size:18px;">person</span> ${userRichiedente.username}
                                     </span>
                                     <span style="font-size:0.8rem; color:#888;"><fmt:formatDate value="${r.dataRichiesta}" pattern="dd/MM HH:mm"/></span>
                                 </div>
-                                <div style="font-size:0.9rem; color:#555; margin-bottom:12px; line-height:1.5;">
-                                    <strong>R1:</strong> ${r.rispostaVerifica1}<br>
-                                    <strong>R2:</strong> ${r.rispostaVerifica2}
+                                <div style="font-size:0.9rem; margin-bottom:10px;">
+                                    <div><strong>R1:</strong> ${r.rispostaVerifica1}</div>
+                                    <div><strong>R2:</strong> ${r.rispostaVerifica2}</div>
                                 </div>
 
-                                    <%-- Bottoni Azione --%>
                                 <c:if test="${r.stato == 'IN_ATTESA'}">
                                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                                         <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post">
@@ -480,60 +301,65 @@
                                 </c:if>
 
                                 <c:if test="${r.stato == 'ACCETTATO'}">
-                                    <div style="background:#E8F5E9; color:#2E7D32; padding:8px; border-radius:8px; text-align:center; font-weight:700; font-size:0.9rem;">
-                                        <span class="material-icons" style="font-size:16px; vertical-align:middle;">check_circle</span> RECLAMO ACCETTATO
+                                    <div class="winner-card" style="margin-top:10px; padding:15px; border-radius:12px;">
+                                        <div style="font-weight:800; color:#2E7D32; margin-bottom:10px; font-size:0.95rem;">
+                                            <span class="material-icons" style="vertical-align:middle; font-size:18px;">check_circle</span> RECLAMO ACCETTATO
+                                        </div>
+
                                         <c:if test="${not empty r.codiceConsegna}">
-                                            <div style="margin-top:4px; font-family:monospace; color:#1B5E20;">COD: ${r.codiceConsegna}</div>
+                                            <div style="background:#FFF; border:2px dashed #2E7D32; padding:10px; border-radius:8px; margin-bottom:10px;">
+                                                <div style="font-size:0.7rem; color:#555; font-weight:700;">CODICE:</div>
+                                                <div style="font-family:monospace; font-size:1.4rem; font-weight:700; color:#1B5E20; letter-spacing:2px;">${r.codiceConsegna}</div>
+                                            </div>
+
+                                            <c:if test="${not empty dropPointRitiro}">
+                                                <div class="pickup-location-card" style="padding:12px; margin-top:0;">
+                                                    <div class="pickup-header" style="margin-bottom:4px;">Porta l'oggetto qui:</div>
+                                                    <div class="pickup-name" style="font-size:1rem;">${dropPointRitiro.nomeAttivita}</div>
+                                                    <div class="pickup-address" style="font-size:0.85rem; margin-bottom:4px;">${dropPointRitiro.indirizzo}</div>
+                                                    <div style="font-size:0.8rem; color:#555; font-style:italic;">Consegna l'oggetto e comunica il codice all'operatore.</div>
+                                                </div>
+                                            </c:if>
                                         </c:if>
                                     </div>
                                 </c:if>
 
                                 <c:if test="${r.stato == 'RIFIUTATO'}">
-                                    <div style="background:#FFEBEE; color:#C62828; padding:8px; border-radius:8px; text-align:center; font-weight:700; font-size:0.9rem;">
-                                        RIFIUTATO
-                                    </div>
+                                    <div style="background:#FFEBEE; color:#C62828; padding:8px; border-radius:8px; text-align:center; font-weight:700; margin-top:10px;">RIFIUTATO</div>
                                 </c:if>
                             </div>
                         </c:forEach>
 
-                        <div style="margin-top:24px; padding-top:24px; border-top:1px solid #eee;">
-                            <form action="${pageContext.request.contextPath}/dettaglio-segnalazione" method="post" onsubmit="return confirm('Sei sicuro di voler eliminare questa segnalazione? Questa azione è irreversibile.');">
+                        <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
+                            <form action="${pageContext.request.contextPath}/dettaglio-segnalazione" method="post" onsubmit="return confirm('Eliminare?');">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-                                <button class="btn-danger">
-                                    <span class="material-icons">delete_forever</span> Elimina Segnalazione
+                                <button class="btn-danger full-width" style="display:flex; justify-content:center; align-items:center; gap:8px;">
+                                    <span class="material-icons">delete</span> Elimina Segnalazione
                                 </button>
                             </form>
                         </div>
                     </div>
                 </c:if>
-            </aside>
 
+            </aside>
         </div>
     </c:if>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var lat = ${segnalazione.latitudine != null ? segnalazione.latitudine : 'null'};
         var lon = ${segnalazione.longitudine != null ? segnalazione.longitudine : 'null'};
-
         if (lat && lon) {
-            var map = L.map('itemMap', { zoomControl: false }).setView([lat, lon], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
-
-            L.marker([lat, lon]).addTo(map)
-                .bindPopup("<b>${segnalazione.titolo}</b><br>${segnalazione.luogoRitrovamento}")
-                .openPopup();
+            var map = L.map('itemMap', { zoomControl:false }).setView([lat, lon], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            L.marker([lat, lon]).addTo(map).bindPopup("<b>${segnalazione.titolo}</b>").openPopup();
         } else {
-            var mapContainer = document.getElementById('itemMap');
-            if(mapContainer) mapContainer.style.display = 'none';
+            document.getElementById('itemMap').style.display = 'none';
         }
     });
 </script>
-
 </body>
 </html>

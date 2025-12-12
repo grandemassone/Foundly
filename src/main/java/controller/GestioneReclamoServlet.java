@@ -14,6 +14,7 @@ import model.bean.Utente;
 import model.bean.enums.ModalitaConsegna;
 import model.bean.enums.StatoSegnalazione;
 import model.dao.ReclamoDAO;
+import model.service.DropPointService;
 import model.service.EmailService;
 import model.service.SegnalazioneService;
 import model.service.UtenteService;
@@ -28,6 +29,7 @@ public class GestioneReclamoServlet extends HttpServlet {
     private final SegnalazioneService segnalazioneService = new SegnalazioneService();
     private final EmailService emailService = new EmailService();
     private final UtenteService utenteService = new UtenteService();
+    private final DropPointService dropPointService = new DropPointService(); // Serve per recuperare nome DP
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -62,7 +64,6 @@ public class GestioneReclamoServlet extends HttpServlet {
         if (utente == null) { response.sendRedirect("login"); return; }
 
         if ("invia".equals(action)) {
-            // ... invia reclamo ...
             long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
             Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
 
@@ -82,22 +83,21 @@ public class GestioneReclamoServlet extends HttpServlet {
             r.setRispostaVerifica2(request.getParameter("risposta2"));
             boolean salvato = reclamoDAO.doSave(r);
 
-            // MAIL AL FINDER (Chiamata Diretta)
             if (salvato) {
                 Utente finder = utenteService.trovaPerId(s.getIdUtente());
-                if (finder != null) {
+                if (finder != null && finder.getEmail() != null) {
                     emailService.inviaNotificaNuovoReclamo(finder.getEmail(), s.getTitolo(), utente.getUsername());
                 }
             }
             response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_inviato");
 
         } else if ("accetta".equals(action)) {
-            // ... accetta reclamo ...
             long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
             long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
             Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
 
             String codice = null;
+            String nomeDropPoint = null;
             boolean isDropPoint = false;
 
             if (s instanceof SegnalazioneOggetto) {
@@ -105,6 +105,12 @@ public class GestioneReclamoServlet extends HttpServlet {
                 if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {
                     isDropPoint = true;
                     codice = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+
+                    // Recupero info DropPoint per la mail
+                    if (so.getIdDropPoint() != null) {
+                        DropPoint dp = dropPointService.trovaPerId(so.getIdDropPoint());
+                        if (dp != null) nomeDropPoint = dp.getNomeAttivita();
+                    }
                 }
             }
 
@@ -115,11 +121,26 @@ public class GestioneReclamoServlet extends HttpServlet {
                 Utente richiedente = utenteService.trovaPerId(r.getIdUtenteRichiedente());
                 Utente finder = utente;
 
-                // MAIL 1: FINDER (Chiamata Diretta)
-                emailService.inviaConfermaAccettazioneFinder(finder.getEmail(), s.getTitolo(), richiedente.getNome() + " " + richiedente.getCognome());
+                // MAIL 1: FINDER (Ora include Codice e Nome DP se esiste)
+                if (finder.getEmail() != null) {
+                    emailService.inviaConfermaAccettazioneFinder(
+                            finder.getEmail(),
+                            s.getTitolo(),
+                            richiedente.getNome() + " " + richiedente.getCognome(),
+                            codice,       // null se diretta
+                            nomeDropPoint // null se diretta
+                    );
+                }
 
-                // MAIL 2: OWNER (Chiamata Diretta)
-                emailService.inviaReclamoAccettatoOwner(richiedente.getEmail(), s.getTitolo(), finder.getNome() + " " + finder.getCognome(), codice);
+                // MAIL 2: OWNER (Richiedente)
+                if (richiedente.getEmail() != null) {
+                    emailService.inviaReclamoAccettatoOwner(
+                            richiedente.getEmail(),
+                            s.getTitolo(),
+                            finder.getNome() + " " + finder.getCognome(),
+                            codice
+                    );
+                }
             }
 
             if (isDropPoint) {
@@ -129,19 +150,19 @@ public class GestioneReclamoServlet extends HttpServlet {
             }
 
         } else if ("rifiuta".equals(action)) {
+            // ... (codice rifiuto invariato) ...
             long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
             long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
             segnalazioneService.rifiutaReclamo(idReclamo);
             response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_rifiutato");
 
         } else if ("conferma_scambio".equals(action)) {
+            // ... (codice conferma scambio invariato) ...
             long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
             long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
             Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
             boolean isFinder = (s.getIdUtente() == utente.getId());
-
             boolean finito = segnalazioneService.gestisciConfermaScambio(idReclamo, isFinder);
-
             if (finito) {
                 response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=scambio_completato");
             } else {
