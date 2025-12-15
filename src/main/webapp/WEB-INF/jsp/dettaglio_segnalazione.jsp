@@ -75,7 +75,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css?v=16">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css?v=17">
 </head>
 
 <body>
@@ -136,11 +136,17 @@
                         <div class="info-grid">
                             <div class="info-item">
                                 <div class="icon-wrap"><span class="material-icons">calendar_today</span></div>
-                                <div><span class="label">Data Ritrovamento</span><div class="value"><fmt:formatDate value="${segnalazione.dataRitrovamento}" pattern="dd MMM yyyy"/></div></div>
+                                <div>
+                                    <span class="label">Data Ritrovamento</span>
+                                    <div class="value"><fmt:formatDate value="${segnalazione.dataRitrovamento}" pattern="dd MMM yyyy"/></div>
+                                </div>
                             </div>
                             <div class="info-item">
                                 <div class="icon-wrap"><span class="material-icons">location_on</span></div>
-                                <div><span class="label">Luogo</span><div class="value">${segnalazione.luogoRitrovamento}</div></div>
+                                <div>
+                                    <span class="label">Luogo</span>
+                                    <div class="value">${segnalazione.luogoRitrovamento}</div>
+                                </div>
                             </div>
                         </div>
 
@@ -149,12 +155,18 @@
                         <% if (isDropPoint) { %>
                         <div class="delivery-box purple">
                             <div class="icon-box"><span class="material-icons">store</span></div>
-                            <div><h4>Drop-Point Partner</h4><p>L'oggetto è custodito presso un negozio autorizzato.</p></div>
+                            <div>
+                                <h4>Drop-Point Partner</h4>
+                                <p>L'oggetto è custodito presso un negozio autorizzato.</p>
+                            </div>
                         </div>
                         <% } else { %>
                         <div class="delivery-box green">
                             <div class="icon-box"><span class="material-icons">handshake</span></div>
-                            <div><h4>Scambio Diretto</h4><p>Incontro diretto tra Finder e Proprietario.</p></div>
+                            <div>
+                                <h4>Scambio Diretto</h4>
+                                <p>Incontro diretto tra Finder e Proprietario.</p>
+                            </div>
                         </div>
                         <% } %>
                     </div>
@@ -330,12 +342,17 @@
                             </div>
                         </c:forEach>
 
-                        <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
-                            <form action="${pageContext.request.contextPath}/dettaglio-segnalazione" method="post" onsubmit="return confirm('Eliminare?');">
+                        <!-- BLOCCO ELIMINAZIONE (CORRETTO) -->
+                        <div class="delete-section">
+                            <form class="delete-form"
+                                  action="${pageContext.request.contextPath}/dettaglio-segnalazione"
+                                  method="post"
+                                  onsubmit="return confirm('Vuoi eliminare la segnalazione?');">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-                                <button class="btn-danger full-width" style="display:flex; justify-content:center; align-items:center; gap:8px;">
-                                    <span class="material-icons">delete</span> Elimina Segnalazione
+                                <button type="submit" class="btn-danger full-width">
+                                    <span class="material-icons">delete</span>
+                                    Elimina Segnalazione
                                 </button>
                             </form>
                         </div>
@@ -352,7 +369,8 @@
     document.addEventListener("DOMContentLoaded", function () {
         var lat = ${segnalazione.latitudine != null ? segnalazione.latitudine : 'null'};
         var lon = ${segnalazione.longitudine != null ? segnalazione.longitudine : 'null'};
-        if (lat && lon) {
+
+        if (lat !== null && lon !== null) {
             var map = L.map('itemMap', { zoomControl:false }).setView([lat, lon], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
             L.marker([lat, lon]).addTo(map).bindPopup("<b>${segnalazione.titolo}</b>").openPopup();
@@ -361,5 +379,6 @@
         }
     });
 </script>
+
 </body>
 </html>
