@@ -57,52 +57,69 @@ public class ProfiloServlet extends HttpServlet {
             return;
         }
 
-        // campi testo
+        String action = request.getParameter("action");
+
+        // ==========================
+        // DELETE ACCOUNT
+        // ==========================
+        if ("delete_account".equals(action)) {
+            boolean deleted = utenteService.cancellaUtente(utente.getId());
+            if (deleted) {
+                session.invalidate();
+                response.sendRedirect(request.getContextPath() + "/login?deleted=1");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/profilo?error=delete_failed");
+            }
+            return;
+        }
+
+        // ==========================
+        // UPDATE PROFILE
+        // ==========================
+        // (consigliato: controlla action update_profile, ma puoi anche farne a meno)
+        // if (!"update_profile".equals(action)) { response.sendRedirect(...); return; }
+
+        // campi testo (non sovrascrivere con null)
         String username = request.getParameter("username");
         String nome     = request.getParameter("nome");
         String cognome  = request.getParameter("cognome");
 
-        utente.setUsername(username);
-        utente.setNome(nome);
-        utente.setCognome(cognome);
+        if (username != null) utente.setUsername(username.trim());
+        if (nome != null)     utente.setNome(nome.trim());
+        if (cognome != null)  utente.setCognome(cognome.trim());
 
         // flag rimozione immagine
-        String removeAvatarParam = request.getParameter("removeAvatar");
-        boolean removeAvatar = "true".equalsIgnoreCase(removeAvatarParam);
+        boolean removeAvatar = "true".equalsIgnoreCase(request.getParameter("removeAvatar"));
 
         // upload immagine profilo (campo "avatar")
         Part avatarPart = null;
         try {
             avatarPart = request.getPart("avatar");
         } catch (IllegalStateException | ServletException e) {
-            avatarPart = null; // tieni l'immagine precedente
+            avatarPart = null;
         }
 
         boolean hasNewUpload = (avatarPart != null && avatarPart.getSize() > 0);
 
         if (hasNewUpload) {
-            // nuova immagine: carico i byte nel BLOB e salvo il content-type
             try (InputStream is = avatarPart.getInputStream()) {
                 byte[] bytes = is.readAllBytes();
                 utente.setImmagineProfilo(bytes);
                 utente.setImmagineProfiloContentType(avatarPart.getContentType());
             }
-            // se carico una nuova immagine, ignoro il flag di rimozione
             removeAvatar = false;
-
         } else if (removeAvatar) {
-            // rimozione esplicita senza nuovo upload
             utente.setImmagineProfilo(null);
             utente.setImmagineProfiloContentType(null);
         }
 
-        // aggiorna profilo (username, nome, cognome, immagine_profilo + content_type)
-        utenteService.aggiornaProfilo(utente);
+        boolean ok = utenteService.aggiornaProfilo(utente);
+        if (!ok) {
+            response.sendRedirect(request.getContextPath() + "/profilo?error=update_failed");
+            return;
+        }
 
-        // aggiorna sessione
         session.setAttribute("utente", utente);
-
-        // redirect al profilo (per evitare il resubmit del POST)
         response.sendRedirect(request.getContextPath() + "/profilo?success=1");
     }
 }

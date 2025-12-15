@@ -1,6 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="model.bean.Utente" %>
-<%@ page import="model.bean.enums.Ruolo" %>
 
 <%
     Utente utente = (Utente) session.getAttribute("utente");
@@ -35,8 +34,7 @@
     }
 
     // ===== AVATAR (BLOB nel DB) =====
-    boolean hasAvatar = (utente.getImmagineProfilo() != null
-            && utente.getImmagineProfilo().length > 0);
+    boolean hasAvatar = (utente.getImmagineProfilo() != null && utente.getImmagineProfilo().length > 0);
 
     // URL della servlet che streamma l'immagine dal DB
     String avatarUrl = request.getContextPath() + "/avatar?userId=" + utente.getId();
@@ -54,34 +52,27 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/profilo.css">
 </head>
+
 <body class="page-enter">
 
-<jsp:include page="navbar.jsp" />
+<jsp:include page="navbar.jsp"/>
 
 <main class="profile-main">
     <section class="profile-card">
+
         <!-- HEADER: avatar + nome + email -->
         <div class="profile-header">
             <div class="profile-avatar-wrapper <%= hasAvatar ? "has-avatar" : "" %>" id="avatarWrapper">
                 <div class="profile-avatar-large">
                     <% if (hasAvatar) { %>
-                    <!-- Avatar servito dalla servlet che legge il BLOB dal DB -->
-                    <img
-                            src="<%= avatarUrl %>"
-                            alt=""
-                            id="profileAvatarImg">
+                    <img src="<%= avatarUrl %>" alt="" id="profileAvatarImg">
                     <% } else { %>
-                    <!-- Nessun avatar: img nascosta, cerchio arancione gestito via CSS -->
-                    <img
-                            src="<%= avatarUrl %>"
-                            alt=""
-                            id="profileAvatarImg"
-                            style="display:none;">
+                    <img src="<%= avatarUrl %>" alt="" id="profileAvatarImg" style="display:none;">
                     <% } %>
                 </div>
 
                 <!-- overlay rosso con cestino -->
-                <div class="avatar-remove-overlay" id="avatarRemoveOverlay">
+                <div class="avatar-remove-overlay" id="avatarRemoveOverlay" title="Rimuovi foto profilo">
                     <span class="material-icons">delete</span>
                 </div>
 
@@ -91,12 +82,8 @@
             </div>
 
             <div>
-                <h1 class="profile-title">
-                    <%= utente.getNome() %> <%= utente.getCognome() %>
-                </h1>
-                <p class="profile-subtitle">
-                    <%= utente.getEmail() %>
-                </p>
+                <h1 class="profile-title"><%= utente.getNome() %> <%= utente.getCognome() %></h1>
+                <p class="profile-subtitle"><%= utente.getEmail() %></p>
             </div>
         </div>
 
@@ -107,9 +94,7 @@
                 <span class="points-label-big">PUNTI TOTALI</span>
             </div>
             <div class="points-right">
-                <span class="points-value-big">
-                    <%= utente.getPunteggio() %>
-                </span>
+                <span class="points-value-big"><%= utente.getPunteggio() %></span>
             </div>
         </div>
 
@@ -146,6 +131,9 @@
                    id="removeAvatarField"
                    value="false">
 
+            <input type="hidden" name="action" value="update_profile">
+
+
             <section class="profile-edit-card" id="profileEditCard">
                 <div class="profile-edit-header">
                     <div class="profile-edit-header-left">
@@ -162,9 +150,7 @@
                 <div class="profile-edit-row">
                     <div class="edit-field-text">
                         <span class="field-label">Username</span>
-                        <span class="field-value view-mode" id="usernameView">
-                            <%= utente.getUsername() %>
-                        </span>
+                        <span class="field-value view-mode" id="usernameView"><%= utente.getUsername() %></span>
                         <input type="text"
                                class="field-input edit-mode"
                                name="username"
@@ -177,9 +163,7 @@
                 <div class="profile-edit-row">
                     <div class="edit-field-text">
                         <span class="field-label">Nome</span>
-                        <span class="field-value view-mode" id="nomeView">
-                            <%= utente.getNome() %>
-                        </span>
+                        <span class="field-value view-mode" id="nomeView"><%= utente.getNome() %></span>
                         <input type="text"
                                class="field-input edit-mode"
                                name="nome"
@@ -192,9 +176,7 @@
                 <div class="profile-edit-row">
                     <div class="edit-field-text">
                         <span class="field-label">Cognome</span>
-                        <span class="field-value view-mode" id="cognomeView">
-                            <%= utente.getCognome() %>
-                        </span>
+                        <span class="field-value view-mode" id="cognomeView"><%= utente.getCognome() %></span>
                         <input type="text"
                                class="field-input edit-mode"
                                name="cognome"
@@ -206,18 +188,31 @@
 
             <!-- PULSANTI SOTTO IL BOX, CENTRATI -->
             <div class="edit-actions">
-                <button type="submit" class="btn-confirm">
-                    Conferma Modifiche
-                </button>
-                <button type="button" class="btn-cancel" id="cancelEditBtn">
-                    Annulla Modifiche
-                </button>
+                <button type="submit" class="btn-confirm">Conferma Modifiche</button>
+                <button type="button" class="btn-cancel" id="cancelEditBtn">Annulla Modifiche</button>
             </div>
         </form>
+
+        <!-- SEZIONE ELIMINA PROFILO -->
+        <div class="danger-zone">
+            <h3 class="danger-title">Zona pericolosa</h3>
+            <p class="danger-text">Elimina definitivamente il tuo account e tutti i dati associati.</p>
+
+            <form action="${pageContext.request.contextPath}/profilo" method="post"
+                  onsubmit="return confirm('Vuoi eliminare definitivamente il tuo profilo? Questa operazione non è annullabile.');">
+                <input type="hidden" name="action" value="delete_account">
+                <button type="submit" class="btn-danger full-width">
+                    <span class="material-icons">delete_forever</span>
+                    Elimina profilo
+                </button>
+            </form>
+
+        </div>
 
         <div class="profile-grid">
             <!-- altri campi in futuro -->
         </div>
+
     </section>
 </main>
 
@@ -234,7 +229,7 @@
         const avatarImg         = document.getElementById("profileAvatarImg");
         const removeAvatarField = document.getElementById("removeAvatarField");
 
-        // attiva/disattiva modalità editing per i campi testo
+        // attiva modalità editing per i campi testo
         if (editForm && editToggleBtn && cancelEditBtn) {
             editToggleBtn.addEventListener("click", function () {
                 editForm.classList.add("editing");
@@ -265,12 +260,8 @@
                 reader.onload = function (ev) {
                     avatarImg.src = ev.target.result;
                     avatarImg.style.display = "block";
-                    if (avatarWrapper) {
-                        avatarWrapper.classList.add("has-avatar");
-                    }
-                    if (removeAvatarField) {
-                        removeAvatarField.value = "false"; // stiamo caricando una nuova immagine
-                    }
+                    if (avatarWrapper) avatarWrapper.classList.add("has-avatar");
+                    if (removeAvatarField) removeAvatarField.value = "false";
                 };
                 reader.readAsDataURL(file);
             });
@@ -295,7 +286,6 @@
         }
     });
 </script>
-
 
 </body>
 </html>

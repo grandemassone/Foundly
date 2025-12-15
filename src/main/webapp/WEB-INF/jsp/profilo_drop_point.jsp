@@ -9,10 +9,8 @@
         return;
     }
 
-    // Stato DP
     StatoDropPoint stato = dropPoint.getStato();
     boolean isApproved = (stato == StatoDropPoint.APPROVATO);
-    boolean isPending  = (stato == StatoDropPoint.IN_ATTESA);
     boolean isRejected = (stato == StatoDropPoint.RIFIUTATO);
 
     String statoLabel = "In attesa di approvazione";
@@ -25,11 +23,7 @@
         statoClass = "status-rejected";
     }
 
-    // Logo / immagine attività (BLOB nel DB)
-    boolean hasLogo = (dropPoint.getImmagine() != null &&
-            dropPoint.getImmagine().length > 0);
-
-    // URL della servlet che dovrà streammare il logo del Drop-Point (da implementare lato server)
+    boolean hasLogo = (dropPoint.getImmagine() != null && dropPoint.getImmagine().length > 0);
     String logoUrl = request.getContextPath() + "/drop-point-avatar?dpId=" + dropPoint.getId();
 %>
 
@@ -45,34 +39,26 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/profilo.css">
 </head>
+
 <body class="page-enter">
 
 <jsp:include page="navbar.jsp" />
 
 <main class="profile-main">
     <section class="profile-card">
-        <!-- HEADER: logo + nome attività + email + badge stato -->
+
+        <!-- HEADER -->
         <div class="profile-header">
             <div class="profile-avatar-wrapper <%= hasLogo ? "has-avatar" : "" %>" id="avatarWrapper">
                 <div class="profile-avatar-large">
                     <% if (hasLogo) { %>
-                    <!-- Logo attività servito da servlet che legge il BLOB dal DB -->
-                    <img
-                            src="<%= logoUrl %>"
-                            alt="Logo Drop-Point"
-                            id="profileAvatarImg">
+                    <img src="<%= logoUrl %>" alt="Logo Drop-Point" id="profileAvatarImg">
                     <% } else { %>
-                    <!-- Nessun logo: img nascosta, cerchio arancione gestito via CSS -->
-                    <img
-                            src="<%= logoUrl %>"
-                            alt="Logo Drop-Point"
-                            id="profileAvatarImg"
-                            style="display:none;">
+                    <img src="<%= logoUrl %>" alt="Logo Drop-Point" id="profileAvatarImg" style="display:none;">
                     <% } %>
                 </div>
 
-                <!-- overlay rosso con cestino -->
-                <div class="avatar-remove-overlay" id="avatarRemoveOverlay">
+                <div class="avatar-remove-overlay" id="avatarRemoveOverlay" title="Rimuovi logo">
                     <span class="material-icons">delete</span>
                 </div>
 
@@ -82,12 +68,8 @@
             </div>
 
             <div>
-                <h1 class="profile-title">
-                    <%= dropPoint.getNomeAttivita() %>
-                </h1>
-                <p class="profile-subtitle">
-                    <%= dropPoint.getEmail() %>
-                </p>
+                <h1 class="profile-title"><%= dropPoint.getNomeAttivita() %></h1>
+                <p class="profile-subtitle"><%= dropPoint.getEmail() %></p>
 
                 <div class="dp-area-status-badge <%= statoClass %>">
                     <span class="material-icons">
@@ -98,24 +80,19 @@
             </div>
         </div>
 
-        <!-- BOX INFO VELOCI SU POSIZIONE E CONTATTI -->
+        <!-- INFO -->
         <div class="profile-badge-card">
-            <div class="badge-medal">
-                <span class="material-icons">location_on</span>
-            </div>
+            <div class="badge-medal"><span class="material-icons">location_on</span></div>
             <div class="badge-texts">
                 <span class="badge-label">Indirizzo</span>
                 <span class="badge-name">
-                    <%= dropPoint.getIndirizzo() %>,
-                    <%= dropPoint.getCitta() %> (<%= dropPoint.getProvincia() %>)
+                    <%= dropPoint.getIndirizzo() %>, <%= dropPoint.getCitta() %> (<%= dropPoint.getProvincia() %>)
                 </span>
             </div>
         </div>
 
         <div class="profile-badge-card">
-            <div class="badge-medal">
-                <span class="material-icons">call</span>
-            </div>
+            <div class="badge-medal"><span class="material-icons">call</span></div>
             <div class="badge-texts">
                 <span class="badge-label">Telefono</span>
                 <span class="badge-name">
@@ -127,9 +104,7 @@
         </div>
 
         <div class="profile-badge-card">
-            <div class="badge-medal">
-                <span class="material-icons">schedule</span>
-            </div>
+            <div class="badge-medal"><span class="material-icons">schedule</span></div>
             <div class="badge-texts">
                 <span class="badge-label">Orari di apertura</span>
                 <span class="badge-name">
@@ -140,21 +115,21 @@
             </div>
         </div>
 
-        <!-- FORM PROFILO DROPPPOINT (dati anagrafici + logo) -->
+        <!-- FORM UPDATE -->
         <form method="post"
               action="${pageContext.request.contextPath}/profilo-drop-point"
               id="profileEditForm"
               class="profile-edit-form"
               enctype="multipart/form-data">
 
-            <!-- input file nascosto per il logo -->
+            <input type="hidden" name="action" value="update_profile">
+
             <input type="file"
                    name="logo"
                    id="avatarInput"
                    accept="image/*"
                    class="avatar-file-input">
 
-            <!-- flag rimozione logo -->
             <input type="hidden"
                    name="removeLogo"
                    id="removeAvatarField"
@@ -172,116 +147,86 @@
                     </button>
                 </div>
 
-                <!-- NOME ATTIVITÀ -->
                 <div class="profile-edit-row">
                     <div class="edit-field-text">
                         <span class="field-label">Nome Attività</span>
-                        <span class="field-value view-mode" id="nomeAttivitaView">
-                            <%= dropPoint.getNomeAttivita() %>
-                        </span>
-                        <input type="text"
-                               class="field-input edit-mode"
-                               name="nomeAttivita"
-                               id="nomeAttivitaInput"
+                        <span class="field-value view-mode" id="nomeAttivitaView"><%= dropPoint.getNomeAttivita() %></span>
+                        <input type="text" class="field-input edit-mode" name="nomeAttivita" id="nomeAttivitaInput"
                                value="<%= dropPoint.getNomeAttivita() %>">
                     </div>
                 </div>
 
-                <!-- INDIRIZZO -->
                 <div class="profile-edit-row">
                     <div class="edit-field-text">
                         <span class="field-label">Indirizzo</span>
-                        <span class="field-value view-mode" id="indirizzoView">
-                            <%= dropPoint.getIndirizzo() %>
-                        </span>
-                        <input type="text"
-                               class="field-input edit-mode"
-                               name="indirizzo"
-                               id="indirizzoInput"
+                        <span class="field-value view-mode" id="indirizzoView"><%= dropPoint.getIndirizzo() %></span>
+                        <input type="text" class="field-input edit-mode" name="indirizzo" id="indirizzoInput"
                                value="<%= dropPoint.getIndirizzo() %>">
                     </div>
                 </div>
 
-                <!-- CITTÀ -->
                 <div class="profile-edit-row">
                     <div class="edit-field-text">
                         <span class="field-label">Città</span>
-                        <span class="field-value view-mode" id="cittaView">
-                            <%= dropPoint.getCitta() %>
-                        </span>
-                        <input type="text"
-                               class="field-input edit-mode"
-                               name="citta"
-                               id="cittaInput"
+                        <span class="field-value view-mode" id="cittaView"><%= dropPoint.getCitta() %></span>
+                        <input type="text" class="field-input edit-mode" name="citta" id="cittaInput"
                                value="<%= dropPoint.getCitta() %>">
                     </div>
                 </div>
 
-                <!-- PROVINCIA -->
                 <div class="profile-edit-row">
                     <div class="edit-field-text">
                         <span class="field-label">Provincia</span>
-                        <span class="field-value view-mode" id="provinciaView">
-                            <%= dropPoint.getProvincia() %>
-                        </span>
-                        <input type="text"
-                               class="field-input edit-mode"
-                               name="provincia"
-                               id="provinciaInput"
+                        <span class="field-value view-mode" id="provinciaView"><%= dropPoint.getProvincia() %></span>
+                        <input type="text" class="field-input edit-mode" name="provincia" id="provinciaInput"
                                value="<%= dropPoint.getProvincia() %>">
                     </div>
                 </div>
 
-                <!-- TELEFONO -->
                 <div class="profile-edit-row">
                     <div class="edit-field-text">
                         <span class="field-label">Telefono</span>
-                        <span class="field-value view-mode" id="telefonoView">
-                            <%= dropPoint.getTelefono() != null ? dropPoint.getTelefono() : "" %>
-                        </span>
-                        <input type="text"
-                               class="field-input edit-mode"
-                               name="telefono"
-                               id="telefonoInput"
+                        <span class="field-value view-mode" id="telefonoView"><%= dropPoint.getTelefono() != null ? dropPoint.getTelefono() : "" %></span>
+                        <input type="text" class="field-input edit-mode" name="telefono" id="telefonoInput"
                                value="<%= dropPoint.getTelefono() != null ? dropPoint.getTelefono() : "" %>">
                     </div>
                 </div>
 
-                <!-- ORARI APERTURA -->
                 <div class="profile-edit-row">
                     <div class="edit-field-text">
                         <span class="field-label">Orari di apertura</span>
-                        <span class="field-value view-mode" id="orariView">
-                            <%= dropPoint.getOrariApertura() != null ? dropPoint.getOrariApertura() : "" %>
-                        </span>
-                        <textarea
-                                class="field-input edit-mode"
-                                name="orariApertura"
-                                id="orariInput"><%= dropPoint.getOrariApertura() != null ? dropPoint.getOrariApertura() : "" %></textarea>
+                        <span class="field-value view-mode" id="orariView"><%= dropPoint.getOrariApertura() != null ? dropPoint.getOrariApertura() : "" %></span>
+                        <textarea class="field-input edit-mode" name="orariApertura" id="orariInput"><%= dropPoint.getOrariApertura() != null ? dropPoint.getOrariApertura() : "" %></textarea>
                     </div>
                 </div>
             </section>
 
-            <!-- PULSANTI SOTTO IL BOX, CENTRATI -->
             <div class="edit-actions">
-                <button type="submit" class="btn-confirm">
-                    Conferma Modifiche
-                </button>
-                <button type="button" class="btn-cancel" id="cancelEditBtn">
-                    Annulla Modifiche
-                </button>
+                <button type="submit" class="btn-confirm">Conferma Modifiche</button>
+                <button type="button" class="btn-cancel" id="cancelEditBtn">Annulla Modifiche</button>
             </div>
         </form>
 
-        <div class="profile-grid">
-            <!-- eventuali altri blocchi in futuro -->
+        <!-- DELETE DROP-POINT (FUORI DAL FORM UPDATE) -->
+        <div class="danger-zone">
+            <h3 class="danger-title">Zona pericolosa</h3>
+            <p class="danger-text">Elimina definitivamente l’account Drop-Point e tutti i dati associati.</p>
+
+            <form action="${pageContext.request.contextPath}/profilo-drop-point" method="post"
+                  onsubmit="return confirm('Vuoi eliminare definitivamente questo Drop-Point? Operazione non annullabile.');">
+                <input type="hidden" name="action" value="delete_account">
+                <button type="submit" class="btn-danger">
+                    <span class="material-icons">delete_forever</span>
+                    Elimina Drop-Point
+                </button>
+            </form>
         </div>
+
     </section>
 </main>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-
         const editForm          = document.getElementById("profileEditForm");
         const editToggleBtn     = document.getElementById("editToggleBtn");
         const cancelEditBtn     = document.getElementById("cancelEditBtn");
@@ -293,7 +238,6 @@
         const avatarImg         = document.getElementById("profileAvatarImg");
         const removeAvatarField = document.getElementById("removeAvatarField");
 
-        // attiva/disattiva modalità editing per i campi testo
         if (editForm && editToggleBtn && cancelEditBtn) {
             editToggleBtn.addEventListener("click", function () {
                 editForm.classList.add("editing");
@@ -304,7 +248,6 @@
             });
         }
 
-        // click sulla matita -> selezione file logo
         if (avatarEditBtn && avatarInput && avatarImg) {
             avatarEditBtn.addEventListener("click", function (e) {
                 e.preventDefault();
@@ -324,18 +267,13 @@
                 reader.onload = function (ev) {
                     avatarImg.src = ev.target.result;
                     avatarImg.style.display = "block";
-                    if (avatarWrapper) {
-                        avatarWrapper.classList.add("has-avatar");
-                    }
-                    if (removeAvatarField) {
-                        removeAvatarField.value = "false"; // stiamo caricando una nuova immagine
-                    }
+                    if (avatarWrapper) avatarWrapper.classList.add("has-avatar");
+                    if (removeAvatarField) removeAvatarField.value = "false";
                 };
                 reader.readAsDataURL(file);
             });
         }
 
-        // click sul cestino -> rimozione logo (UI + flag per il server)
         if (avatarRemoveOv && avatarWrapper && avatarImg && avatarInput && removeAvatarField) {
             avatarRemoveOv.addEventListener("click", function (e) {
                 e.preventDefault();
@@ -354,7 +292,6 @@
         }
     });
 </script>
-
 
 </body>
 </html>
