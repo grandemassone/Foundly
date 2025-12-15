@@ -10,6 +10,18 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
 </head>
+
+<script>
+    function togglePassword() {
+        const pwd = document.getElementById("password");
+        const icon = document.getElementById("togglePasswordIcon");
+
+        const isHidden = pwd.type === "password";
+        pwd.type = isHidden ? "text" : "password";
+        icon.textContent = isHidden ? "visibility_off" : "visibility";
+    }
+</script>
+
 <body>
 
 <div class="main-container">
@@ -50,8 +62,16 @@
 
                 <div class="input-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Inserisci la tua password"
-                           required>
+
+                    <div class="password-wrapper">
+                        <input type="password" id="password" name="password"
+                               placeholder="Inserisci la tua password" required>
+
+                        <button type="button" class="toggle-password" aria-label="Mostra/Nascondi password"
+                                onclick="togglePassword()">
+                            <span class="material-icons" id="togglePasswordIcon">visibility</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-actions">

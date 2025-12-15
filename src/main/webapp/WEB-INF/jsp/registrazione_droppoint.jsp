@@ -16,6 +16,19 @@
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin=""/>
 </head>
+
+<script>
+    function togglePassword() {
+        const pwd = document.getElementById("password");
+        const icon = document.getElementById("togglePasswordIcon");
+        if (!pwd || !icon) return;
+
+        const isHidden = pwd.type === "password";
+        pwd.type = isHidden ? "text" : "password";
+        icon.textContent = isHidden ? "visibility_off" : "visibility";
+    }
+</script>
+
 <body>
 
 <div class="main-container">
@@ -102,24 +115,33 @@
 
                 <div class="input-group">
                     <label for="password">Password</label>
-                    <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Crea una password sicura"
-                            required
-                            minlength="8"
-                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._#-])[A-Za-z\d@$!%*?&._#-]{8,}$"
-                            title="Almeno 8 caratteri, con una maiuscola, una minuscola, un numero e un carattere speciale (@$!%*?&._#-)"
-                    >
+
+                    <div class="password-wrapper">
+                        <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Crea una password sicura"
+                                required
+                                minlength="8"
+                                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._#-])[A-Za-z\d@$!%*?&._#-]{8,}$"
+                                title="Almeno 8 caratteri, con una maiuscola, una minuscola, un numero e un carattere speciale (@$!%*?&._#-)"
+                        >
+
+                        <button type="button" class="toggle-password" aria-label="Mostra/Nascondi password"
+                                onclick="togglePassword()">
+                            <span class="material-icons" id="togglePasswordIcon">visibility</span>
+                        </button>
+                    </div>
+
                     <small id="passwordHelp" style="color:#777; font-size:0.8rem;">
-                        Minimo 8 caratteri, almeno 1 maiuscola, 1 minuscola, 1 numero e 1 carattere speciale
-                        (@$!%*?&._#-).
+                        Minimo 8 caratteri, almeno 1 maiuscola, 1 minuscola, 1 numero e 1 carattere speciale (@$!%*?&._#-).
                     </small>
                     <div id="passwordError" style="display:none; color:#c62828; font-size:0.8rem; margin-top:4px;">
                         La password non rispetta i requisiti indicati.
                     </div>
                 </div>
+
 
                 <button type="submit" class="btn-primary mt-2">Invia Richiesta</button>
 

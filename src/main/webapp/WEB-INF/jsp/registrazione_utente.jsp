@@ -1,5 +1,4 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -80,16 +79,24 @@
 
                 <div class="input-group">
                     <label for="password">Password</label>
-                    <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Minimo 8 caratteri"
-                            required
-                            minlength="8"
-                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._#-])[A-Za-z\d@$!%*?&._#-]{8,}$"
-                            title="Almeno 8 caratteri, con una maiuscola, una minuscola, un numero e un carattere speciale (@$!%*?&._#-)"
-                    >
+
+                    <div class="password-wrapper">
+                        <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Minimo 8 caratteri"
+                                required
+                                minlength="8"
+                                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._#-])[A-Za-z\d@$!%*?&._#-]{8,}$"
+                                title="Almeno 8 caratteri, con una maiuscola, una minuscola, un numero e un carattere speciale (@$!%*?&._#-)"
+                        >
+                        <button type="button" class="toggle-password" aria-label="Mostra/Nascondi password"
+                                onclick="togglePassword()">
+                            <span class="material-icons" id="togglePasswordIcon">visibility</span>
+                        </button>
+                    </div>
+
                     <small id="passwordHelp" style="color:#777; font-size:0.8rem;">
                         Minimo 8 caratteri, almeno 1 maiuscola, 1 minuscola, 1 numero e 1 carattere speciale
                         (@$!%*?&._#-).
@@ -97,57 +104,75 @@
                     <div id="passwordError" style="display:none; color:#c62828; font-size:0.8rem; margin-top:4px;">
                         La password non rispetta i requisiti indicati.
                     </div>
-
-                    <button type="submit" class="btn-primary mt-2">Registrati</button>
-
-                    <div class="form-footer">
-                        <span>Hai già un account?</span>
-                        <a href="${pageContext.request.contextPath}/login" class="link-login">Accedi qui</a>
-                    </div>
-
                 </div>
 
-                <script>
-                    (function () {
-                        const form = document.querySelector('.auth-card form');
-                        const passwordInput = document.getElementById('password');
-                        const passwordError = document.getElementById('passwordError');
+                <button type="submit" class="btn-primary mt-2">Registrati</button>
 
-                        if (!form || !passwordInput || !passwordError) return;
+                <div class="form-footer">
+                    <span>Hai già un account?</span>
+                    <a href="${pageContext.request.contextPath}/login" class="link-login">Accedi qui</a>
+                </div>
 
-                        // REGEX AGGIORNATA ANCHE QUI
-                        const passwordRegex =
-                            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._#-])[A-Za-z\d@$!%*?&._#-]{8,}$/;
+            </form>
 
-                        function validatePassword() {
-                            const value = passwordInput.value || "";
+        </div>
+    </div>
+</div>
 
-                            if (passwordRegex.test(value)) {
-                                passwordInput.style.borderColor = '#ccc';
-                                passwordError.style.display = 'none';
-                                return true;
-                            } else {
-                                if (value.length > 0) {
-                                    passwordInput.style.borderColor = '#c62828';
-                                    passwordError.style.display = 'block';
-                                } else {
-                                    passwordInput.style.borderColor = '#ccc';
-                                    passwordError.style.display = 'none';
-                                }
-                                return false;
-                            }
-                        }
+<script>
+    // Toggle visibilità password
+    function togglePassword() {
+        const pwd = document.getElementById("password");
+        const icon = document.getElementById("togglePasswordIcon");
+        if (!pwd || !icon) return;
 
-                        passwordInput.addEventListener('input', validatePassword);
+        const hidden = pwd.type === "password";
+        pwd.type = hidden ? "text" : "password";
+        icon.textContent = hidden ? "visibility_off" : "visibility";
+    }
+</script>
 
-                        form.addEventListener('submit', function (e) {
-                            if (!validatePassword()) {
-                                e.preventDefault();
-                                passwordInput.focus();
-                            }
-                        });
-                    })();
-                </script>
+<script>
+    // Validazione password
+    (function () {
+        const form = document.querySelector('.auth-card form');
+        const passwordInput = document.getElementById('password');
+        const passwordError = document.getElementById('passwordError');
+
+        if (!form || !passwordInput || !passwordError) return;
+
+        const passwordRegex =
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._#-])[A-Za-z\d@$!%*?&._#-]{8,}$/;
+
+        function validatePassword() {
+            const value = passwordInput.value || "";
+
+            if (passwordRegex.test(value)) {
+                passwordInput.style.borderColor = '#ccc';
+                passwordError.style.display = 'none';
+                return true;
+            } else {
+                if (value.length > 0) {
+                    passwordInput.style.borderColor = '#c62828';
+                    passwordError.style.display = 'block';
+                } else {
+                    passwordInput.style.borderColor = '#ccc';
+                    passwordError.style.display = 'none';
+                }
+                return false;
+            }
+        }
+
+        passwordInput.addEventListener('input', validatePassword);
+
+        form.addEventListener('submit', function (e) {
+            if (!validatePassword()) {
+                e.preventDefault();
+                passwordInput.focus();
+            }
+        });
+    })();
+</script>
 
 </body>
 </html>
