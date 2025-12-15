@@ -186,16 +186,40 @@ public class SegnalazioneDAO {
     }
 
     public boolean doDelete(long id) {
-        String query = "DELETE FROM segnalazione WHERE id = ?";
-        try (Connection con = ConPool.getConnection();
-             PreparedStatement ps = con.prepareStatement(query)) {
-            ps.setLong(1, id);
-            return ps.executeUpdate() > 0;
+        try (Connection con = ConPool.getConnection()) {
+            con.setAutoCommit(false);
+
+            // se hai tabella reclamo con FK su segnalazione
+            try (PreparedStatement ps = con.prepareStatement("DELETE FROM reclamo WHERE id_segnalazione = ?")) {
+                ps.setLong(1, id);
+                ps.executeUpdate();
+            } catch (SQLException ignored) {}
+
+            try (PreparedStatement ps = con.prepareStatement("DELETE FROM segnalazione_oggetto WHERE id_segnalazione = ?")) {
+                ps.setLong(1, id);
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = con.prepareStatement("DELETE FROM segnalazione_animale WHERE id_segnalazione = ?")) {
+                ps.setLong(1, id);
+                ps.executeUpdate();
+            }
+
+            int deleted;
+            try (PreparedStatement ps = con.prepareStatement("DELETE FROM segnalazione WHERE id = ?")) {
+                ps.setLong(1, id);
+                deleted = ps.executeUpdate();
+            }
+
+            con.commit();
+            return deleted > 0;
+
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
+
 
     /**
      * Ricerca Pubblica.
@@ -299,4 +323,27 @@ public class SegnalazioneDAO {
 
         return s;
     }
+    public List<Segnalazione> doRetrieveAll() {
+        List<Segnalazione> list = new ArrayList<>();
+        String sql =
+                "SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza " +
+                        "FROM segnalazione s " +
+                        "LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione " +
+                        "LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione " +
+                        "ORDER BY s.data_pubblicazione DESC";
+
+        try (Connection con = ConPool.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+
 }

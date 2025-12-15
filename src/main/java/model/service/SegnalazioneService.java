@@ -96,4 +96,9 @@ public class SegnalazioneService {
     public List<Reclamo> trovaReclamiFattiDaUtente(long idUtente) {
         return reclamoDAO.doRetrieveByRichiedente(idUtente);
     }
+
+    public List<Segnalazione> trovaTutte() {
+        return segnalazioneDAO.doRetrieveAll(); // lo aggiungi nel DAO
+    }
+
 }

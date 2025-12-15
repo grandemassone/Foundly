@@ -9,16 +9,17 @@ import jakarta.servlet.http.HttpSession;
 import model.bean.Utente;
 import model.bean.enums.Ruolo;
 import model.service.DropPointService;
+import model.service.SegnalazioneService;
 import model.service.UtenteService;
 
 import java.io.IOException;
-import java.util.List;
 
 @WebServlet(name = "AreaAdminServlet", value = "/admin")
 public class AreaAdminServlet extends HttpServlet {
 
     private final DropPointService dropPointService = new DropPointService();
     private final UtenteService utenteService = new UtenteService();
+    private final SegnalazioneService segnalazioneService = new SegnalazioneService();
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -35,6 +36,9 @@ public class AreaAdminServlet extends HttpServlet {
         request.setAttribute("dropPointsPendenti", dropPointService.findAllInAttesa());
         request.setAttribute("dropPointsApprovati", dropPointService.findAllApprovati());
         request.setAttribute("listaUtenti", utenteService.trovaTutti());
+
+        // NEW: tutte le segnalazioni per admin
+        request.setAttribute("listaSegnalazioni", segnalazioneService.trovaTutte());
 
         request.getRequestDispatcher("/WEB-INF/jsp/area_admin.jsp")
                 .forward(request, response);
@@ -77,18 +81,24 @@ public class AreaAdminServlet extends HttpServlet {
                 }
                 case "deleteUser": {
                     long userId = Long.parseLong(request.getParameter("userId"));
-                    // Non permetto all'admin di cancellare se stesso
                     if (userId != admin.getId()) {
                         utenteService.cancellaUtente(userId);
                     }
                     break;
                 }
+
+                // NEW: elimina segnalazione (admin può eliminare tutte)
+                case "deleteSegnalazione": {
+                    long segnalazioneId = Long.parseLong(request.getParameter("segnalazioneId"));
+                    segnalazioneService.eliminaSegnalazione(segnalazioneId);
+                    break;
+                }
+
                 default:
-                    // azione non riconosciuta -> ignora
                     break;
             }
         } catch (NumberFormatException ignore) {
-            // input non valido, ignoro
+            // input non valido -> ignoro
         }
 
         response.sendRedirect(request.getContextPath() + "/admin");
