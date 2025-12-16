@@ -133,7 +133,7 @@
 </script>
 
 <script>
-    // Validazione password
+    // Validazione password lato Client
     (function () {
         const form = document.querySelector('.auth-card form');
         const passwordInput = document.getElementById('password');
@@ -162,6 +162,7 @@
                 return false;
             }
         }
+
 
         passwordInput.addEventListener('input', validatePassword);
 

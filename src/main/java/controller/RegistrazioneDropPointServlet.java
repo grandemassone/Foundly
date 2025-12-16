@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.service.DropPointService;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @WebServlet(name = "RegistrazioneDropPointServlet", value = "/registrazione-droppoint")
 public class RegistrazioneDropPointServlet extends HttpServlet {
@@ -52,8 +53,43 @@ public class RegistrazioneDropPointServlet extends HttpServlet {
         boolean successo = dpService.registraDropPoint(nomeAttivita, email, password, indirizzo, citta, provincia, telefono, orari, latitudine, longitudine);
 
         if (successo) {
+            // --- INIZIO LOGICA ALERT SEMPLICE ---
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+
+            out.println("<!DOCTYPE html>");
+            out.println("<html><body>");
+            out.println("<script type='text/javascript'>");
+
+            // Qui scriviamo l'alert del browser
+            out.println("alert('Registrazione effettuata con successo! Ora puoi effettuare il login.');");
+
+            // Qui reindirizziamo l'utente alla pagina di login dopo che clicca OK
+            // Nota: Usa request.getContextPath() per essere sicuro del percorso
+
+            out.println("</script>");
+            out.println("</body></html>");
+            // --- FINE LOGICA ALERT SEMPLICE --
             response.sendRedirect("login?registrazione=attesa_approvazione");
         } else {
+            // --- INIZIO LOGICA ALERT SEMPLICE ---
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+
+            out.println("<!DOCTYPE html>");
+            out.println("<html><body>");
+            out.println("<script type='text/javascript'>");
+
+            // Qui scriviamo l'alert del browser
+            out.println("alert('Email già registrata per un altro Drop-Point.');");
+
+            // Qui reindirizziamo l'utente alla pagina di login dopo che clicca OK
+            // Nota: Usa request.getContextPath() per essere sicuro del percorso
+            out.println("window.location.href = '" + request.getContextPath() + "/login';");
+
+            out.println("</script>");
+            out.println("</body></html>");
+            // --- FINE LOGICA ALERT SEMPLICE --
             request.setAttribute("errore", "Email già registrata per un altro Drop-Point.");
             request.getRequestDispatcher("/WEB-INF/jsp/registrazione_droppoint.jsp").forward(request, response);
         }
