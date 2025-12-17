@@ -190,7 +190,7 @@ public class CreaSegnalazioneServlet extends HttpServlet {
                 out.println("</body></html>");
 
                 // Nota: response.sendRedirect qui sotto verrà probabilmente ignorato o causerà errore
-                // dopo aver scritto con PrintWriter, ma l'ho lasciato come richiesto.
+                // dopo aver scritto con PrintWriter, ma l'ho lasciato come richiesdto.
                 response.sendRedirect(request.getContextPath() + "/index?msg=success_segnalazione");
             } else {
                 request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
