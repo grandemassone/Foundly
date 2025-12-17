@@ -75,7 +75,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css?v=17">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css?v=23">
 </head>
 
 <body>
@@ -136,17 +136,11 @@
                         <div class="info-grid">
                             <div class="info-item">
                                 <div class="icon-wrap"><span class="material-icons">calendar_today</span></div>
-                                <div>
-                                    <span class="label">Data Ritrovamento</span>
-                                    <div class="value"><fmt:formatDate value="${segnalazione.dataRitrovamento}" pattern="dd MMM yyyy"/></div>
-                                </div>
+                                <div><span class="label">Data Ritrovamento</span><div class="value"><fmt:formatDate value="${segnalazione.dataRitrovamento}" pattern="dd MMM yyyy"/></div></div>
                             </div>
                             <div class="info-item">
                                 <div class="icon-wrap"><span class="material-icons">location_on</span></div>
-                                <div>
-                                    <span class="label">Luogo</span>
-                                    <div class="value">${segnalazione.luogoRitrovamento}</div>
-                                </div>
+                                <div><span class="label">Luogo</span><div class="value">${segnalazione.luogoRitrovamento}</div></div>
                             </div>
                         </div>
 
@@ -155,18 +149,12 @@
                         <% if (isDropPoint) { %>
                         <div class="delivery-box purple">
                             <div class="icon-box"><span class="material-icons">store</span></div>
-                            <div>
-                                <h4>Drop-Point Partner</h4>
-                                <p>L'oggetto è custodito presso un negozio autorizzato.</p>
-                            </div>
+                            <div><h4>Drop-Point Partner</h4><p>L'oggetto è custodito presso un negozio autorizzato.</p></div>
                         </div>
                         <% } else { %>
                         <div class="delivery-box green">
                             <div class="icon-box"><span class="material-icons">handshake</span></div>
-                            <div>
-                                <h4>Scambio Diretto</h4>
-                                <p>Incontro diretto tra Finder e Proprietario.</p>
-                            </div>
+                            <div><h4>Scambio Diretto</h4><p>Incontro diretto tra Finder e Proprietario.</p></div>
                         </div>
                         <% } %>
                     </div>
@@ -183,9 +171,11 @@
                                 <h3 class="winner-title">Congratulazioni!</h3>
                                 <p class="winner-subtitle">L'oggetto è ufficialmente tuo.</p>
 
+                                <% if (isDropPoint) { %>
+                                    <%-- CASO DROP-POINT --%>
                                 <c:if test="${not empty mioReclamo.codiceConsegna}">
                                     <div class="code-ticket">
-                                        <span class="code-label">CODICE RITIRO DROP-POINT</span>
+                                        <span class="code-label">CODICE RITIRO</span>
                                         <div class="the-code">${mioReclamo.codiceConsegna}</div>
                                     </div>
                                     <p class="winner-note">Mostra questo codice al negozio.</p>
@@ -194,36 +184,33 @@
                                         <div class="pickup-location-card">
                                             <div class="pickup-header">RITIRA PRESSO</div>
                                             <div class="pickup-name">${dropPointRitiro.nomeAttivita}</div>
-                                            <div class="pickup-address">
-                                                    ${dropPointRitiro.indirizzo}, ${dropPointRitiro.citta}
-                                            </div>
-
-                                            <div class="pickup-details-row">
-                                                <span class="material-icons">schedule</span>
-                                                <span>${dropPointRitiro.orariApertura}</span>
-                                            </div>
-
+                                            <div class="pickup-address">${dropPointRitiro.indirizzo}, ${dropPointRitiro.citta}</div>
+                                            <div class="pickup-details-row"><span class="material-icons">schedule</span> <span>${dropPointRitiro.orariApertura}</span></div>
                                             <c:if test="${not empty dropPointRitiro.telefono}">
-                                                <div class="pickup-details-row">
-                                                    <span class="material-icons">call</span>
-                                                    <span>${dropPointRitiro.telefono}</span>
-                                                </div>
+                                                <div class="pickup-details-row"><span class="material-icons">call</span> <span>${dropPointRitiro.telefono}</span></div>
                                             </c:if>
                                         </div>
                                     </c:if>
                                 </c:if>
+                                <% } else { %>
+                                    <%-- CASO SCAMBIO DIRETTO --%>
+                                <div class="contact-card-blue">
+                                    <div class="contact-header">CONTATTI FINDER</div>
+                                    <% if (controparte != null) { %>
+                                    <div class="contact-name"><%= controparte.getNome() %> <%= controparte.getCognome() %></div>
+                                    <div class="contact-row"><span class="material-icons">email</span> <a href="mailto:<%= controparte.getEmail() %>"><%= controparte.getEmail() %></a></div>
+                                    <div class="contact-row"><span class="material-icons">call</span> <a href="tel:<%= controparte.getTelefono() %>"><%= controparte.getTelefono() %></a></div>
+                                    <% } %>
+                                    <p style="margin-top:10px; font-size:0.85rem; color:#666;">Contatta il Finder per organizzare il ritiro.</p>
+                                </div>
 
-                                    <%-- Scambio diretto --%>
-                                <% if (!isDropPoint && s.getStato() == StatoSegnalazione.APERTA && reclamoAccettato != null) { %>
-                                <div style="margin-top:20px;"></div>
-                                <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post">
+                                <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post" style="margin-top:20px;">
                                     <input type="hidden" name="action" value="conferma_scambio">
                                     <input type="hidden" name="idReclamo" value="${mioReclamo.id}">
                                     <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
 
                                     <% if (reclamoAccettato.isConfermaOwner()) { %>
-                                    <div style="text-align:center; color:#2E7D32; font-weight:600; margin-bottom:5px;">Ricezione confermata!</div>
-                                    <button type="button" class="btn-disabled status-pill done" style="width:100%;">In attesa del Finder...</button>
+                                    <button type="button" class="btn-disabled full-width">In attesa del Finder...</button>
                                     <% } else { %>
                                     <button type="submit" class="btn-primary">Conferma Ricezione</button>
                                     <% } %>
@@ -257,16 +244,30 @@
                                 </c:if>
 
                                 <c:if test="${empty mioReclamo && segnalazione.stato == 'APERTA'}">
-                                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">Rispondi alle domande di sicurezza.</p>
-                                    <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post">
-                                        <input type="hidden" name="action" value="invia">
-                                        <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-                                        <label style="display:block; font-size:0.8rem; font-weight:700; color:#555; margin-bottom:5px;">1. ${segnalazione.domandaVerifica1}</label>
-                                        <input type="text" name="risposta1" required class="form-input" style="margin-bottom:15px;">
-                                        <label style="display:block; font-size:0.8rem; font-weight:700; color:#555; margin-bottom:5px;">2. ${segnalazione.domandaVerifica2}</label>
-                                        <input type="text" name="risposta2" required class="form-input" style="margin-bottom:20px;">
-                                        <button class="btn-primary full-width">Invia Reclamo</button>
-                                    </form>
+                                    <div class="claim-container">
+                                        <div class="claim-header-row">
+                                            <div class="security-icon"><span class="material-icons">security</span></div>
+                                            <div style="font-weight:700; color:#333;">Verifica Proprietà</div>
+                                        </div>
+                                        <p class="claim-intro-text">
+                                            Rispondi alle domande di sicurezza impostate dal Finder per dimostrare che l'oggetto è tuo.
+                                        </p>
+                                        <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post">
+                                            <input type="hidden" name="action" value="invia">
+                                            <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
+                                            <div class="question-group">
+                                                <label class="q-label-styled"><span class="q-step">1</span> ${segnalazione.domandaVerifica1}</label>
+                                                <input type="text" name="risposta1" required class="modern-input" placeholder="La tua risposta...">
+                                            </div>
+                                            <div class="question-group">
+                                                <label class="q-label-styled"><span class="q-step">2</span> ${segnalazione.domandaVerifica2}</label>
+                                                <input type="text" name="risposta2" required class="modern-input" placeholder="La tua risposta...">
+                                            </div>
+                                            <button class="btn-claim-modern">
+                                                Invia Reclamo <span class="material-icons">arrow_forward</span>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </c:if>
                             </div>
                         </c:otherwise>
@@ -275,22 +276,29 @@
 
                 <c:if test="<%= isOwner %>">
                     <div class="sidebar-card">
-                        <h3 class="sidebar-title" style="display:flex; align-items:center; gap:8px;">
-                            <span class="material-icons" style="color:var(--primary);">admin_panel_settings</span>
-                            Gestione Reclami
-                        </h3>
+
+                        <c:if test="${param.msg == 'scambio_completato'}">
+                            <div class="points-earned-card">
+                                <span class="material-icons points-icon-large">emoji_events</span>
+                                <div class="points-title">Ottimo Lavoro!</div>
+                                <p class="points-text">Hai guadagnato <strong>+1 Punto</strong>.</p>
+                                <a href="${pageContext.request.contextPath}/profilo" class="btn-profile-link">Vedi Profilo</a>
+                            </div>
+                        </c:if>
+
+                        <h3 class="sidebar-title">Gestione Reclami</h3>
 
                         <c:forEach var="r" items="${reclamiRicevuti}">
                             <c:set var="userRichiedente" value="${mappaRichiedenti[r.idUtenteRichiedente]}" />
 
                             <div class="claim-card">
                                 <div class="claim-header">
-                                    <span style="display:flex; align-items:center; gap:6px; font-weight:700;">
+                                    <span style="display:flex; align-items:center; gap:6px; font-weight:700; color:#333;">
                                         <span class="material-icons" style="font-size:18px;">person</span> ${userRichiedente.username}
                                     </span>
                                     <span style="font-size:0.8rem; color:#888;"><fmt:formatDate value="${r.dataRichiesta}" pattern="dd/MM HH:mm"/></span>
                                 </div>
-                                <div style="font-size:0.9rem; margin-bottom:10px;">
+                                <div style="font-size:0.9rem; margin-bottom:10px; color:#555;">
                                     <div><strong>R1:</strong> ${r.rispostaVerifica1}</div>
                                     <div><strong>R2:</strong> ${r.rispostaVerifica2}</div>
                                 </div>
@@ -301,13 +309,13 @@
                                             <input type="hidden" name="action" value="accetta">
                                             <input type="hidden" name="idReclamo" value="${r.id}">
                                             <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-                                            <button class="btn-accept" style="width:100%;">Accetta</button>
+                                            <button class="btn-accept">Accetta</button>
                                         </form>
                                         <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post">
                                             <input type="hidden" name="action" value="rifiuta">
                                             <input type="hidden" name="idReclamo" value="${r.id}">
                                             <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-                                            <button class="btn-reject" style="width:100%;">Rifiuta</button>
+                                            <button class="btn-reject">Rifiuta</button>
                                         </form>
                                     </div>
                                 </c:if>
@@ -318,21 +326,48 @@
                                             <span class="material-icons" style="vertical-align:middle; font-size:18px;">check_circle</span> RECLAMO ACCETTATO
                                         </div>
 
+                                        <% if (isDropPoint) { %>
+                                            <%-- Caso DropPoint: Mostra Codice + CARD DETTAGLI DROP-POINT --%>
                                         <c:if test="${not empty r.codiceConsegna}">
-                                            <div style="background:#FFF; border:2px dashed #2E7D32; padding:10px; border-radius:8px; margin-bottom:10px;">
-                                                <div style="font-size:0.7rem; color:#555; font-weight:700;">CODICE:</div>
-                                                <div style="font-family:monospace; font-size:1.4rem; font-weight:700; color:#1B5E20; letter-spacing:2px;">${r.codiceConsegna}</div>
+                                            <div class="code-ticket" style="padding:10px; margin:10px 0;">
+                                                <div style="font-size:0.7rem; color:#555; font-weight:700;">CODICE</div>
+                                                <div style="font-size:1.4rem;" class="the-code">${r.codiceConsegna}</div>
                                             </div>
 
                                             <c:if test="${not empty dropPointRitiro}">
                                                 <div class="pickup-location-card" style="padding:12px; margin-top:0;">
-                                                    <div class="pickup-header" style="margin-bottom:4px;">Porta l'oggetto qui:</div>
+                                                    <div class="pickup-header" style="margin-bottom:4px;">PORTA L'OGGETTO QUI</div>
                                                     <div class="pickup-name" style="font-size:1rem;">${dropPointRitiro.nomeAttivita}</div>
-                                                    <div class="pickup-address" style="font-size:0.85rem; margin-bottom:4px;">${dropPointRitiro.indirizzo}</div>
-                                                    <div style="font-size:0.8rem; color:#555; font-style:italic;">Consegna l'oggetto e comunica il codice all'operatore.</div>
+                                                    <div class="pickup-address" style="font-size:0.85rem; margin-bottom:4px;">${dropPointRitiro.indirizzo}, ${dropPointRitiro.citta}</div>
+                                                    <div class="pickup-details-row"><span class="material-icons" style="font-size:16px;">schedule</span> <span>${dropPointRitiro.orariApertura}</span></div>
+                                                    <c:if test="${not empty dropPointRitiro.telefono}">
+                                                        <div class="pickup-details-row"><span class="material-icons" style="font-size:16px;">call</span> <span>${dropPointRitiro.telefono}</span></div>
+                                                    </c:if>
+                                                    <div style="font-size:0.8rem; color:#555; font-style:italic; margin-top:8px;">Consegna l'oggetto e comunica il codice.</div>
                                                 </div>
                                             </c:if>
                                         </c:if>
+                                        <% } else { %>
+                                            <%-- Caso Diretto: Mostra Contatti Richiedente --%>
+                                        <div class="contact-card-blue" style="background:#FFF; border:1px solid #E0E0E0; color:#333;">
+                                            <div class="contact-header" style="color:#2E7D32;">CONTATTI RICHIEDENTE</div>
+                                            <div class="contact-name">${userRichiedente.nome} ${userRichiedente.cognome}</div>
+                                            <div class="contact-row"><span class="material-icons">email</span> <a href="mailto:${userRichiedente.email}">${userRichiedente.email}</a></div>
+                                            <div class="contact-row"><span class="material-icons">call</span> <a href="tel:${userRichiedente.telefono}">${userRichiedente.telefono}</a></div>
+                                            <p style="margin-top:10px; font-size:0.85rem; color:#666;">Contatta l'utente per organizzare la consegna.</p>
+                                        </div>
+
+                                        <form action="${pageContext.request.contextPath}/gestione-reclamo" method="post" style="margin-top:15px;">
+                                            <input type="hidden" name="action" value="conferma_scambio">
+                                            <input type="hidden" name="idReclamo" value="${r.id}">
+                                            <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
+                                            <% if (reclamoAccettato.isConfermaFinder()) { %>
+                                            <button type="button" class="btn-disabled full-width">In attesa dell'Owner...</button>
+                                            <% } else { %>
+                                            <button type="submit" class="btn-primary full-width">Conferma Consegna</button>
+                                            <% } %>
+                                        </form>
+                                        <% } %>
                                     </div>
                                 </c:if>
 
@@ -342,18 +377,11 @@
                             </div>
                         </c:forEach>
 
-                        <!-- BLOCCO ELIMINAZIONE (CORRETTO) -->
                         <div class="delete-section">
-                            <form class="delete-form"
-                                  action="${pageContext.request.contextPath}/dettaglio-segnalazione"
-                                  method="post"
-                                  onsubmit="return confirm('Vuoi eliminare la segnalazione?');">
+                            <form action="${pageContext.request.contextPath}/dettaglio-segnalazione" method="post" onsubmit="return confirm('Eliminare?');">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-                                <button type="submit" class="btn-danger full-width">
-                                    <span class="material-icons">delete</span>
-                                    Elimina Segnalazione
-                                </button>
+                                <button class="btn-danger full-width"><span class="material-icons">delete</span> Elimina Segnalazione</button>
                             </form>
                         </div>
                     </div>
@@ -369,8 +397,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         var lat = ${segnalazione.latitudine != null ? segnalazione.latitudine : 'null'};
         var lon = ${segnalazione.longitudine != null ? segnalazione.longitudine : 'null'};
-
-        if (lat !== null && lon !== null) {
+        if (lat && lon) {
             var map = L.map('itemMap', { zoomControl:false }).setView([lat, lon], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
             L.marker([lat, lon]).addTo(map).bindPopup("<b>${segnalazione.titolo}</b>").openPopup();
@@ -379,6 +406,5 @@
         }
     });
 </script>
-
 </body>
 </html>

@@ -31,7 +31,6 @@ CREATE TABLE drop_point
     provincia                VARCHAR(50)  NOT NULL,
     telefono                 VARCHAR(20),
     orari_apertura           VARCHAR(255),
-    descrizione              TEXT,
     immagine                 LONGBLOB,
     immagine_content_type    VARCHAR(50),
     latitudine               DOUBLE,
@@ -93,7 +92,6 @@ CREATE TABLE reclamo
     risposta_verifica2    VARCHAR(255) NOT NULL,
     data_richiesta        DATETIME                                     DEFAULT CURRENT_TIMESTAMP,
     stato                 ENUM ('IN_ATTESA', 'ACCETTATO', 'RIFIUTATO') DEFAULT 'IN_ATTESA',
-
     codice_consegna       VARCHAR(6) UNIQUE,
     data_deposito         DATETIME,
     data_ritiro           DATETIME,
