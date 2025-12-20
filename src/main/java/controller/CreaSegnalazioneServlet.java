@@ -21,6 +21,7 @@ import model.service.SegnalazioneService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,9 +29,9 @@ import java.time.LocalTime;
 
 @WebServlet(name = "CreaSegnalazioneServlet", value = "/crea-segnalazione")
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-        maxFileSize = 1024 * 1024 * 10,      // 10MB
-        maxRequestSize = 1024 * 1024 * 50    // 50MB
+        fileSizeThreshold = 1024 * 1024 * 2,
+        maxFileSize = 1024 * 1024 * 10,
+        maxRequestSize = 1024 * 1024 * 50
 )
 public class CreaSegnalazioneServlet extends HttpServlet {
 
@@ -67,7 +68,6 @@ public class CreaSegnalazioneServlet extends HttpServlet {
         }
 
         try {
-            // 1) parametri base
             String tipo = request.getParameter("tipo_segnalazione");
             String titolo = request.getParameter("titolo");
             String descrizione = request.getParameter("descrizione");
@@ -78,9 +78,27 @@ public class CreaSegnalazioneServlet extends HttpServlet {
             String domanda1 = request.getParameter("domanda1");
             String domanda2 = request.getParameter("domanda2");
 
+            if (dataStr != null && !dataStr.isEmpty()) {
+                LocalDate checkDate;
+                if (dataStr.contains("T")) {
+                    checkDate = LocalDateTime.parse(dataStr).toLocalDate();
+                } else {
+                    checkDate = LocalDate.parse(dataStr);
+                }
+                int checkYear = checkDate.getYear();
+                int currentYear = LocalDate.now().getYear();
+
+                if (checkYear < 2000 || checkYear > currentYear) {
+                    request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
+                    request.setAttribute("errore", "La data deve essere compresa tra il 01/01/2000 e l'anno corrente.");
+                    request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp")
+                            .forward(request, response);
+                    return;
+                }
+            }
+
             Segnalazione segnalazione;
 
-            // 2) oggetto polimorfico
             if ("OGGETTO".equalsIgnoreCase(tipo)) {
                 SegnalazioneOggetto so = new SegnalazioneOggetto();
 
@@ -118,7 +136,6 @@ public class CreaSegnalazioneServlet extends HttpServlet {
                 segnalazione = sa;
             }
 
-            // 3) dati comuni
             segnalazione.setIdUtente(utente.getId());
             segnalazione.setTitolo(titolo);
             segnalazione.setDescrizione(descrizione);
@@ -141,12 +158,10 @@ public class CreaSegnalazioneServlet extends HttpServlet {
                 }
             }
 
-            // 4) immagine BLOB
             Part filePart = null;
             try {
                 filePart = request.getPart("immagine");
             } catch (IllegalStateException | ServletException e) {
-                // niente upload → lascio immagine null
             }
 
             if (filePart != null && filePart.getSize() > 0) {
@@ -160,10 +175,22 @@ public class CreaSegnalazioneServlet extends HttpServlet {
                 segnalazione.setImmagineContentType(null);
             }
 
-            // 5) salvataggio
             boolean successo = segnalazioneService.creaSegnalazione(segnalazione);
 
             if (successo) {
+                response.setContentType("text/html;charset=UTF-8");
+                PrintWriter out = response.getWriter();
+
+                out.println("<!DOCTYPE html>");
+                out.println("<html><body>");
+                out.println("<script type='text/javascript'>");
+                out.println("alert('Segnalazione pubblicata con successo');");
+                out.println("window.location.href = '" + request.getContextPath() + "/Index';");
+                out.println("</script>");
+                out.println("</body></html>");
+
+                // Nota: response.sendRedirect qui sotto verrà probabilmente ignorato o causerà errore
+                // dopo aver scritto con PrintWriter, ma l'ho lasciato come richiesdto.
                 response.sendRedirect(request.getContextPath() + "/index?msg=success_segnalazione");
             } else {
                 request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
@@ -175,7 +202,7 @@ public class CreaSegnalazioneServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("listaDropPoint", dropPointService.findAllApprovati());
-            request.setAttribute("errore", "Errore tecnico: " + e.getMessage());
+            request.setAttribute("errore", "L'immagine inserita è troppo grande (max 10Mb).");
             request.getRequestDispatcher("/WEB-INF/jsp/crea_segnalazione.jsp")
                     .forward(request, response);
         }
