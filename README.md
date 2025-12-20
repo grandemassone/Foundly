@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/6e9a0026-0671-45b5-bb89-6ae375693952" alt="logo_foundly" width="200" height="200" />
+  <img src="src/main/webapp/assets/images/logo.png" alt="logo_foundly" width="200" height="200" />
   <h1>Foundly</h1>
   <p>
     <b>The go-to platform for reporting, searching, and returning lost items.</b>
