@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AvatarServlet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">AvatarServlet.java</span></div><h1>AvatarServlet.java</h1><pre class="source lang-java linenums">package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import model.bean.Utente;
+import model.service.UtenteService;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+@WebServlet(name = &quot;AvatarServlet&quot;, value = &quot;/avatar&quot;)
+<span class="fc" id="L16">public class AvatarServlet extends HttpServlet {</span>
+
+<span class="fc" id="L18">    private final UtenteService utenteService = new UtenteService();</span>
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws IOException {
+
+<span class="fc" id="L24">        String idParam = request.getParameter(&quot;userId&quot;);</span>
+        long userId;
+
+        try {
+<span class="fc" id="L28">            userId = Long.parseLong(idParam);</span>
+<span class="fc" id="L29">        } catch (Exception e) {</span>
+<span class="fc" id="L30">            sendDefaultAvatar(response);</span>
+<span class="fc" id="L31">            return;</span>
+<span class="fc" id="L32">        }</span>
+
+<span class="fc" id="L34">        Utente u = utenteService.trovaPerId(userId);</span>
+<span class="pc bpc" id="L35" title="2 of 6 branches missed.">        if (u == null || u.getImmagineProfilo() == null || u.getImmagineProfilo().length == 0) {</span>
+<span class="fc" id="L36">            sendDefaultAvatar(response);</span>
+<span class="fc" id="L37">            return;</span>
+        }
+
+<span class="fc" id="L40">        String contentType = u.getImmagineProfiloContentType();</span>
+<span class="pc bpc" id="L41" title="2 of 4 branches missed.">        if (contentType == null || contentType.isBlank()) {</span>
+<span class="nc" id="L42">            contentType = &quot;image/jpeg&quot;;</span>
+        }
+
+<span class="fc" id="L45">        byte[] data = u.getImmagineProfilo();</span>
+
+        // (opzionale) disabilita la cache se vuoi sempre l'ultima versione
+        // response.setHeader(&quot;Cache-Control&quot;, &quot;no-store, no-cache, must-revalidate, max-age=0&quot;);
+
+<span class="fc" id="L50">        response.setContentType(contentType);</span>
+<span class="fc" id="L51">        response.setContentLength(data.length);</span>
+
+<span class="fc" id="L53">        try (OutputStream os = response.getOutputStream()) {</span>
+<span class="fc" id="L54">            os.write(data);</span>
+        }
+<span class="fc" id="L56">    }</span>
+
+    private void sendDefaultAvatar(HttpServletResponse response) throws IOException {
+        // avatar di default: metti un file in src/main/webapp/assets/images/default-avatar.png
+<span class="fc" id="L60">        try (InputStream is = getServletContext()</span>
+<span class="fc" id="L61">                .getResourceAsStream(&quot;/assets/images/default-avatar.png&quot;)) {</span>
+
+<span class="fc bfc" id="L63" title="All 2 branches covered.">            if (is == null) {</span>
+                // nessun default: non mando contenuto
+<span class="fc" id="L65">                response.setStatus(HttpServletResponse.SC_NO_CONTENT);</span>
+<span class="fc" id="L66">                return;</span>
+            }
+
+<span class="fc" id="L69">            byte[] buffer = is.readAllBytes();</span>
+
+<span class="fc" id="L71">            response.setContentType(&quot;image/png&quot;);</span>
+<span class="fc" id="L72">            response.setContentLength(buffer.length);</span>
+
+<span class="fc" id="L74">            try (OutputStream os = response.getOutputStream()) {</span>
+<span class="fc" id="L75">                os.write(buffer);</span>
+            }
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        }</span>
+<span class="fc" id="L78">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

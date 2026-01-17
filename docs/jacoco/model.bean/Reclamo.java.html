@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Reclamo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">model.bean</a> &gt; <span class="el_source">Reclamo.java</span></div><h1>Reclamo.java</h1><pre class="source lang-java linenums">package model.bean;
+
+import model.bean.enums.StatoReclamo;
+
+import java.sql.Timestamp;
+
+public class Reclamo {
+
+    private long id;
+    private long idSegnalazione;
+    private long idUtenteRichiedente;
+    private String rispostaVerifica1;
+    private String rispostaVerifica2;
+    private Timestamp dataRichiesta;
+    private StatoReclamo stato;
+
+    // Gestione Consegna
+    private String codiceConsegna;
+    private Timestamp dataDeposito;
+    private Timestamp dataRitiro;
+    private boolean confermaFinder;
+    private boolean confermaOwner;
+
+    // Dati derivati dalla segnalazione associata (join)
+    private String titoloSegnalazione;
+    private byte[] immagineSegnalazione;
+    private String immagineSegnalazioneContentType;
+
+<span class="fc" id="L29">    public Reclamo() {}</span>
+
+    // Getters e Setters base
+
+    public long getId() {
+<span class="fc" id="L34">        return id;</span>
+    }
+
+    public void setId(long id) {
+<span class="fc" id="L38">        this.id = id;</span>
+<span class="fc" id="L39">    }</span>
+
+    public long getIdSegnalazione() {
+<span class="fc" id="L42">        return idSegnalazione;</span>
+    }
+
+    public void setIdSegnalazione(long idSegnalazione) {
+<span class="fc" id="L46">        this.idSegnalazione = idSegnalazione;</span>
+<span class="fc" id="L47">    }</span>
+
+    public long getIdUtenteRichiedente() {
+<span class="fc" id="L50">        return idUtenteRichiedente;</span>
+    }
+
+    public void setIdUtenteRichiedente(long idUtenteRichiedente) {
+<span class="fc" id="L54">        this.idUtenteRichiedente = idUtenteRichiedente;</span>
+<span class="fc" id="L55">    }</span>
+
+    public String getRispostaVerifica1() {
+<span class="fc" id="L58">        return rispostaVerifica1;</span>
+    }
+
+    public void setRispostaVerifica1(String rispostaVerifica1) {
+<span class="fc" id="L62">        this.rispostaVerifica1 = rispostaVerifica1;</span>
+<span class="fc" id="L63">    }</span>
+
+    public String getRispostaVerifica2() {
+<span class="fc" id="L66">        return rispostaVerifica2;</span>
+    }
+
+    public void setRispostaVerifica2(String rispostaVerifica2) {
+<span class="fc" id="L70">        this.rispostaVerifica2 = rispostaVerifica2;</span>
+<span class="fc" id="L71">    }</span>
+
+    public Timestamp getDataRichiesta() {
+<span class="fc" id="L74">        return dataRichiesta;</span>
+    }
+
+    public void setDataRichiesta(Timestamp dataRichiesta) {
+<span class="fc" id="L78">        this.dataRichiesta = dataRichiesta;</span>
+<span class="fc" id="L79">    }</span>
+
+    public StatoReclamo getStato() {
+<span class="fc" id="L82">        return stato;</span>
+    }
+
+    public void setStato(StatoReclamo stato) {
+<span class="fc" id="L86">        this.stato = stato;</span>
+<span class="fc" id="L87">    }</span>
+
+    public String getCodiceConsegna() {
+<span class="fc" id="L90">        return codiceConsegna;</span>
+    }
+
+    public void setCodiceConsegna(String codiceConsegna) {
+<span class="fc" id="L94">        this.codiceConsegna = codiceConsegna;</span>
+<span class="fc" id="L95">    }</span>
+
+    public Timestamp getDataDeposito() {
+<span class="fc" id="L98">        return dataDeposito;</span>
+    }
+
+    public void setDataDeposito(Timestamp dataDeposito) {
+<span class="fc" id="L102">        this.dataDeposito = dataDeposito;</span>
+<span class="fc" id="L103">    }</span>
+
+    public Timestamp getDataRitiro() {
+<span class="fc" id="L106">        return dataRitiro;</span>
+    }
+
+    public void setDataRitiro(Timestamp dataRitiro) {
+<span class="fc" id="L110">        this.dataRitiro = dataRitiro;</span>
+<span class="fc" id="L111">    }</span>
+
+    public boolean isConfermaFinder() {
+<span class="fc" id="L114">        return confermaFinder;</span>
+    }
+
+    public void setConfermaFinder(boolean confermaFinder) {
+<span class="fc" id="L118">        this.confermaFinder = confermaFinder;</span>
+<span class="fc" id="L119">    }</span>
+
+    public boolean isConfermaOwner() {
+<span class="fc" id="L122">        return confermaOwner;</span>
+    }
+
+    public void setConfermaOwner(boolean confermaOwner) {
+<span class="fc" id="L126">        this.confermaOwner = confermaOwner;</span>
+<span class="fc" id="L127">    }</span>
+
+    // Dati derivati dalla segnalazione
+
+    public String getTitoloSegnalazione() {
+<span class="fc" id="L132">        return titoloSegnalazione;</span>
+    }
+
+    public void setTitoloSegnalazione(String titoloSegnalazione) {
+<span class="fc" id="L136">        this.titoloSegnalazione = titoloSegnalazione;</span>
+<span class="fc" id="L137">    }</span>
+
+    public byte[] getImmagineSegnalazione() {
+<span class="fc" id="L140">        return immagineSegnalazione;</span>
+    }
+
+    public void setImmagineSegnalazione(byte[] immagineSegnalazione) {
+<span class="fc" id="L144">        this.immagineSegnalazione = immagineSegnalazione;</span>
+<span class="fc" id="L145">    }</span>
+
+    public String getImmagineSegnalazioneContentType() {
+<span class="fc" id="L148">        return immagineSegnalazioneContentType;</span>
+    }
+
+    public void setImmagineSegnalazioneContentType(String immagineSegnalazioneContentType) {
+<span class="fc" id="L152">        this.immagineSegnalazioneContentType = immagineSegnalazioneContentType;</span>
+<span class="fc" id="L153">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

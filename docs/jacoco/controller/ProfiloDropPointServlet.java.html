@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProfiloDropPointServlet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">ProfiloDropPointServlet.java</span></div><h1>ProfiloDropPointServlet.java</h1><pre class="source lang-java linenums">package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import model.bean.DropPoint;
+import model.service.DropPointService;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+@WebServlet(name = &quot;ProfiloDropPointServlet&quot;, value = &quot;/profilo-drop-point&quot;)
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 10,      // 10MB
+        maxRequestSize = 1024 * 1024 * 50    // 50MB
+)
+<span class="fc" id="L23">public class ProfiloDropPointServlet extends HttpServlet {</span>
+
+<span class="fc" id="L25">    private final DropPointService dropPointService = new DropPointService();</span>
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
+
+<span class="fc" id="L31">        HttpSession session = request.getSession(false);</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        DropPoint dp = (session != null) ? (DropPoint) session.getAttribute(&quot;dropPoint&quot;) : null;</span>
+
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        if (dp == null) {</span>
+<span class="fc" id="L35">            response.sendRedirect(request.getContextPath() + &quot;/login&quot;);</span>
+<span class="fc" id="L36">            return;</span>
+        }
+
+<span class="fc" id="L39">        DropPoint fresh = dropPointService.trovaPerId(dp.getId());</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        if (fresh != null) {</span>
+<span class="fc" id="L41">            session.setAttribute(&quot;dropPoint&quot;, fresh);</span>
+<span class="fc" id="L42">            dp = fresh;</span>
+        }
+
+<span class="fc" id="L45">        request.setAttribute(&quot;dropPoint&quot;, dp);</span>
+<span class="fc" id="L46">        request.getRequestDispatcher(&quot;/WEB-INF/jsp/profilo_drop_point.jsp&quot;)</span>
+<span class="fc" id="L47">                .forward(request, response);</span>
+<span class="fc" id="L48">    }</span>
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
+
+<span class="fc" id="L54">        request.setCharacterEncoding(&quot;UTF-8&quot;);</span>
+
+<span class="fc" id="L56">        HttpSession session = request.getSession(false);</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">        DropPoint dp = (session != null) ? (DropPoint) session.getAttribute(&quot;dropPoint&quot;) : null;</span>
+
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">        if (dp == null) {</span>
+<span class="nc" id="L60">            response.sendRedirect(request.getContextPath() + &quot;/login&quot;);</span>
+<span class="nc" id="L61">            return;</span>
+        }
+
+<span class="fc" id="L64">        String action = request.getParameter(&quot;action&quot;);</span>
+
+        // ==========================
+        // DELETE ACCOUNT
+        // ==========================
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (&quot;delete_account&quot;.equals(action)) {</span>
+<span class="fc" id="L70">            boolean deleted = dropPointService.eliminaDropPoint(dp.getId());</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">            if (deleted) {</span>
+<span class="fc" id="L72">                session.invalidate();</span>
+<span class="fc" id="L73">                response.sendRedirect(request.getContextPath() + &quot;/login?dpDeleted=1&quot;);</span>
+            } else {
+<span class="fc" id="L75">                response.sendRedirect(request.getContextPath() + &quot;/profilo-drop-point?error=delete_failed&quot;);</span>
+            }
+<span class="fc" id="L77">            return;</span>
+        }
+
+        // ==========================
+        // UPDATE PROFILE
+        // ==========================
+<span class="fc" id="L83">        String nomeAttivita  = request.getParameter(&quot;nomeAttivita&quot;);</span>
+<span class="fc" id="L84">        String indirizzo     = request.getParameter(&quot;indirizzo&quot;);</span>
+<span class="fc" id="L85">        String citta         = request.getParameter(&quot;citta&quot;);</span>
+<span class="fc" id="L86">        String provincia     = request.getParameter(&quot;provincia&quot;);</span>
+<span class="fc" id="L87">        String telefono      = request.getParameter(&quot;telefono&quot;);</span>
+<span class="fc" id="L88">        String orariApertura = request.getParameter(&quot;orariApertura&quot;);</span>
+
+        // evita &quot;null&quot; / azzeramenti
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (nomeAttivita != null)  dp.setNomeAttivita(nomeAttivita.trim());</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (indirizzo != null)     dp.setIndirizzo(indirizzo.trim());</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (citta != null)         dp.setCitta(citta.trim());</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">        if (provincia != null)     dp.setProvincia(provincia.trim());</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (telefono != null)      dp.setTelefono(telefono.trim());</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">        if (orariApertura != null) dp.setOrariApertura(orariApertura.trim());</span>
+
+<span class="fc" id="L98">        boolean removeLogo = &quot;true&quot;.equalsIgnoreCase(request.getParameter(&quot;removeLogo&quot;));</span>
+
+<span class="fc" id="L100">        Part logoPart = null;</span>
+        try {
+<span class="fc" id="L102">            logoPart = request.getPart(&quot;logo&quot;);</span>
+<span class="pc" id="L103">        } catch (Exception ignored) {}</span>
+
+<span class="pc bpc" id="L105" title="1 of 4 branches missed.">        boolean hasNewUpload = (logoPart != null &amp;&amp; logoPart.getSize() &gt; 0);</span>
+
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        if (hasNewUpload) {</span>
+<span class="fc" id="L108">            try (InputStream is = logoPart.getInputStream()) {</span>
+<span class="fc" id="L109">                byte[] bytes = is.readAllBytes();</span>
+<span class="fc" id="L110">                dp.setImmagine(bytes);</span>
+<span class="fc" id="L111">                dp.setImmagineContentType(logoPart.getContentType());</span>
+            }
+<span class="fc" id="L113">            removeLogo = false;</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">        } else if (removeLogo) {</span>
+<span class="fc" id="L115">            dp.setImmagine(null);</span>
+<span class="fc" id="L116">            dp.setImmagineContentType(null);</span>
+        }
+
+<span class="fc" id="L119">        boolean ok = dropPointService.aggiornaProfilo(dp);</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if (!ok) {</span>
+<span class="fc" id="L121">            response.sendRedirect(request.getContextPath() + &quot;/profilo-drop-point?error=update_failed&quot;);</span>
+<span class="fc" id="L122">            return;</span>
+        }
+
+<span class="fc" id="L125">        DropPoint updated = dropPointService.trovaPerId(dp.getId());</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">        session.setAttribute(&quot;dropPoint&quot;, (updated != null ? updated : dp));</span>
+
+<span class="fc" id="L128">        response.sendRedirect(request.getContextPath() + &quot;/profilo-drop-point?success=1&quot;);</span>
+<span class="fc" id="L129">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

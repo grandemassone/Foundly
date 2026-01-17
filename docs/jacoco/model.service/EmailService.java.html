@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmailService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">model.service</a> &gt; <span class="el_source">EmailService.java</span></div><h1>EmailService.java</h1><pre class="source lang-java linenums">package model.service;
+
+import jakarta.mail.*;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Properties;
+
+public class EmailService {
+    private final Session session;
+    private final String mittente;
+<span class="fc" id="L15">    private final String nomeMittente = &quot;Foundly&quot;;</span>
+
+    // Palette Colori
+    private static final String COLOR_PRIMARY = &quot;#FB8C00&quot;; // Arancione
+    private static final String COLOR_ACCENT  = &quot;#FFF3E0&quot;; // Arancione Chiaro
+    private static final String COLOR_TEXT    = &quot;#333333&quot;; // Grigio Scuro
+    private static final String COLOR_BG      = &quot;#F9F9F9&quot;; // Sfondo Pagina
+
+    // COSTANTI AGGIUNTE (che mancavano)
+    private static final String COLOR_CARD    = &quot;#FFFFFF&quot;; // Bianco Card
+    private static final String COLOR_MUTED   = &quot;#757575&quot;; // Testo Secondario (Grigio)
+
+<span class="fc" id="L27">    public EmailService() {</span>
+<span class="fc" id="L28">        Properties props = new Properties();</span>
+<span class="fc" id="L29">        props.put(&quot;mail.smtp.auth&quot;, &quot;true&quot;);</span>
+<span class="fc" id="L30">        props.put(&quot;mail.smtp.starttls.enable&quot;, &quot;true&quot;);</span>
+<span class="fc" id="L31">        props.put(&quot;mail.smtp.host&quot;, &quot;smtp.gmail.com&quot;);</span>
+<span class="fc" id="L32">        props.put(&quot;mail.smtp.port&quot;, &quot;587&quot;);</span>
+
+<span class="fc" id="L34">        this.mittente = &quot;foundly.app@gmail.com&quot;;</span>
+<span class="fc" id="L35">        final String username = &quot;foundly.app@gmail.com&quot;;</span>
+<span class="fc" id="L36">        final String password = System.getenv(&quot;SMTP_PASSKEY&quot;);</span>
+
+<span class="fc" id="L38">        this.session = Session.getInstance(props, new Authenticator() {</span>
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+<span class="fc" id="L41">                return new PasswordAuthentication(username, password);</span>
+            }
+        });
+<span class="fc" id="L44">    }</span>
+
+    // =================================================================================
+    //  METODI DI INVIO (SOLO TESTO/HTML INFORMATIVO - NO LINK)
+    // =================================================================================
+
+    // 1. RECUPERO PASSWORD
+    public void inviaCodiceRecuperoPassword(String destinatario, String codice) {
+<span class="fc" id="L52">        String oggetto = &quot;🔐 Codice di Recupero - Foundly&quot;;</span>
+<span class="fc" id="L53">        String body =</span>
+                &quot;&lt;p&gt;Hai richiesto il ripristino della password. Utilizza il codice sottostante per completare la procedura nell'applicazione:&lt;/p&gt;&quot; +
+<span class="fc" id="L55">                        getBoxCodice(codice) +</span>
+                        &quot;&lt;p style='font-size:13px; color:&quot; + COLOR_MUTED + &quot;;'&gt;Se non hai richiesto tu il ripristino, ignora questo messaggio.&lt;/p&gt;&quot;;
+
+<span class="fc" id="L58">        inviaEmail(destinatario, oggetto, &quot;Recupero Password&quot;, body);</span>
+<span class="fc" id="L59">    }</span>
+
+    // 2. APPROVAZIONE DROP-POINT (Verso il Drop-Point)
+    public void inviaAccettazioneDropPoint(String destinatario, String nomeAttivita) {
+<span class="fc" id="L63">        String oggetto = &quot;🎉 Drop-Point Approvato!&quot;;</span>
+<span class="fc" id="L64">        String body =</span>
+                &quot;&lt;p&gt;Gentile &lt;strong&gt;&quot; + nomeAttivita + &quot;&lt;/strong&gt;,&lt;/p&gt;&quot; +
+                        &quot;&lt;p&gt;Siamo lieti di informarti che la tua richiesta di affiliazione è stata &lt;strong&gt;accettata&lt;/strong&gt;.&lt;/p&gt;&quot; +
+                        &quot;&lt;div style='background-color:#E8F5E9; border-left: 5px solid #4CAF50; padding: 15px; margin: 20px 0; color:#2E7D32;'&gt;&quot; +
+                        &quot;  &lt;strong&gt;Stato Attuale:&lt;/strong&gt; ATTIVO&lt;br&gt;&quot; +
+                        &quot;  La tua attività è ora visibile sulla mappa come Drop-Point ufficiale.&quot; +
+                        &quot;&lt;/div&gt;&quot; +
+                        &quot;&lt;p&gt;Puoi ora accedere alla piattaforma per gestire depositi e ritiri.&lt;/p&gt;&quot;;
+
+<span class="fc" id="L73">        inviaEmail(destinatario, oggetto, &quot;Benvenuto in Foundly&quot;, body);</span>
+<span class="fc" id="L74">    }</span>
+
+    // 3. NUOVO RECLAMO RICEVUTO (Verso il Finder)
+    public void inviaNotificaNuovoReclamo(String destinatario, String titoloOggetto, String usernameRichiedente) {
+<span class="fc" id="L78">        String oggetto = &quot;📩 Nuovo Reclamo Ricevuto&quot;;</span>
+<span class="fc" id="L79">        String body =</span>
+                &quot;&lt;p&gt;Un utente ha inviato una richiesta di restituzione per un oggetto che hai segnalato.&lt;/p&gt;&quot; +
+<span class="fc" id="L81">                        getInfoBox(&quot;Oggetto&quot;, titoloOggetto) +</span>
+<span class="fc" id="L82">                        getInfoBox(&quot;Richiedente&quot;, &quot;@&quot; + usernameRichiedente) +</span>
+                        &quot;&lt;p&gt;Accedi all'applicazione per verificare le risposte di sicurezza e decidere se accettare la richiesta.&lt;/p&gt;&quot;;
+
+<span class="fc" id="L85">        inviaEmail(destinatario, oggetto, &quot;Nuova Richiesta&quot;, body);</span>
+<span class="fc" id="L86">    }</span>
+
+    // 4. RECLAMO ACCETTATO (Verso l'Owner - &quot;Hai vinto!&quot;)
+    public void inviaReclamoAccettatoOwner(String destinatario, String titoloOggetto, String nomeFinder, String eventualeCodice) {
+<span class="fc" id="L90">        String oggetto = &quot;✅ Reclamo Accettato!&quot;;</span>
+
+        String bloccoConsegna;
+<span class="pc bpc" id="L93" title="2 of 4 branches missed.">        if (eventualeCodice != null &amp;&amp; !eventualeCodice.isBlank()) {</span>
+<span class="fc" id="L94">            bloccoConsegna =</span>
+                    &quot;&lt;p&gt;Recati al Drop-Point indicato e mostra questo codice per il ritiro:&lt;/p&gt;&quot; +
+<span class="fc" id="L96">                            getBoxCodice(eventualeCodice);</span>
+        } else {
+<span class="nc" id="L98">            bloccoConsegna =</span>
+                    &quot;&lt;div style='background-color:#E3F2FD; padding:15px; border-radius:8px; border:1px solid #BBDEFB; color:#0D47A1; text-align:center; margin:20px 0;'&gt;&quot; +
+                            &quot;  &lt;strong&gt;Consegna Diretta&lt;/strong&gt;&lt;br&gt;&quot; +
+                            &quot;  Accedi all'app per visualizzare i contatti del Finder e concordare l'incontro.&quot; +
+                            &quot;&lt;/div&gt;&quot;;
+        }
+
+<span class="fc" id="L105">        String body =</span>
+                &quot;&lt;p&gt;Ottime notizie! &lt;strong&gt;&quot; + nomeFinder + &quot;&lt;/strong&gt; ha confermato che l'oggetto è tuo.&lt;/p&gt;&quot; +
+<span class="fc" id="L107">                        getInfoBox(&quot;Oggetto Recuperato&quot;, titoloOggetto) +</span>
+                        bloccoConsegna;
+
+<span class="fc" id="L110">        inviaEmail(destinatario, oggetto, &quot;Congratulazioni!&quot;, body);</span>
+<span class="fc" id="L111">    }</span>
+
+    // 5. CONFERMA AZIONE ACCETTAZIONE (Verso il Finder - &quot;Hai accettato&quot;)
+    public void inviaConfermaAccettazioneFinder(String destinatario, String titoloOggetto, String nomeRichiedente, String codice, String nomeDropPoint) {
+<span class="nc" id="L115">        String oggetto = &quot;👍 Hai accettato il reclamo&quot;;</span>
+
+        String istruzioni;
+<span class="nc bnc" id="L118" title="All 4 branches missed.">        if (codice != null &amp;&amp; !codice.isBlank()) {</span>
+            // Caso Drop-Point
+<span class="nc" id="L120">            istruzioni =</span>
+                    &quot;&lt;p&gt;Hai scelto di utilizzare un &lt;strong&gt;Drop-Point&lt;/strong&gt; (&quot; + nomeDropPoint + &quot;).&lt;/p&gt;&quot; +
+                            &quot;&lt;p&gt;Per completare la restituzione:&lt;/p&gt;&quot; +
+                            &quot;&lt;ol style='color:#555; line-height:1.6;'&gt;&quot; +
+                            &quot;  &lt;li&gt;Recati al Drop-Point selezionato portando l'oggetto.&lt;/li&gt;&quot; +
+                            &quot;  &lt;li&gt;Consegna l'oggetto all'operatore del negozio.&lt;/li&gt;&quot; +
+                            &quot;  &lt;li&gt;Comunica il seguente codice di sicurezza:&lt;/li&gt;&quot; +
+                            &quot;&lt;/ol&gt;&quot; +
+<span class="nc" id="L128">                            getBoxCodice(codice) +</span>
+                            &quot;&lt;p style='font-size:13px; color:&quot; + COLOR_MUTED + &quot;;'&gt;L'operatore registrerà il deposito e noi avviseremo il proprietario per il ritiro.&lt;/p&gt;&quot;;
+        } else {
+            // Caso Diretta
+<span class="nc" id="L132">            istruzioni =</span>
+                    &quot;&lt;p&gt;Hai scelto la &lt;strong&gt;Consegna Diretta&lt;/strong&gt;.&lt;/p&gt;&quot; +
+                            &quot;&lt;p&gt;L'utente è stato notificato. Accedi all'app per visualizzare i suoi contatti, concordare un luogo sicuro e confermare lo scambio.&lt;/p&gt;&quot;;
+        }
+
+<span class="nc" id="L137">        String body =</span>
+                &quot;&lt;p&gt;Hai confermato correttamente che l'oggetto appartiene a &lt;strong&gt;&quot; + nomeRichiedente + &quot;&lt;/strong&gt;.&lt;/p&gt;&quot; +
+<span class="nc" id="L139">                        getInfoBox(&quot;Oggetto&quot;, titoloOggetto) +</span>
+                        &quot;&lt;hr style='border:0; border-top:1px solid #EEE; margin:20px 0;'&gt;&quot; +
+                        istruzioni;
+
+<span class="nc" id="L143">        inviaEmail(destinatario, oggetto, &quot;Azione Registrata&quot;, body);</span>
+<span class="nc" id="L144">    }</span>
+
+    // 6. NUOVA RICHIESTA DROP-POINT (Verso Admin)
+    public void inviaNotificaAdminNuovoDropPoint(String destinatario, String nomeAttivita, String citta) {
+<span class="nc" id="L148">        String oggetto = &quot;🔔 Nuova richiesta Drop-Point&quot;;</span>
+<span class="nc" id="L149">        String body =</span>
+                &quot;&lt;p&gt;È stata ricevuta una nuova richiesta di affiliazione.&lt;/p&gt;&quot; +
+                        &quot;&lt;div style='background-color:#FFF; border:1px solid #EEE; padding:15px; border-radius:8px; margin:15px 0;'&gt;&quot; +
+                        &quot;  &lt;ul style='list-style:none; padding:0; margin:0; color:#555;'&gt;&quot; +
+                        &quot;    &lt;li style='margin-bottom:5px;'&gt;&lt;strong&gt;Attività:&lt;/strong&gt; &quot; + nomeAttivita + &quot;&lt;/li&gt;&quot; +
+                        &quot;    &lt;li&gt;&lt;strong&gt;Città:&lt;/strong&gt; &quot; + citta + &quot;&lt;/li&gt;&quot; +
+                        &quot;  &lt;/ul&gt;&quot; +
+                        &quot;&lt;/div&gt;&quot; +
+                        &quot;&lt;p&gt;Accedi al pannello di amministrazione per valutare la richiesta.&lt;/p&gt;&quot;;
+
+<span class="nc" id="L159">        inviaEmail(destinatario, oggetto, &quot;Notifica Admin&quot;, body);</span>
+<span class="nc" id="L160">    }</span>
+
+    // =================================================================================
+    //  HELPER GRAFICI &amp; TEMPLATE
+    // =================================================================================
+
+    private String getBoxCodice(String codice) {
+<span class="fc" id="L167">        return &quot;&lt;div style='text-align:center; margin:25px 0;'&gt;&quot; +</span>
+                &quot;  &lt;span style='font-size:28px; font-weight:800; letter-spacing:4px; color:&quot; + COLOR_PRIMARY + &quot;; background:&quot; + COLOR_ACCENT + &quot;; padding:15px 30px; border-radius:8px; border:2px dashed &quot; + COLOR_PRIMARY + &quot;; display:inline-block;'&gt;&quot; +
+                codice +
+                &quot;  &lt;/span&gt;&quot; +
+                &quot;&lt;/div&gt;&quot;;
+    }
+
+    private String getInfoBox(String label, String value) {
+<span class="fc" id="L175">        return &quot;&lt;div style='margin-bottom:15px;'&gt;&quot; +</span>
+                &quot;  &lt;span style='font-size:12px; color:#888; text-transform:uppercase; display:block;'&gt;&quot; + label + &quot;&lt;/span&gt;&quot; +
+                &quot;  &lt;span style='font-size:16px; font-weight:600; color:&quot; + COLOR_TEXT + &quot;; display:block;'&gt;&quot; + value + &quot;&lt;/span&gt;&quot; +
+                &quot;&lt;/div&gt;&quot;;
+    }
+
+    private void inviaEmail(String destinatario, String oggetto, String preHeader, String bodyHtml) {
+<span class="pc bpc" id="L182" title="2 of 4 branches missed.">        if (destinatario == null || destinatario.isBlank()) {</span>
+<span class="nc" id="L183">            System.err.println(&quot;⚠️ Impossibile inviare email: Destinatario nullo o vuoto.&quot;);</span>
+<span class="nc" id="L184">            return;</span>
+        }
+
+        // Esecuzione in thread separato
+<span class="fc" id="L188">        new Thread(() -&gt; {</span>
+            try {
+<span class="fc" id="L190">                MimeMessage message = new MimeMessage(session);</span>
+                try {
+<span class="fc" id="L192">                    message.setFrom(new InternetAddress(mittente, nomeMittente, StandardCharsets.UTF_8.name()));</span>
+<span class="nc" id="L193">                } catch (Exception e) {</span>
+<span class="nc" id="L194">                    message.setFrom(new InternetAddress(mittente));</span>
+<span class="fc" id="L195">                }</span>
+<span class="fc" id="L196">                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));</span>
+<span class="fc" id="L197">                message.setSubject(oggetto, StandardCharsets.UTF_8.name());</span>
+
+<span class="fc" id="L199">                String htmlFinale = getTemplateHtml(preHeader, bodyHtml);</span>
+
+<span class="fc" id="L201">                MimeBodyPart htmlPart = new MimeBodyPart();</span>
+<span class="fc" id="L202">                htmlPart.setContent(htmlFinale, &quot;text/html; charset=UTF-8&quot;);</span>
+
+<span class="fc" id="L204">                MimeMultipart multipart = new MimeMultipart(&quot;alternative&quot;);</span>
+<span class="fc" id="L205">                multipart.addBodyPart(htmlPart);</span>
+
+<span class="fc" id="L207">                message.setContent(multipart);</span>
+<span class="nc" id="L208">                Transport.send(message);</span>
+
+<span class="nc" id="L210">                System.out.println(&quot;✅ Email inviata a: &quot; + destinatario + &quot; | Oggetto: &quot; + oggetto);</span>
+
+<span class="fc" id="L212">            } catch (MessagingException e) {</span>
+<span class="fc" id="L213">                System.err.println(&quot;❌ Errore invio email a &quot; + destinatario + &quot;: &quot; + e.getMessage());</span>
+<span class="fc" id="L214">                e.printStackTrace();</span>
+<span class="nc" id="L215">            }</span>
+<span class="fc" id="L216">        }).start();</span>
+<span class="fc" id="L217">    }</span>
+
+    private String getTemplateHtml(String titolo, String contenuto) {
+<span class="fc" id="L220">        return &quot;&lt;!DOCTYPE html&gt;&quot; +</span>
+                &quot;&lt;html&gt;&quot; +
+                &quot;&lt;head&gt;&lt;meta charset='UTF-8'&gt;&lt;/head&gt;&quot; +
+                &quot;&lt;body style='margin:0; padding:0; background-color:&quot; + COLOR_BG + &quot;; font-family:Helvetica, Arial, sans-serif; color:&quot; + COLOR_TEXT + &quot;;'&gt;&quot; +
+                &quot;  &lt;table width='100%' cellpadding='0' cellspacing='0' style='padding:40px 0;'&gt;&quot; +
+                &quot;    &lt;tr&gt;&lt;td align='center'&gt;&quot; +
+                &quot;      &lt;table width='600' cellpadding='0' cellspacing='0' style='background-color:&quot; + COLOR_CARD + &quot;; border-radius:12px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.05);'&gt;&quot; +
+                &quot;        &quot; +
+                &quot;        &lt;tr&gt;&lt;td style='background-color:&quot; + COLOR_PRIMARY + &quot;; padding:25px; text-align:center;'&gt;&quot; +
+                &quot;          &lt;h1 style='color:#FFFFFF; margin:0; font-size:24px; letter-spacing:1px;'&gt;Foundly&lt;/h1&gt;&quot; +
+                &quot;        &lt;/td&gt;&lt;/tr&gt;&quot; +
+                &quot;        &quot; +
+                &quot;        &lt;tr&gt;&lt;td style='padding:40px;'&gt;&quot; +
+                &quot;          &lt;h2 style='color:&quot; + COLOR_PRIMARY + &quot;; margin-top:0; font-size:20px; border-bottom:1px solid #EEE; padding-bottom:10px;'&gt;&quot; + titolo + &quot;&lt;/h2&gt;&quot; +
+                &quot;          &lt;div style='font-size:15px; line-height:1.6; color:#444;'&gt;&quot; +
+                contenuto +
+                &quot;          &lt;/div&gt;&quot; +
+                &quot;        &lt;/td&gt;&lt;/tr&gt;&quot; +
+                &quot;        &quot; +
+                &quot;        &lt;tr&gt;&lt;td style='background-color:#FAFAFA; padding:20px; text-align:center; border-top:1px solid #EEE; font-size:12px; color:#999;'&gt;&quot; +
+                &quot;          &amp;copy; 2025 Foundly. Messaggio automatico, non rispondere.&quot; +
+                &quot;        &lt;/td&gt;&lt;/tr&gt;&quot; +
+                &quot;      &lt;/table&gt;&quot; +
+                &quot;    &lt;/td&gt;&lt;/tr&gt;&quot; +
+                &quot;  &lt;/table&gt;&quot; +
+                &quot;&lt;/body&gt;&lt;/html&gt;&quot;;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AreaAdminServlet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">AreaAdminServlet.java</span></div><h1>AreaAdminServlet.java</h1><pre class="source lang-java linenums">package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.Utente;
+import model.bean.enums.Ruolo;
+import model.service.DropPointService;
+import model.service.SegnalazioneService;
+import model.service.UtenteService;
+
+import java.io.IOException;
+
+@WebServlet(name = &quot;AreaAdminServlet&quot;, value = &quot;/admin&quot;)
+<span class="fc" id="L18">public class AreaAdminServlet extends HttpServlet {</span>
+
+<span class="fc" id="L20">    private final DropPointService dropPointService = new DropPointService();</span>
+<span class="fc" id="L21">    private final UtenteService utenteService = new UtenteService();</span>
+<span class="fc" id="L22">    private final SegnalazioneService segnalazioneService = new SegnalazioneService();</span>
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
+
+<span class="fc" id="L28">        HttpSession session = request.getSession(false);</span>
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">        Utente admin = (session != null) ? (Utente) session.getAttribute(&quot;utente&quot;) : null;</span>
+
+<span class="pc bpc" id="L31" title="1 of 4 branches missed.">        if (admin == null || admin.getRuolo() != Ruolo.ADMIN) {</span>
+<span class="fc" id="L32">            response.sendError(HttpServletResponse.SC_FORBIDDEN);</span>
+<span class="fc" id="L33">            return;</span>
+        }
+
+<span class="fc" id="L36">        request.setAttribute(&quot;dropPointsPendenti&quot;, dropPointService.findAllInAttesa());</span>
+<span class="fc" id="L37">        request.setAttribute(&quot;dropPointsApprovati&quot;, dropPointService.findAllApprovati());</span>
+<span class="fc" id="L38">        request.setAttribute(&quot;listaUtenti&quot;, utenteService.trovaTutti());</span>
+
+        // NEW: tutte le segnalazioni per admin
+<span class="fc" id="L41">        request.setAttribute(&quot;listaSegnalazioni&quot;, segnalazioneService.trovaTutte());</span>
+
+<span class="fc" id="L43">        request.getRequestDispatcher(&quot;/WEB-INF/jsp/area_admin.jsp&quot;)</span>
+<span class="fc" id="L44">                .forward(request, response);</span>
+<span class="fc" id="L45">    }</span>
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
+
+<span class="fc" id="L51">        HttpSession session = request.getSession(false);</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        Utente admin = (session != null) ? (Utente) session.getAttribute(&quot;utente&quot;) : null;</span>
+
+<span class="pc bpc" id="L54" title="2 of 4 branches missed.">        if (admin == null || admin.getRuolo() != Ruolo.ADMIN) {</span>
+<span class="nc" id="L55">            response.sendError(HttpServletResponse.SC_FORBIDDEN);</span>
+<span class="nc" id="L56">            return;</span>
+        }
+
+<span class="fc" id="L59">        String action = request.getParameter(&quot;action&quot;);</span>
+<span class="pc bpc" id="L60" title="1 of 4 branches missed.">        if (action == null || action.isBlank()) {</span>
+<span class="fc" id="L61">            response.sendRedirect(request.getContextPath() + &quot;/admin&quot;);</span>
+<span class="fc" id="L62">            return;</span>
+        }
+
+        try {
+<span class="pc bpc" id="L66" title="1 of 6 branches missed.">            switch (action) {</span>
+                case &quot;approveDropPoint&quot;: {
+<span class="fc" id="L68">                    long id = Long.parseLong(request.getParameter(&quot;dropPointId&quot;));</span>
+<span class="fc" id="L69">                    dropPointService.approvaDropPoint(id);</span>
+<span class="fc" id="L70">                    break;</span>
+                }
+                case &quot;rejectDropPoint&quot;: {
+<span class="fc" id="L73">                    long id = Long.parseLong(request.getParameter(&quot;dropPointId&quot;));</span>
+<span class="fc" id="L74">                    dropPointService.rifiutaDropPoint(id);</span>
+<span class="fc" id="L75">                    break;</span>
+                }
+                case &quot;deleteDropPoint&quot;: {
+<span class="fc" id="L78">                    long id = Long.parseLong(request.getParameter(&quot;dropPointId&quot;));</span>
+<span class="fc" id="L79">                    dropPointService.eliminaDropPoint(id);</span>
+<span class="fc" id="L80">                    break;</span>
+                }
+                case &quot;deleteUser&quot;: {
+<span class="fc" id="L83">                    long userId = Long.parseLong(request.getParameter(&quot;userId&quot;));</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">                    if (userId != admin.getId()) {</span>
+<span class="fc" id="L85">                        utenteService.cancellaUtente(userId);</span>
+                    }
+                    break;
+                }
+
+                // NEW: elimina segnalazione (admin può eliminare tutte)
+                case &quot;deleteSegnalazione&quot;: {
+<span class="fc" id="L92">                    long segnalazioneId = Long.parseLong(request.getParameter(&quot;segnalazioneId&quot;));</span>
+<span class="fc" id="L93">                    segnalazioneService.eliminaSegnalazione(segnalazioneId);</span>
+<span class="fc" id="L94">                    break;</span>
+                }
+
+                default:
+                    break;
+            }
+<span class="nc" id="L100">        } catch (NumberFormatException ignore) {</span>
+            // input non valido -&gt; ignoro
+<span class="fc" id="L102">        }</span>
+
+<span class="fc" id="L104">        response.sendRedirect(request.getContextPath() + &quot;/admin&quot;);</span>
+<span class="fc" id="L105">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

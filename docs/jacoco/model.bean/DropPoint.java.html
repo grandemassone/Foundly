@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DropPoint.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">model.bean</a> &gt; <span class="el_source">DropPoint.java</span></div><h1>DropPoint.java</h1><pre class="source lang-java linenums">package model.bean;
+
+import model.bean.enums.StatoDropPoint;
+
+public class DropPoint {
+
+    private Long id;
+    private String nomeAttivita;
+    private String email;
+    private String passwordHash;
+    private String indirizzo;
+    private String citta;
+    private String provincia;
+    private String telefono;
+    private String orariApertura;
+    private String descrizione;
+
+    // Ora BLOB nel DB → byte[] nel model
+    private byte[] immagine;
+    private String immagineContentType;
+
+    private Double latitudine;
+    private Double longitudine;
+    private int ritiriEffettuati;
+
+    private StatoDropPoint stato;
+
+<span class="fc" id="L28">    public DropPoint() {}</span>
+
+    // Getters e Setters
+
+    public Long getId() {
+<span class="fc" id="L33">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L37">        this.id = id;</span>
+<span class="fc" id="L38">    }</span>
+
+    public String getNomeAttivita() {
+<span class="fc" id="L41">        return nomeAttivita;</span>
+    }
+
+    public void setNomeAttivita(String nomeAttivita) {
+<span class="fc" id="L45">        this.nomeAttivita = nomeAttivita;</span>
+<span class="fc" id="L46">    }</span>
+
+    public String getEmail() {
+<span class="fc" id="L49">        return email;</span>
+    }
+
+    public void setEmail(String email) {
+<span class="fc" id="L53">        this.email = email;</span>
+<span class="fc" id="L54">    }</span>
+
+    public String getPasswordHash() {
+<span class="fc" id="L57">        return passwordHash;</span>
+    }
+
+    public void setPasswordHash(String passwordHash) {
+<span class="fc" id="L61">        this.passwordHash = passwordHash;</span>
+<span class="fc" id="L62">    }</span>
+
+    public String getIndirizzo() {
+<span class="fc" id="L65">        return indirizzo;</span>
+    }
+
+    public void setIndirizzo(String indirizzo) {
+<span class="fc" id="L69">        this.indirizzo = indirizzo;</span>
+<span class="fc" id="L70">    }</span>
+
+    public String getCitta() {
+<span class="fc" id="L73">        return citta;</span>
+    }
+
+    public void setCitta(String citta) {
+<span class="fc" id="L77">        this.citta = citta;</span>
+<span class="fc" id="L78">    }</span>
+
+    public String getProvincia() {
+<span class="fc" id="L81">        return provincia;</span>
+    }
+
+    public void setProvincia(String provincia) {
+<span class="fc" id="L85">        this.provincia = provincia;</span>
+<span class="fc" id="L86">    }</span>
+
+    public String getTelefono() {
+<span class="fc" id="L89">        return telefono;</span>
+    }
+
+    public void setTelefono(String telefono) {
+<span class="fc" id="L93">        this.telefono = telefono;</span>
+<span class="fc" id="L94">    }</span>
+
+    public String getOrariApertura() {
+<span class="fc" id="L97">        return orariApertura;</span>
+    }
+
+    public void setOrariApertura(String orariApertura) {
+<span class="fc" id="L101">        this.orariApertura = orariApertura;</span>
+<span class="fc" id="L102">    }</span>
+
+    public String getDescrizione() {
+<span class="fc" id="L105">        return descrizione;</span>
+    }
+
+    public void setDescrizione(String descrizione) {
+<span class="fc" id="L109">        this.descrizione = descrizione;</span>
+<span class="fc" id="L110">    }</span>
+
+    public byte[] getImmagine() {
+<span class="fc" id="L113">        return immagine;</span>
+    }
+
+    public void setImmagine(byte[] immagine) {
+<span class="fc" id="L117">        this.immagine = immagine;</span>
+<span class="fc" id="L118">    }</span>
+
+    public String getImmagineContentType() {
+<span class="fc" id="L121">        return immagineContentType;</span>
+    }
+
+    public void setImmagineContentType(String immagineContentType) {
+<span class="fc" id="L125">        this.immagineContentType = immagineContentType;</span>
+<span class="fc" id="L126">    }</span>
+
+    public Double getLatitudine() {
+<span class="fc" id="L129">        return latitudine;</span>
+    }
+
+    public void setLatitudine(Double latitudine) {
+<span class="fc" id="L133">        this.latitudine = latitudine;</span>
+<span class="fc" id="L134">    }</span>
+
+    public Double getLongitudine() {
+<span class="fc" id="L137">        return longitudine;</span>
+    }
+
+    public void setLongitudine(Double longitudine) {
+<span class="fc" id="L141">        this.longitudine = longitudine;</span>
+<span class="fc" id="L142">    }</span>
+
+    public int getRitiriEffettuati() {
+<span class="fc" id="L145">        return ritiriEffettuati;</span>
+    }
+
+    public void setRitiriEffettuati(int ritiriEffettuati) {
+<span class="fc" id="L149">        this.ritiriEffettuati = ritiriEffettuati;</span>
+<span class="fc" id="L150">    }</span>
+
+    public StatoDropPoint getStato() {
+<span class="fc" id="L153">        return stato;</span>
+    }
+
+    public void setStato(StatoDropPoint stato) {
+<span class="fc" id="L157">        this.stato = stato;</span>
+<span class="fc" id="L158">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

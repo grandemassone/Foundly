@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegistrazioneDropPointServlet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">RegistrazioneDropPointServlet.java</span></div><h1>RegistrazioneDropPointServlet.java</h1><pre class="source lang-java linenums">package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import model.service.DropPointService;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+@WebServlet(name = &quot;RegistrazioneDropPointServlet&quot;, value = &quot;/registrazione-droppoint&quot;)
+<span class="fc" id="L13">public class RegistrazioneDropPointServlet extends HttpServlet {</span>
+
+<span class="fc" id="L15">    private final DropPointService dpService = new DropPointService();</span>
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="fc" id="L19">        request.getRequestDispatcher(&quot;/WEB-INF/jsp/registrazione_droppoint.jsp&quot;).forward(request, response);</span>
+<span class="fc" id="L20">    }</span>
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="fc" id="L24">        String nomeAttivita = request.getParameter(&quot;nomeAttivita&quot;);</span>
+<span class="fc" id="L25">        String email = request.getParameter(&quot;email&quot;);</span>
+<span class="fc" id="L26">        String password = request.getParameter(&quot;password&quot;);</span>
+<span class="fc" id="L27">        String indirizzo = request.getParameter(&quot;indirizzo&quot;);</span>
+<span class="fc" id="L28">        String citta = request.getParameter(&quot;citta&quot;);</span>
+<span class="fc" id="L29">        String provincia = request.getParameter(&quot;provincia&quot;);</span>
+<span class="fc" id="L30">        String telefono = request.getParameter(&quot;telefono&quot;);</span>
+<span class="fc" id="L31">        String orari = request.getParameter(&quot;orari&quot;);</span>
+
+<span class="fc" id="L33">        String latStr = request.getParameter(&quot;latitudine&quot;);</span>
+<span class="fc" id="L34">        String lonStr = request.getParameter(&quot;longitudine&quot;);</span>
+
+<span class="fc" id="L36">        Double latitudine = null;</span>
+<span class="fc" id="L37">        Double longitudine = null;</span>
+
+        try {
+<span class="pc bpc" id="L40" title="1 of 4 branches missed.">            if (latStr != null &amp;&amp; !latStr.isEmpty()) latitudine = Double.parseDouble(latStr);</span>
+<span class="pc bpc" id="L41" title="1 of 4 branches missed.">            if (lonStr != null &amp;&amp; !lonStr.isEmpty()) longitudine = Double.parseDouble(lonStr);</span>
+<span class="fc" id="L42">        } catch (NumberFormatException e) {</span>
+            // Ignora
+<span class="fc" id="L44">        }</span>
+
+<span class="pc bpc" id="L46" title="3 of 10 branches missed.">        if (email == null || password == null || nomeAttivita == null || latitudine == null || longitudine == null) {</span>
+<span class="fc" id="L47">            request.setAttribute(&quot;errore&quot;, &quot;Campi obbligatori mancanti o posizione mappa non selezionata.&quot;);</span>
+<span class="fc" id="L48">            request.getRequestDispatcher(&quot;/WEB-INF/jsp/registrazione_droppoint.jsp&quot;).forward(request, response);</span>
+<span class="fc" id="L49">            return;</span>
+        }
+
+        // CORRETTO: Ordine parametri allineato col Service aggiornato (Lat, Lon)
+<span class="fc" id="L53">        boolean successo = dpService.registraDropPoint(nomeAttivita, email, password, indirizzo, citta, provincia, telefono, orari, latitudine, longitudine);</span>
+
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        if (successo) {</span>
+            // --- INIZIO LOGICA ALERT SEMPLICE ---
+<span class="fc" id="L57">            response.setContentType(&quot;text/html;charset=UTF-8&quot;);</span>
+<span class="fc" id="L58">            PrintWriter out = response.getWriter();</span>
+
+<span class="fc" id="L60">            out.println(&quot;&lt;!DOCTYPE html&gt;&quot;);</span>
+<span class="fc" id="L61">            out.println(&quot;&lt;html&gt;&lt;body&gt;&quot;);</span>
+<span class="fc" id="L62">            out.println(&quot;&lt;script type='text/javascript'&gt;&quot;);</span>
+
+            // Qui scriviamo l'alert del browser
+<span class="fc" id="L65">            out.println(&quot;alert('Registrazione effettuata con successo! Ora puoi effettuare il login.');&quot;);</span>
+
+            // Qui reindirizziamo l'utente alla pagina di login dopo che clicca OK
+            // Nota: Usa request.getContextPath() per essere sicuro del percorso
+
+<span class="fc" id="L70">            out.println(&quot;&lt;/script&gt;&quot;);</span>
+<span class="fc" id="L71">            out.println(&quot;&lt;/body&gt;&lt;/html&gt;&quot;);</span>
+            // --- FINE LOGICA ALERT SEMPLICE --
+<span class="fc" id="L73">            response.sendRedirect(&quot;login?registrazione=attesa_approvazione&quot;);</span>
+<span class="fc" id="L74">        } else {</span>
+            // --- INIZIO LOGICA ALERT SEMPLICE ---
+<span class="fc" id="L76">            response.setContentType(&quot;text/html;charset=UTF-8&quot;);</span>
+<span class="fc" id="L77">            PrintWriter out = response.getWriter();</span>
+
+<span class="fc" id="L79">            out.println(&quot;&lt;!DOCTYPE html&gt;&quot;);</span>
+<span class="fc" id="L80">            out.println(&quot;&lt;html&gt;&lt;body&gt;&quot;);</span>
+<span class="fc" id="L81">            out.println(&quot;&lt;script type='text/javascript'&gt;&quot;);</span>
+
+            // Qui scriviamo l'alert del browser
+<span class="fc" id="L84">            out.println(&quot;alert('Email già registrata per un altro Drop-Point.');&quot;);</span>
+
+            // Qui reindirizziamo l'utente alla pagina di login dopo che clicca OK
+            // Nota: Usa request.getContextPath() per essere sicuro del percorso
+<span class="fc" id="L88">            out.println(&quot;window.location.href = '&quot; + request.getContextPath() + &quot;/login';&quot;);</span>
+
+<span class="fc" id="L90">            out.println(&quot;&lt;/script&gt;&quot;);</span>
+<span class="fc" id="L91">            out.println(&quot;&lt;/body&gt;&lt;/html&gt;&quot;);</span>
+            // --- FINE LOGICA ALERT SEMPLICE --
+<span class="fc" id="L93">            request.setAttribute(&quot;errore&quot;, &quot;Email già registrata per un altro Drop-Point.&quot;);</span>
+<span class="fc" id="L94">            request.getRequestDispatcher(&quot;/WEB-INF/jsp/registrazione_droppoint.jsp&quot;).forward(request, response);</span>
+        }
+<span class="fc" id="L96">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

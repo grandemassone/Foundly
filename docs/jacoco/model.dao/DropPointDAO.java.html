@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DropPointDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">model.dao</a> &gt; <span class="el_source">DropPointDAO.java</span></div><h1>DropPointDAO.java</h1><pre class="source lang-java linenums">package model.dao;
+
+import model.ConPool;
+import model.bean.DropPoint;
+import model.bean.enums.StatoDropPoint;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+<span class="fc" id="L11">public class DropPointDAO {</span>
+
+    public boolean doSave(DropPoint dp) {
+<span class="fc" id="L14">        String query = &quot;INSERT INTO drop_point (&quot; +</span>
+                &quot;nome_attivita, email, password_hash, indirizzo, &quot; +
+                &quot;citta, provincia, telefono, orari_apertura, descrizione, &quot; +
+                &quot;immagine, immagine_content_type, &quot; +
+                &quot;latitudine, longitudine, ritiri_effettuati, stato&quot; +
+                &quot;) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&quot;;
+
+<span class="fc" id="L21">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L22">             PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {</span>
+
+<span class="fc" id="L24">            ps.setString(1, dp.getNomeAttivita());</span>
+<span class="fc" id="L25">            ps.setString(2, dp.getEmail());</span>
+<span class="fc" id="L26">            ps.setString(3, dp.getPasswordHash());</span>
+<span class="fc" id="L27">            ps.setString(4, dp.getIndirizzo());</span>
+<span class="fc" id="L28">            ps.setString(5, dp.getCitta());</span>
+<span class="fc" id="L29">            ps.setString(6, dp.getProvincia());</span>
+<span class="fc" id="L30">            ps.setString(7, dp.getTelefono());</span>
+<span class="fc" id="L31">            ps.setString(8, dp.getOrariApertura());</span>
+<span class="fc" id="L32">            ps.setString(9, dp.getDescrizione());</span>
+
+            // immagine BLOB + content type
+<span class="pc bpc" id="L35" title="2 of 4 branches missed.">            if (dp.getImmagine() != null &amp;&amp; dp.getImmagine().length &gt; 0) {</span>
+<span class="fc" id="L36">                ps.setBytes(10, dp.getImmagine());</span>
+<span class="fc" id="L37">                ps.setString(11, dp.getImmagineContentType());</span>
+            } else {
+<span class="nc" id="L39">                ps.setNull(10, Types.BLOB);</span>
+<span class="nc" id="L40">                ps.setNull(11, Types.VARCHAR);</span>
+            }
+
+<span class="fc" id="L43">            ps.setObject(12, dp.getLatitudine());</span>
+<span class="fc" id="L44">            ps.setObject(13, dp.getLongitudine());</span>
+<span class="fc" id="L45">            ps.setInt(14, dp.getRitiriEffettuati());</span>
+<span class="fc" id="L46">            ps.setString(15, dp.getStato().toString());</span>
+
+<span class="fc" id="L48">            int result = ps.executeUpdate();</span>
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">            if (result &gt; 0) {</span>
+<span class="fc" id="L50">                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">                    if (generatedKeys.next()) {</span>
+<span class="fc" id="L52">                        dp.setId(generatedKeys.getLong(1));</span>
+                    }
+                }
+<span class="fc" id="L55">                return true;</span>
+            }
+<span class="pc bpc" id="L57" title="2 of 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L58">            e.printStackTrace();</span>
+<span class="nc" id="L59">        }</span>
+<span class="nc" id="L60">        return false;</span>
+    }
+
+    public DropPoint doRetrieveByEmail(String email) {
+<span class="fc" id="L64">        String query = &quot;SELECT * FROM drop_point WHERE email = ?&quot;;</span>
+
+<span class="fc" id="L66">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L67">             PreparedStatement ps = con.prepareStatement(query)) {</span>
+
+<span class="fc" id="L69">            ps.setString(1, email);</span>
+
+<span class="fc" id="L71">            try (ResultSet rs = ps.executeQuery()) {</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">                if (rs.next()) {</span>
+<span class="fc" id="L73">                    return mapRowToDropPoint(rs);</span>
+                }
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">            }</span>
+<span class="pc bpc" id="L76" title="2 of 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L77">            e.printStackTrace();</span>
+<span class="nc" id="L78">        }</span>
+<span class="nc" id="L79">        return null;</span>
+    }
+
+    public List&lt;DropPoint&gt; doRetrieveAllApprovati() {
+<span class="fc" id="L83">        List&lt;DropPoint&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L84">        String query = &quot;SELECT * FROM drop_point WHERE stato = 'APPROVATO'&quot;;</span>
+
+<span class="fc" id="L86">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L87">             PreparedStatement ps = con.prepareStatement(query);</span>
+<span class="fc" id="L88">             ResultSet rs = ps.executeQuery()) {</span>
+
+<span class="fc bfc" id="L90" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L91">                list.add(mapRowToDropPoint(rs));</span>
+            }
+<span class="nc" id="L93">        } catch (SQLException e) {</span>
+<span class="nc" id="L94">            e.printStackTrace();</span>
+<span class="fc" id="L95">        }</span>
+<span class="fc" id="L96">        return list;</span>
+    }
+
+    /** Tutti i Drop-Point con un certo stato (per l’admin). */
+    public List&lt;DropPoint&gt; doRetrieveByStato(StatoDropPoint stato) {
+<span class="nc" id="L101">        List&lt;DropPoint&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L102">        String query = &quot;SELECT * FROM drop_point WHERE stato = ? ORDER BY id DESC&quot;;</span>
+
+<span class="nc" id="L104">        try (Connection con = ConPool.getConnection();</span>
+<span class="nc" id="L105">             PreparedStatement ps = con.prepareStatement(query)) {</span>
+
+<span class="nc" id="L107">            ps.setString(1, stato.toString());</span>
+
+<span class="nc" id="L109">            try (ResultSet rs = ps.executeQuery()) {</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">                while (rs.next()) {</span>
+<span class="nc" id="L111">                    list.add(mapRowToDropPoint(rs));</span>
+                }
+            }
+<span class="nc" id="L114">        } catch (SQLException e) {</span>
+<span class="nc" id="L115">            e.printStackTrace();</span>
+<span class="nc" id="L116">        }</span>
+<span class="nc" id="L117">        return list;</span>
+    }
+
+    /** Cambia lo stato di un Drop-Point (IN_ATTESA → APPROVATO/RIFIUTATO). */
+    public boolean updateStato(long id, StatoDropPoint nuovoStato) {
+<span class="fc" id="L122">        String query = &quot;UPDATE drop_point SET stato = ? WHERE id = ?&quot;;</span>
+
+<span class="fc" id="L124">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L125">             PreparedStatement ps = con.prepareStatement(query)) {</span>
+
+<span class="fc" id="L127">            ps.setString(1, nuovoStato.toString());</span>
+<span class="fc" id="L128">            ps.setLong(2, id);</span>
+
+<span class="fc" id="L130">            int updated = ps.executeUpdate();</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">            return updated &gt; 0;</span>
+
+<span class="nc" id="L133">        } catch (SQLException e) {</span>
+<span class="nc" id="L134">            e.printStackTrace();</span>
+        }
+<span class="nc" id="L136">        return false;</span>
+    }
+
+    private DropPoint mapRowToDropPoint(ResultSet rs) throws SQLException {
+<span class="fc" id="L140">        DropPoint dp = new DropPoint();</span>
+<span class="fc" id="L141">        dp.setId(rs.getLong(&quot;id&quot;));</span>
+<span class="fc" id="L142">        dp.setNomeAttivita(rs.getString(&quot;nome_attivita&quot;));</span>
+<span class="fc" id="L143">        dp.setEmail(rs.getString(&quot;email&quot;));</span>
+<span class="fc" id="L144">        dp.setPasswordHash(rs.getString(&quot;password_hash&quot;));</span>
+<span class="fc" id="L145">        dp.setIndirizzo(rs.getString(&quot;indirizzo&quot;));</span>
+<span class="fc" id="L146">        dp.setCitta(rs.getString(&quot;citta&quot;));</span>
+<span class="fc" id="L147">        dp.setProvincia(rs.getString(&quot;provincia&quot;));</span>
+<span class="fc" id="L148">        dp.setTelefono(rs.getString(&quot;telefono&quot;));</span>
+<span class="fc" id="L149">        dp.setOrariApertura(rs.getString(&quot;orari_apertura&quot;));</span>
+<span class="fc" id="L150">        dp.setDescrizione(rs.getString(&quot;descrizione&quot;));</span>
+
+        // immagine BLOB + content-type
+<span class="fc" id="L153">        dp.setImmagine(rs.getBytes(&quot;immagine&quot;));</span>
+<span class="fc" id="L154">        dp.setImmagineContentType(rs.getString(&quot;immagine_content_type&quot;));</span>
+
+<span class="fc" id="L156">        dp.setLatitudine(rs.getObject(&quot;latitudine&quot;, Double.class));</span>
+<span class="fc" id="L157">        dp.setLongitudine(rs.getObject(&quot;longitudine&quot;, Double.class));</span>
+<span class="fc" id="L158">        dp.setRitiriEffettuati(rs.getInt(&quot;ritiri_effettuati&quot;));</span>
+
+        try {
+<span class="fc" id="L161">            dp.setStato(StatoDropPoint.valueOf(rs.getString(&quot;stato&quot;)));</span>
+<span class="nc" id="L162">        } catch (IllegalArgumentException | NullPointerException e) {</span>
+<span class="nc" id="L163">            dp.setStato(StatoDropPoint.IN_ATTESA);</span>
+<span class="fc" id="L164">        }</span>
+
+<span class="fc" id="L166">        return dp;</span>
+    }
+
+    public DropPoint doRetrieveById(long id) {
+<span class="fc" id="L170">        String query = &quot;SELECT * FROM drop_point WHERE id = ?&quot;;</span>
+<span class="fc" id="L171">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L172">             PreparedStatement ps = con.prepareStatement(query)) {</span>
+<span class="fc" id="L173">            ps.setLong(1, id);</span>
+<span class="fc" id="L174">            try (ResultSet rs = ps.executeQuery()) {</span>
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">                if (rs.next()) {</span>
+<span class="fc" id="L176">                    return mapRowToDropPoint(rs);</span>
+                }
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">            }</span>
+<span class="pc bpc" id="L179" title="2 of 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L180">            e.printStackTrace();</span>
+<span class="nc" id="L181">        }</span>
+<span class="nc" id="L182">        return null;</span>
+    }
+    public boolean updateProfilo(DropPoint dp) {
+<span class="fc" id="L185">        String sql = &quot;UPDATE drop_point SET &quot; +</span>
+                &quot;nome_attivita = ?, &quot; +
+                &quot;email = ?, &quot; +
+                &quot;indirizzo = ?, &quot; +
+                &quot;citta = ?, &quot; +
+                &quot;provincia = ?, &quot; +
+                &quot;telefono = ?, &quot; +
+                &quot;orari_apertura = ?, &quot; +
+                &quot;immagine = ?, &quot; +
+                &quot;immagine_content_type = ? &quot; +
+                &quot;WHERE id = ?&quot;;
+
+<span class="fc" id="L197">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L198">             PreparedStatement ps = con.prepareStatement(sql)) {</span>
+
+<span class="fc" id="L200">            ps.setString(1, dp.getNomeAttivita());</span>
+<span class="fc" id="L201">            ps.setString(2, dp.getEmail());</span>
+<span class="fc" id="L202">            ps.setString(3, dp.getIndirizzo());</span>
+<span class="fc" id="L203">            ps.setString(4, dp.getCitta());</span>
+<span class="fc" id="L204">            ps.setString(5, dp.getProvincia());</span>
+<span class="fc" id="L205">            ps.setString(6, dp.getTelefono());</span>
+<span class="fc" id="L206">            ps.setString(7, dp.getOrariApertura());</span>
+
+<span class="pc bpc" id="L208" title="2 of 4 branches missed.">            if (dp.getImmagine() != null &amp;&amp; dp.getImmagine().length &gt; 0) {</span>
+<span class="fc" id="L209">                ps.setBytes(8, dp.getImmagine());</span>
+<span class="fc" id="L210">                ps.setString(9, dp.getImmagineContentType());</span>
+            } else {
+<span class="nc" id="L212">                ps.setNull(8, Types.BLOB);</span>
+<span class="nc" id="L213">                ps.setNull(9, Types.VARCHAR);</span>
+            }
+
+<span class="fc" id="L216">            ps.setLong(10, dp.getId());</span>
+
+<span class="pc bpc" id="L218" title="1 of 2 branches missed.">            return ps.executeUpdate() &gt; 0;</span>
+<span class="nc" id="L219">        } catch (SQLException e) {</span>
+<span class="nc" id="L220">            e.printStackTrace();</span>
+<span class="nc" id="L221">            return false;</span>
+        }
+    }
+    public boolean doDeleteById(long id) {
+<span class="fc" id="L225">        String sql = &quot;DELETE FROM drop_point WHERE id = ?&quot;;</span>
+<span class="fc" id="L226">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L227">             PreparedStatement ps = con.prepareStatement(sql)) {</span>
+<span class="fc" id="L228">            ps.setLong(1, id);</span>
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">            return ps.executeUpdate() == 1;</span>
+<span class="nc" id="L230">        } catch (SQLException e) {</span>
+<span class="nc" id="L231">            e.printStackTrace();</span>
+<span class="nc" id="L232">            return false;</span>
+        }
+    }
+
+    public boolean doUpdateProfilo(DropPoint dp) {
+<span class="nc" id="L237">        String sql = &quot;UPDATE drop_point &quot; +</span>
+                &quot;SET nome_attivita = ?, &quot; +
+                &quot;    indirizzo = ?, &quot; +
+                &quot;    citta = ?, &quot; +
+                &quot;    provincia = ?, &quot; +
+                &quot;    telefono = ?, &quot; +
+                &quot;    orari_apertura = ?, &quot; +
+                &quot;    immagine = ?, &quot; +
+                &quot;    immagine_content_type = ? &quot; +
+                &quot;WHERE id = ?&quot;;
+
+<span class="nc" id="L248">        try (Connection con = ConPool.getConnection();</span>
+<span class="nc" id="L249">             PreparedStatement ps = con.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L251">            ps.setString(1, dp.getNomeAttivita());</span>
+<span class="nc" id="L252">            ps.setString(2, dp.getIndirizzo());</span>
+<span class="nc" id="L253">            ps.setString(3, dp.getCitta());</span>
+<span class="nc" id="L254">            ps.setString(4, dp.getProvincia());</span>
+<span class="nc" id="L255">            ps.setString(5, dp.getTelefono());</span>
+<span class="nc" id="L256">            ps.setString(6, dp.getOrariApertura());</span>
+
+<span class="nc bnc" id="L258" title="All 4 branches missed.">            if (dp.getImmagine() != null &amp;&amp; dp.getImmagine().length &gt; 0) {</span>
+<span class="nc" id="L259">                ps.setBytes(7, dp.getImmagine());</span>
+<span class="nc" id="L260">                ps.setString(8, dp.getImmagineContentType());</span>
+            } else {
+<span class="nc" id="L262">                ps.setNull(7, java.sql.Types.BLOB);</span>
+<span class="nc" id="L263">                ps.setNull(8, java.sql.Types.VARCHAR);</span>
+            }
+
+<span class="nc" id="L266">            ps.setLong(9, dp.getId());</span>
+
+<span class="nc bnc" id="L268" title="All 2 branches missed.">            return ps.executeUpdate() &gt; 0;</span>
+<span class="nc" id="L269">        } catch (SQLException e) {</span>
+<span class="nc" id="L270">            e.printStackTrace();</span>
+<span class="nc" id="L271">            return false;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreaSegnalazioneServlet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">CreaSegnalazioneServlet.java</span></div><h1>CreaSegnalazioneServlet.java</h1><pre class="source lang-java linenums">package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneAnimale;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.CategoriaOggetto;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoSegnalazione;
+import model.bean.enums.TipoSegnalazione;
+import model.service.DropPointService;
+import model.service.SegnalazioneService;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+@WebServlet(name = &quot;CreaSegnalazioneServlet&quot;, value = &quot;/crea-segnalazione&quot;)
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2,
+        maxFileSize = 1024 * 1024 * 10,
+        maxRequestSize = 1024 * 1024 * 50
+)
+<span class="fc" id="L36">public class CreaSegnalazioneServlet extends HttpServlet {</span>
+
+<span class="fc" id="L38">    private final DropPointService dropPointService = new DropPointService();</span>
+<span class="fc" id="L39">    private final SegnalazioneService segnalazioneService = new SegnalazioneService();</span>
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
+
+<span class="fc" id="L45">        HttpSession session = request.getSession(false);</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">        Utente utente = (session != null) ? (Utente) session.getAttribute(&quot;utente&quot;) : null;</span>
+
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">        if (utente == null) {</span>
+<span class="nc" id="L49">            response.sendRedirect(request.getContextPath() + &quot;/login&quot;);</span>
+<span class="nc" id="L50">            return;</span>
+        }
+
+<span class="fc" id="L53">        request.setAttribute(&quot;listaDropPoint&quot;, dropPointService.findAllApprovati());</span>
+<span class="fc" id="L54">        request.getRequestDispatcher(&quot;/WEB-INF/jsp/crea_segnalazione.jsp&quot;)</span>
+<span class="fc" id="L55">                .forward(request, response);</span>
+<span class="fc" id="L56">    }</span>
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
+
+<span class="fc" id="L62">        HttpSession session = request.getSession(false);</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        Utente utente = (session != null) ? (Utente) session.getAttribute(&quot;utente&quot;) : null;</span>
+
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">        if (utente == null) {</span>
+<span class="nc" id="L66">            response.sendRedirect(request.getContextPath() + &quot;/login&quot;);</span>
+<span class="nc" id="L67">            return;</span>
+        }
+
+        try {
+<span class="fc" id="L71">            String tipo = request.getParameter(&quot;tipo_segnalazione&quot;);</span>
+<span class="fc" id="L72">            String titolo = request.getParameter(&quot;titolo&quot;);</span>
+<span class="fc" id="L73">            String descrizione = request.getParameter(&quot;descrizione&quot;);</span>
+<span class="fc" id="L74">            String dataStr = request.getParameter(&quot;dataRitrovamento&quot;);</span>
+<span class="fc" id="L75">            String luogo = request.getParameter(&quot;luogo_ritrovamento&quot;);</span>
+<span class="fc" id="L76">            String citta = request.getParameter(&quot;citta&quot;);</span>
+<span class="fc" id="L77">            String provincia = request.getParameter(&quot;provincia&quot;);</span>
+<span class="fc" id="L78">            String domanda1 = request.getParameter(&quot;domanda1&quot;);</span>
+<span class="fc" id="L79">            String domanda2 = request.getParameter(&quot;domanda2&quot;);</span>
+
+<span class="pc bpc" id="L81" title="2 of 4 branches missed.">            if (dataStr != null &amp;&amp; !dataStr.isEmpty()) {</span>
+                LocalDate checkDate;
+<span class="fc bfc" id="L83" title="All 2 branches covered.">                if (dataStr.contains(&quot;T&quot;)) {</span>
+<span class="fc" id="L84">                    checkDate = LocalDateTime.parse(dataStr).toLocalDate();</span>
+                } else {
+<span class="fc" id="L86">                    checkDate = LocalDate.parse(dataStr);</span>
+                }
+<span class="fc" id="L88">                int checkYear = checkDate.getYear();</span>
+<span class="fc" id="L89">                int currentYear = LocalDate.now().getYear();</span>
+
+<span class="pc bpc" id="L91" title="1 of 4 branches missed.">                if (checkYear &lt; 2000 || checkYear &gt; currentYear) {</span>
+<span class="fc" id="L92">                    request.setAttribute(&quot;listaDropPoint&quot;, dropPointService.findAllApprovati());</span>
+<span class="fc" id="L93">                    request.setAttribute(&quot;errore&quot;, &quot;La data deve essere compresa tra il 01/01/2000 e l'anno corrente.&quot;);</span>
+<span class="fc" id="L94">                    request.getRequestDispatcher(&quot;/WEB-INF/jsp/crea_segnalazione.jsp&quot;)</span>
+<span class="fc" id="L95">                            .forward(request, response);</span>
+<span class="fc" id="L96">                    return;</span>
+                }
+            }
+
+            Segnalazione segnalazione;
+
+<span class="fc bfc" id="L102" title="All 2 branches covered.">            if (&quot;OGGETTO&quot;.equalsIgnoreCase(tipo)) {</span>
+<span class="fc" id="L103">                SegnalazioneOggetto so = new SegnalazioneOggetto();</span>
+
+<span class="fc" id="L105">                String categoriaStr = request.getParameter(&quot;categoria&quot;);</span>
+<span class="pc bpc" id="L106" title="1 of 4 branches missed.">                if (categoriaStr != null &amp;&amp; !categoriaStr.isEmpty()) {</span>
+                    try {
+<span class="fc" id="L108">                        so.setCategoria(CategoriaOggetto.valueOf(categoriaStr));</span>
+<span class="nc" id="L109">                    } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L110">                        so.setCategoria(CategoriaOggetto.ALTRO);</span>
+<span class="pc" id="L111">                    }</span>
+                } else {
+<span class="fc" id="L113">                    so.setCategoria(CategoriaOggetto.ALTRO);</span>
+                }
+
+<span class="fc" id="L116">                String modalitaStr = request.getParameter(&quot;modalita_consegna&quot;);</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">                if (&quot;DROP_POINT&quot;.equals(modalitaStr)) {</span>
+<span class="fc" id="L118">                    so.setModalitaConsegna(ModalitaConsegna.DROP_POINT);</span>
+<span class="fc" id="L119">                    String idDpStr = request.getParameter(&quot;idDropPoint&quot;);</span>
+<span class="pc bpc" id="L120" title="2 of 4 branches missed.">                    if (idDpStr != null &amp;&amp; !idDpStr.isEmpty()) {</span>
+<span class="fc" id="L121">                        so.setIdDropPoint(Long.parseLong(idDpStr));</span>
+                    }
+<span class="fc" id="L123">                } else {</span>
+<span class="fc" id="L124">                    so.setModalitaConsegna(ModalitaConsegna.DIRETTA);</span>
+<span class="fc" id="L125">                    so.setIdDropPoint(null);</span>
+                }
+
+<span class="fc" id="L128">                so.setTipoSegnalazione(TipoSegnalazione.OGGETTO);</span>
+<span class="fc" id="L129">                segnalazione = so;</span>
+
+<span class="fc" id="L131">            } else {</span>
+<span class="fc" id="L132">                SegnalazioneAnimale sa = new SegnalazioneAnimale();</span>
+<span class="fc" id="L133">                sa.setSpecie(request.getParameter(&quot;specie&quot;));</span>
+<span class="fc" id="L134">                sa.setRazza(request.getParameter(&quot;razza&quot;));</span>
+<span class="fc" id="L135">                sa.setTipoSegnalazione(TipoSegnalazione.ANIMALE);</span>
+<span class="fc" id="L136">                segnalazione = sa;</span>
+            }
+
+<span class="fc" id="L139">            segnalazione.setIdUtente(utente.getId());</span>
+<span class="fc" id="L140">            segnalazione.setTitolo(titolo);</span>
+<span class="fc" id="L141">            segnalazione.setDescrizione(descrizione);</span>
+<span class="fc" id="L142">            segnalazione.setLuogoRitrovamento(luogo);</span>
+<span class="fc" id="L143">            segnalazione.setCitta(citta);</span>
+<span class="fc" id="L144">            segnalazione.setProvincia(provincia);</span>
+<span class="fc" id="L145">            segnalazione.setDomandaVerifica1(domanda1);</span>
+<span class="fc" id="L146">            segnalazione.setDomandaVerifica2(domanda2);</span>
+<span class="fc" id="L147">            segnalazione.setStato(StatoSegnalazione.APERTA);</span>
+<span class="fc" id="L148">            segnalazione.setDataPubblicazione(new Timestamp(System.currentTimeMillis()));</span>
+
+<span class="pc bpc" id="L150" title="2 of 4 branches missed.">            if (dataStr != null &amp;&amp; !dataStr.isEmpty()) {</span>
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">                if (dataStr.contains(&quot;T&quot;)) {</span>
+<span class="fc" id="L152">                    LocalDateTime dt = LocalDateTime.parse(dataStr);</span>
+<span class="fc" id="L153">                    segnalazione.setDataRitrovamento(Timestamp.valueOf(dt));</span>
+<span class="fc" id="L154">                } else {</span>
+<span class="nc" id="L155">                    LocalDate date = LocalDate.parse(dataStr);</span>
+<span class="nc" id="L156">                    segnalazione.setDataRitrovamento(</span>
+<span class="nc" id="L157">                            Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)));</span>
+                }
+            }
+
+<span class="fc" id="L161">            Part filePart = null;</span>
+            try {
+<span class="fc" id="L163">                filePart = request.getPart(&quot;immagine&quot;);</span>
+<span class="nc" id="L164">            } catch (IllegalStateException | ServletException e) {</span>
+<span class="fc" id="L165">            }</span>
+
+<span class="pc bpc" id="L167" title="1 of 4 branches missed.">            if (filePart != null &amp;&amp; filePart.getSize() &gt; 0) {</span>
+<span class="fc" id="L168">                try (InputStream is = filePart.getInputStream()) {</span>
+<span class="fc" id="L169">                    byte[] bytes = is.readAllBytes();</span>
+<span class="fc" id="L170">                    segnalazione.setImmagine(bytes);</span>
+<span class="fc" id="L171">                    segnalazione.setImmagineContentType(filePart.getContentType());</span>
+                }
+            } else {
+<span class="fc" id="L174">                segnalazione.setImmagine(null);</span>
+<span class="fc" id="L175">                segnalazione.setImmagineContentType(null);</span>
+            }
+
+<span class="fc" id="L178">            boolean successo = segnalazioneService.creaSegnalazione(segnalazione);</span>
+
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">            if (successo) {</span>
+<span class="fc" id="L181">                response.setContentType(&quot;text/html;charset=UTF-8&quot;);</span>
+<span class="fc" id="L182">                PrintWriter out = response.getWriter();</span>
+
+<span class="fc" id="L184">                out.println(&quot;&lt;!DOCTYPE html&gt;&quot;);</span>
+<span class="fc" id="L185">                out.println(&quot;&lt;html&gt;&lt;body&gt;&quot;);</span>
+<span class="fc" id="L186">                out.println(&quot;&lt;script type='text/javascript'&gt;&quot;);</span>
+<span class="fc" id="L187">                out.println(&quot;alert('Segnalazione pubblicata con successo');&quot;);</span>
+<span class="fc" id="L188">                out.println(&quot;window.location.href = '&quot; + request.getContextPath() + &quot;/Index';&quot;);</span>
+<span class="fc" id="L189">                out.println(&quot;&lt;/script&gt;&quot;);</span>
+<span class="fc" id="L190">                out.println(&quot;&lt;/body&gt;&lt;/html&gt;&quot;);</span>
+
+                // Nota: response.sendRedirect qui sotto verrà probabilmente ignorato o causerà errore
+                // dopo aver scritto con PrintWriter, ma l'ho lasciato come richiesdto.
+<span class="fc" id="L194">                response.sendRedirect(request.getContextPath() + &quot;/index?msg=success_segnalazione&quot;);</span>
+<span class="fc" id="L195">            } else {</span>
+<span class="nc" id="L196">                request.setAttribute(&quot;listaDropPoint&quot;, dropPointService.findAllApprovati());</span>
+<span class="nc" id="L197">                request.setAttribute(&quot;errore&quot;, &quot;Errore nel salvataggio. Controlla i dati inseriti.&quot;);</span>
+<span class="nc" id="L198">                request.getRequestDispatcher(&quot;/WEB-INF/jsp/crea_segnalazione.jsp&quot;)</span>
+<span class="nc" id="L199">                        .forward(request, response);</span>
+            }
+
+<span class="fc" id="L202">        } catch (Exception e) {</span>
+<span class="fc" id="L203">            e.printStackTrace();</span>
+<span class="fc" id="L204">            request.setAttribute(&quot;listaDropPoint&quot;, dropPointService.findAllApprovati());</span>
+<span class="fc" id="L205">            request.setAttribute(&quot;errore&quot;, &quot;L'immagine inserita è troppo grande (max 10Mb).&quot;);</span>
+<span class="fc" id="L206">            request.getRequestDispatcher(&quot;/WEB-INF/jsp/crea_segnalazione.jsp&quot;)</span>
+<span class="fc" id="L207">                    .forward(request, response);</span>
+<span class="fc" id="L208">        }</span>
+<span class="fc" id="L209">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

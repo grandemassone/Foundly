@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SegnalazioneDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">model.dao</a> &gt; <span class="el_source">SegnalazioneDAO.java</span></div><h1>SegnalazioneDAO.java</h1><pre class="source lang-java linenums">package model.dao;
+
+import model.ConPool;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneAnimale;
+import model.bean.SegnalazioneOggetto;
+import model.bean.enums.CategoriaOggetto;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoSegnalazione;
+import model.bean.enums.TipoSegnalazione;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+<span class="fc" id="L16">public class SegnalazioneDAO {</span>
+
+    public boolean updateStato(long id, StatoSegnalazione nuovoStato) {
+<span class="fc" id="L19">        String query = &quot;UPDATE segnalazione SET stato = ? WHERE id = ?&quot;;</span>
+<span class="fc" id="L20">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L21">             PreparedStatement ps = con.prepareStatement(query)) {</span>
+<span class="fc" id="L22">            ps.setString(1, nuovoStato.toString());</span>
+<span class="fc" id="L23">            ps.setLong(2, id);</span>
+<span class="pc bpc" id="L24" title="1 of 2 branches missed.">            return ps.executeUpdate() &gt; 0;</span>
+<span class="nc" id="L25">        } catch (SQLException e) {</span>
+<span class="nc" id="L26">            e.printStackTrace();</span>
+<span class="nc" id="L27">            return false;</span>
+        }
+    }
+
+    public boolean doSave(Segnalazione s) {
+<span class="fc" id="L32">        String sqlPadre =</span>
+                &quot;INSERT INTO segnalazione (&quot; +
+                        &quot;id_utente, titolo, descrizione, data_ritrovamento, &quot; +
+                        &quot;luogo_ritrovamento, citta, provincia, latitudine, longitudine, &quot; +
+                        &quot;immagine, immagine_content_type, &quot; +
+                        &quot;domanda_verifica1, domanda_verifica2, stato, tipo_segnalazione&quot; +
+                        &quot;) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&quot;;
+
+<span class="fc" id="L40">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L41">             PreparedStatement psPadre = con.prepareStatement(sqlPadre, Statement.RETURN_GENERATED_KEYS)) {</span>
+
+<span class="fc" id="L43">            con.setAutoCommit(false);</span>
+
+<span class="fc" id="L45">            psPadre.setLong(1, s.getIdUtente());</span>
+<span class="fc" id="L46">            psPadre.setString(2, s.getTitolo());</span>
+<span class="fc" id="L47">            psPadre.setString(3, s.getDescrizione());</span>
+<span class="fc" id="L48">            psPadre.setTimestamp(4, s.getDataRitrovamento());</span>
+<span class="fc" id="L49">            psPadre.setString(5, s.getLuogoRitrovamento());</span>
+<span class="fc" id="L50">            psPadre.setString(6, s.getCitta());</span>
+<span class="fc" id="L51">            psPadre.setString(7, s.getProvincia());</span>
+<span class="fc" id="L52">            psPadre.setObject(8, s.getLatitudine());</span>
+<span class="fc" id="L53">            psPadre.setObject(9, s.getLongitudine());</span>
+
+<span class="pc bpc" id="L55" title="1 of 4 branches missed.">            if (s.getImmagine() != null &amp;&amp; s.getImmagine().length &gt; 0) {</span>
+<span class="fc" id="L56">                psPadre.setBytes(10, s.getImmagine());</span>
+<span class="fc" id="L57">                psPadre.setString(11, s.getImmagineContentType());</span>
+            } else {
+<span class="fc" id="L59">                psPadre.setNull(10, Types.BLOB);</span>
+<span class="fc" id="L60">                psPadre.setNull(11, Types.VARCHAR);</span>
+            }
+
+<span class="fc" id="L63">            psPadre.setString(12, s.getDomandaVerifica1());</span>
+<span class="fc" id="L64">            psPadre.setString(13, s.getDomandaVerifica2());</span>
+<span class="fc" id="L65">            psPadre.setString(14, s.getStato().toString());</span>
+<span class="fc" id="L66">            psPadre.setString(15, s.getTipoSegnalazione().toString());</span>
+
+<span class="fc" id="L68">            int result = psPadre.executeUpdate();</span>
+
+<span class="fc bfc" id="L70" title="All 2 branches covered.">            if (result &gt; 0) {</span>
+<span class="fc" id="L71">                try (ResultSet generatedKeys = psPadre.getGeneratedKeys()) {</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">                    if (generatedKeys.next()) {</span>
+<span class="fc" id="L73">                        long id = generatedKeys.getLong(1);</span>
+<span class="fc" id="L74">                        s.setId(id);</span>
+
+<span class="fc bfc" id="L76" title="All 2 branches covered.">                        if (s instanceof SegnalazioneOggetto) {</span>
+<span class="fc" id="L77">                            saveOggetto(con, (SegnalazioneOggetto) s);</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">                        } else if (s instanceof SegnalazioneAnimale) {</span>
+<span class="fc" id="L79">                            saveAnimale(con, (SegnalazioneAnimale) s);</span>
+                        }
+
+<span class="fc" id="L82">                        con.commit();</span>
+<span class="fc" id="L83">                        return true;</span>
+                    }
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">                }</span>
+            }
+<span class="fc" id="L87">            con.rollback();</span>
+<span class="pc bpc" id="L88" title="2 of 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L89">            e.printStackTrace();</span>
+<span class="fc" id="L90">        }</span>
+<span class="fc" id="L91">        return false;</span>
+    }
+
+    private void saveOggetto(Connection con, SegnalazioneOggetto so) throws SQLException {
+<span class="fc" id="L95">        String sql = &quot;INSERT INTO segnalazione_oggetto &quot; +</span>
+                &quot;(id_segnalazione, categoria, modalita_consegna, id_drop_point) &quot; +
+                &quot;VALUES (?, ?, ?, ?)&quot;;
+<span class="fc" id="L98">        try (PreparedStatement ps = con.prepareStatement(sql)) {</span>
+<span class="fc" id="L99">            ps.setLong(1, so.getId());</span>
+<span class="fc" id="L100">            ps.setString(2, so.getCategoria().toString());</span>
+<span class="fc" id="L101">            ps.setString(3, so.getModalitaConsegna().toString());</span>
+<span class="fc" id="L102">            ps.setObject(4, so.getIdDropPoint());</span>
+<span class="fc" id="L103">            ps.executeUpdate();</span>
+        }
+<span class="fc" id="L105">    }</span>
+
+    private void saveAnimale(Connection con, SegnalazioneAnimale sa) throws SQLException {
+<span class="fc" id="L108">        String sql = &quot;INSERT INTO segnalazione_animale &quot; +</span>
+                &quot;(id_segnalazione, specie, razza) VALUES (?, ?, ?)&quot;;
+<span class="fc" id="L110">        try (PreparedStatement ps = con.prepareStatement(sql)) {</span>
+<span class="fc" id="L111">            ps.setLong(1, sa.getId());</span>
+<span class="fc" id="L112">            ps.setString(2, sa.getSpecie());</span>
+<span class="fc" id="L113">            ps.setString(3, sa.getRazza());</span>
+<span class="fc" id="L114">            ps.executeUpdate();</span>
+        }
+<span class="fc" id="L116">    }</span>
+
+    /**
+     * Recupera le ultime segnalazioni per la HOME.
+     * FILTRO: Solo segnalazioni 'APERTA'. Quelle CHIUSE non si vedono.
+     */
+    public List&lt;Segnalazione&gt; doRetrieveLatest(int limit) {
+<span class="fc" id="L123">        List&lt;Segnalazione&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L124">        String query = &quot;SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza &quot; +</span>
+                &quot;FROM segnalazione s &quot; +
+                &quot;LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione &quot; +
+                &quot;LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione &quot; +
+                &quot;WHERE s.stato = 'APERTA' &quot; + // &lt;--- QUESTA RIGA FA LA MAGIA
+                &quot;ORDER BY s.data_pubblicazione DESC LIMIT ?&quot;;
+
+<span class="fc" id="L131">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L132">             PreparedStatement ps = con.prepareStatement(query)) {</span>
+<span class="fc" id="L133">            ps.setInt(1, limit);</span>
+<span class="fc" id="L134">            try (ResultSet rs = ps.executeQuery()) {</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">                while (rs.next()) {</span>
+<span class="fc" id="L136">                    list.add(mapRow(rs));</span>
+                }
+            }
+<span class="nc" id="L139">        } catch (SQLException e) {</span>
+<span class="nc" id="L140">            e.printStackTrace();</span>
+<span class="fc" id="L141">        }</span>
+<span class="fc" id="L142">        return list;</span>
+    }
+
+    public Segnalazione doRetrieveById(long id) {
+<span class="fc" id="L146">        String query = &quot;SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza &quot; +</span>
+                &quot;FROM segnalazione s &quot; +
+                &quot;LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione &quot; +
+                &quot;LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione &quot; +
+                &quot;WHERE s.id = ?&quot;;
+<span class="fc" id="L151">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L152">             PreparedStatement ps = con.prepareStatement(query)) {</span>
+<span class="fc" id="L153">            ps.setLong(1, id);</span>
+<span class="fc" id="L154">            try (ResultSet rs = ps.executeQuery()) {</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">                if (rs.next()) return mapRow(rs);</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">            }</span>
+<span class="pc bpc" id="L157" title="2 of 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L158">            e.printStackTrace();</span>
+<span class="nc" id="L159">        }</span>
+<span class="nc" id="L160">        return null;</span>
+    }
+
+    /**
+     * Recupera le segnalazioni di un utente specifico (Storico Personale).
+     * QUI NON FILTRIAMO: L'utente deve poter vedere anche le sue segnalazioni CHIUSE.
+     */
+    public List&lt;Segnalazione&gt; doRetrieveByUtente(long idUtente) {
+<span class="fc" id="L168">        List&lt;Segnalazione&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L169">        String query = &quot;SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza &quot; +</span>
+                &quot;FROM segnalazione s &quot; +
+                &quot;LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione &quot; +
+                &quot;LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione &quot; +
+                &quot;WHERE s.id_utente = ? ORDER BY s.data_pubblicazione DESC&quot;;
+<span class="fc" id="L174">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L175">             PreparedStatement ps = con.prepareStatement(query)) {</span>
+<span class="fc" id="L176">            ps.setLong(1, idUtente);</span>
+<span class="fc" id="L177">            try (ResultSet rs = ps.executeQuery()) {</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">                while (rs.next()) {</span>
+<span class="fc" id="L179">                    list.add(mapRow(rs));</span>
+                }
+            }
+<span class="nc" id="L182">        } catch (SQLException e) {</span>
+<span class="nc" id="L183">            e.printStackTrace();</span>
+<span class="fc" id="L184">        }</span>
+<span class="fc" id="L185">        return list;</span>
+    }
+
+    public boolean doDelete(long id) {
+<span class="fc" id="L189">        try (Connection con = ConPool.getConnection()) {</span>
+<span class="fc" id="L190">            con.setAutoCommit(false);</span>
+
+            // se hai tabella reclamo con FK su segnalazione
+<span class="fc" id="L193">            try (PreparedStatement ps = con.prepareStatement(&quot;DELETE FROM reclamo WHERE id_segnalazione = ?&quot;)) {</span>
+<span class="fc" id="L194">                ps.setLong(1, id);</span>
+<span class="fc" id="L195">                ps.executeUpdate();</span>
+<span class="pc" id="L196">            } catch (SQLException ignored) {}</span>
+
+<span class="fc" id="L198">            try (PreparedStatement ps = con.prepareStatement(&quot;DELETE FROM segnalazione_oggetto WHERE id_segnalazione = ?&quot;)) {</span>
+<span class="fc" id="L199">                ps.setLong(1, id);</span>
+<span class="fc" id="L200">                ps.executeUpdate();</span>
+            }
+
+<span class="fc" id="L203">            try (PreparedStatement ps = con.prepareStatement(&quot;DELETE FROM segnalazione_animale WHERE id_segnalazione = ?&quot;)) {</span>
+<span class="fc" id="L204">                ps.setLong(1, id);</span>
+<span class="fc" id="L205">                ps.executeUpdate();</span>
+            }
+
+            int deleted;
+<span class="fc" id="L209">            try (PreparedStatement ps = con.prepareStatement(&quot;DELETE FROM segnalazione WHERE id = ?&quot;)) {</span>
+<span class="fc" id="L210">                ps.setLong(1, id);</span>
+<span class="fc" id="L211">                deleted = ps.executeUpdate();</span>
+            }
+
+<span class="fc" id="L214">            con.commit();</span>
+<span class="pc bpc" id="L215" title="1 of 2 branches missed.">            return deleted &gt; 0;</span>
+
+<span class="nc" id="L217">        } catch (SQLException e) {</span>
+<span class="nc" id="L218">            e.printStackTrace();</span>
+<span class="nc" id="L219">            return false;</span>
+        }
+    }
+
+
+    /**
+     * Ricerca Pubblica.
+     * FILTRO: Solo segnalazioni 'APERTA'.
+     */
+    public List&lt;Segnalazione&gt; doRetrieveByFiltri(String queryTesto, String tipo, String categoria) {
+<span class="fc" id="L229">        StringBuilder sql = new StringBuilder(</span>
+                &quot;SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza &quot; +
+                        &quot;FROM segnalazione s &quot; +
+                        &quot;LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione &quot; +
+                        &quot;LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione &quot; +
+                        &quot;WHERE s.stato = 'APERTA'&quot;); // &lt;--- ANCHE QUI LA MAGIA
+
+<span class="fc" id="L236">        List&lt;Object&gt; params = new ArrayList&lt;&gt;();</span>
+
+<span class="pc bpc" id="L238" title="1 of 4 branches missed.">        if (queryTesto != null &amp;&amp; !queryTesto.trim().isEmpty()) {</span>
+<span class="fc" id="L239">            sql.append(&quot; AND (s.titolo LIKE ? OR s.descrizione LIKE ? OR s.luogo_ritrovamento LIKE ?)&quot;);</span>
+<span class="fc" id="L240">            String likeQuery = &quot;%&quot; + queryTesto + &quot;%&quot;;</span>
+<span class="fc" id="L241">            params.add(likeQuery);</span>
+<span class="fc" id="L242">            params.add(likeQuery);</span>
+<span class="fc" id="L243">            params.add(likeQuery);</span>
+        }
+
+<span class="pc bpc" id="L246" title="1 of 4 branches missed.">        if (tipo != null &amp;&amp; !tipo.trim().isEmpty()) {</span>
+<span class="fc" id="L247">            sql.append(&quot; AND s.tipo_segnalazione = ?&quot;);</span>
+<span class="fc" id="L248">            params.add(tipo.toUpperCase());</span>
+        }
+
+<span class="pc bpc" id="L251" title="1 of 4 branches missed.">        if (categoria != null &amp;&amp; !categoria.trim().isEmpty()) {</span>
+<span class="fc" id="L252">            sql.append(&quot; AND so.categoria = ?&quot;);</span>
+<span class="fc" id="L253">            params.add(categoria.toUpperCase());</span>
+        }
+
+<span class="fc" id="L256">        sql.append(&quot; ORDER BY s.data_pubblicazione DESC&quot;);</span>
+
+<span class="fc" id="L258">        List&lt;Segnalazione&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L259">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L260">             PreparedStatement ps = con.prepareStatement(sql.toString())) {</span>
+
+<span class="fc bfc" id="L262" title="All 2 branches covered.">            for (int i = 0; i &lt; params.size(); i++) {</span>
+<span class="fc" id="L263">                ps.setObject(i + 1, params.get(i));</span>
+            }
+
+<span class="fc" id="L266">            try (ResultSet rs = ps.executeQuery()) {</span>
+<span class="fc bfc" id="L267" title="All 2 branches covered.">                while (rs.next()) {</span>
+<span class="fc" id="L268">                    list.add(mapRow(rs));</span>
+                }
+            }
+<span class="nc" id="L271">        } catch (SQLException e) {</span>
+<span class="nc" id="L272">            e.printStackTrace();</span>
+<span class="fc" id="L273">        }</span>
+<span class="fc" id="L274">        return list;</span>
+    }
+
+    private Segnalazione mapRow(ResultSet rs) throws SQLException {
+        Segnalazione s;
+<span class="fc" id="L279">        String tipo = rs.getString(&quot;tipo_segnalazione&quot;);</span>
+
+<span class="fc bfc" id="L281" title="All 2 branches covered.">        if (&quot;OGGETTO&quot;.equals(tipo)) {</span>
+<span class="fc" id="L282">            SegnalazioneOggetto so = new SegnalazioneOggetto();</span>
+            try {
+<span class="fc" id="L284">                String cat = rs.getString(&quot;categoria&quot;);</span>
+<span class="pc bpc" id="L285" title="1 of 2 branches missed.">                if (cat != null) so.setCategoria(CategoriaOggetto.valueOf(cat));</span>
+
+<span class="fc" id="L287">                String mod = rs.getString(&quot;modalita_consegna&quot;);</span>
+<span class="pc bpc" id="L288" title="1 of 2 branches missed.">                if (mod != null) so.setModalitaConsegna(ModalitaConsegna.valueOf(mod));</span>
+<span class="fc" id="L289">            } catch (Exception ignored) {}</span>
+<span class="fc" id="L290">            so.setIdDropPoint(rs.getObject(&quot;id_drop_point&quot;, Long.class));</span>
+<span class="fc" id="L291">            s = so;</span>
+<span class="fc" id="L292">        } else {</span>
+<span class="fc" id="L293">            SegnalazioneAnimale sa = new SegnalazioneAnimale();</span>
+<span class="fc" id="L294">            sa.setSpecie(rs.getString(&quot;specie&quot;));</span>
+<span class="fc" id="L295">            sa.setRazza(rs.getString(&quot;razza&quot;));</span>
+<span class="fc" id="L296">            s = sa;</span>
+        }
+
+<span class="fc" id="L299">        s.setId(rs.getLong(&quot;id&quot;));</span>
+<span class="fc" id="L300">        s.setIdUtente(rs.getLong(&quot;id_utente&quot;));</span>
+<span class="fc" id="L301">        s.setTitolo(rs.getString(&quot;titolo&quot;));</span>
+<span class="fc" id="L302">        s.setDescrizione(rs.getString(&quot;descrizione&quot;));</span>
+<span class="fc" id="L303">        s.setDataRitrovamento(rs.getTimestamp(&quot;data_ritrovamento&quot;));</span>
+<span class="fc" id="L304">        s.setLuogoRitrovamento(rs.getString(&quot;luogo_ritrovamento&quot;));</span>
+<span class="fc" id="L305">        s.setCitta(rs.getString(&quot;citta&quot;));</span>
+<span class="fc" id="L306">        s.setProvincia(rs.getString(&quot;provincia&quot;));</span>
+<span class="fc" id="L307">        s.setLatitudine(rs.getObject(&quot;latitudine&quot;, Double.class));</span>
+<span class="fc" id="L308">        s.setLongitudine(rs.getObject(&quot;longitudine&quot;, Double.class));</span>
+
+<span class="pc bpc" id="L310" title="1 of 2 branches missed.">        if (rs.getBytes(&quot;immagine&quot;) != null) {</span>
+<span class="fc" id="L311">            s.setImmagine(rs.getBytes(&quot;immagine&quot;));</span>
+<span class="fc" id="L312">            s.setImmagineContentType(rs.getString(&quot;immagine_content_type&quot;));</span>
+        }
+
+<span class="fc" id="L315">        s.setDomandaVerifica1(rs.getString(&quot;domanda_verifica1&quot;));</span>
+<span class="fc" id="L316">        s.setDomandaVerifica2(rs.getString(&quot;domanda_verifica2&quot;));</span>
+<span class="fc" id="L317">        s.setDataPubblicazione(rs.getTimestamp(&quot;data_pubblicazione&quot;));</span>
+
+        try {
+<span class="fc" id="L320">            s.setStato(StatoSegnalazione.valueOf(rs.getString(&quot;stato&quot;)));</span>
+<span class="fc" id="L321">            s.setTipoSegnalazione(TipoSegnalazione.valueOf(tipo));</span>
+<span class="pc" id="L322">        } catch (Exception ignored) {}</span>
+
+<span class="fc" id="L324">        return s;</span>
+    }
+    public List&lt;Segnalazione&gt; doRetrieveAll() {
+<span class="fc" id="L327">        List&lt;Segnalazione&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L328">        String sql =</span>
+                &quot;SELECT s.*, so.categoria, so.modalita_consegna, so.id_drop_point, sa.specie, sa.razza &quot; +
+                        &quot;FROM segnalazione s &quot; +
+                        &quot;LEFT JOIN segnalazione_oggetto so ON s.id = so.id_segnalazione &quot; +
+                        &quot;LEFT JOIN segnalazione_animale sa ON s.id = sa.id_segnalazione &quot; +
+                        &quot;ORDER BY s.data_pubblicazione DESC&quot;;
+
+<span class="fc" id="L335">        try (Connection con = ConPool.getConnection();</span>
+<span class="fc" id="L336">             PreparedStatement ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L337">             ResultSet rs = ps.executeQuery()) {</span>
+
+<span class="fc bfc" id="L339" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L340">                list.add(mapRow(rs));</span>
+            }
+<span class="nc" id="L342">        } catch (SQLException e) {</span>
+<span class="nc" id="L343">            e.printStackTrace();</span>
+<span class="fc" id="L344">        }</span>
+<span class="fc" id="L345">        return list;</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

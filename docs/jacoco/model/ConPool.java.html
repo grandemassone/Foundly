@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConPool.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">model</a> &gt; <span class="el_source">ConPool.java</span></div><h1>ConPool.java</h1><pre class="source lang-java linenums">package model;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+<span class="nc" id="L7">public class ConPool {</span>
+    private static final String URL = &quot;jdbc:mysql://foundly-db-salvolepore7.j.aivencloud.com:21893/defaultdb&quot;
+            + &quot;?useSSL=true&quot;
+            + &quot;&amp;requireSSL=true&quot;
+            + &quot;&amp;verifyServerCertificate=false&quot;
+            + &quot;&amp;allowPublicKeyRetrieval=true&quot;
+            + &quot;&amp;serverTimezone=Europe/Rome&quot;
+            + &quot;&amp;enabledTLSProtocols=TLSv1.2,TLSv1.3&quot;;
+
+    private static final String USER = &quot;avnadmin&quot;;
+<span class="fc" id="L17">    private static final String PASSWORD = System.getenv(&quot;DB_PASSKEY&quot;); //Ciao</span>
+
+    static {
+        try {
+<span class="fc" id="L21">            Class.forName(&quot;com.mysql.cj.jdbc.Driver&quot;);</span>
+<span class="nc" id="L22">        } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L23">            throw new RuntimeException(&quot;Driver MySQL non trovato!&quot;, e);</span>
+<span class="fc" id="L24">        }</span>
+<span class="fc" id="L25">    }</span>
+
+    /**
+     * Restituisce una connessione attiva al database.
+     */
+    public static Connection getConnection() throws SQLException {
+<span class="nc" id="L31">        return DriverManager.getConnection(URL, USER, PASSWORD);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DropPointService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">model.service</a> &gt; <span class="el_source">DropPointService.java</span></div><h1>DropPointService.java</h1><pre class="source lang-java linenums">package model.service;
+
+import model.bean.DropPoint;
+import model.bean.Reclamo;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoDropPoint;
+import model.bean.enums.StatoReclamo;
+import model.bean.enums.StatoSegnalazione;
+import model.dao.DropPointDAO;
+import model.dao.ReclamoDAO;
+import model.dao.SegnalazioneDAO;
+import model.utils.PasswordUtils;
+
+import java.util.List;
+
+<span class="fc" id="L19">public class DropPointService {</span>
+
+<span class="fc" id="L21">    private final DropPointDAO dropPointDAO = new DropPointDAO();</span>
+<span class="fc" id="L22">    private final ReclamoDAO reclamoDAO = new ReclamoDAO();</span>
+<span class="fc" id="L23">    private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();</span>
+<span class="fc" id="L24">    private final UtenteService utenteService = new UtenteService();</span>
+<span class="fc" id="L25">    private final EmailService emailService = new EmailService();</span>
+
+    // ==========================
+    //  REGISTRAZIONE / LOGIN
+    // ==========================
+
+    public boolean registraDropPoint(String nomeAttivita, String email, String password,
+                                     String indirizzo, String citta, String provincia,
+                                     String telefono, String orari,
+                                     Double latitudine, Double longitudine) {
+
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        if (dropPointDAO.doRetrieveByEmail(email) != null) return false;</span>
+
+<span class="fc" id="L38">        DropPoint dp = new DropPoint();</span>
+<span class="fc" id="L39">        dp.setNomeAttivita(nomeAttivita);</span>
+<span class="fc" id="L40">        dp.setEmail(email);</span>
+<span class="fc" id="L41">        dp.setPasswordHash(PasswordUtils.hashPassword(password));</span>
+<span class="fc" id="L42">        dp.setIndirizzo(indirizzo);</span>
+<span class="fc" id="L43">        dp.setCitta(citta);</span>
+<span class="fc" id="L44">        dp.setProvincia(provincia);</span>
+<span class="fc" id="L45">        dp.setTelefono(telefono);</span>
+<span class="fc" id="L46">        dp.setOrariApertura(orari);</span>
+<span class="fc" id="L47">        dp.setLatitudine(latitudine);</span>
+<span class="fc" id="L48">        dp.setLongitudine(longitudine);</span>
+<span class="fc" id="L49">        dp.setStato(StatoDropPoint.IN_ATTESA);</span>
+<span class="fc" id="L50">        dp.setRitiriEffettuati(0);</span>
+<span class="fc" id="L51">        dp.setImmagine(null);</span>
+<span class="fc" id="L52">        dp.setImmagineContentType(null);</span>
+
+<span class="fc" id="L54">        boolean salvato = dropPointDAO.doSave(dp);</span>
+
+        // NOTIFICA ADMIN (chiamata diretta, EmailService gestisce il thread)
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">        if (salvato) {</span>
+<span class="fc" id="L58">            List&lt;String&gt; admins = utenteService.getEmailAdmins();</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">            for (String adminEmail : admins) {</span>
+<span class="nc" id="L60">                emailService.inviaNotificaAdminNuovoDropPoint(adminEmail, nomeAttivita, citta);</span>
+<span class="nc" id="L61">            }</span>
+        }
+<span class="fc" id="L63">        return salvato;</span>
+    }
+
+    public DropPoint login(String email, String password) {
+<span class="nc" id="L67">        DropPoint dp = dropPointDAO.doRetrieveByEmail(email);</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">        if (dp == null) return null;</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        if (!PasswordUtils.checkPassword(password, dp.getPasswordHash())) return null;</span>
+<span class="nc" id="L70">        return dropPointDAO.doRetrieveById(dp.getId());</span>
+    }
+
+    // ==========================
+    //   GESTIONE APPROVAZIONE
+    // ==========================
+
+    public boolean approvaDropPoint(long id) {
+<span class="fc" id="L78">        boolean aggiornato = dropPointDAO.updateStato(id, StatoDropPoint.APPROVATO);</span>
+
+        // NOTIFICA DROP-POINT (chiamata diretta)
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if (aggiornato) {</span>
+<span class="fc" id="L82">            DropPoint dp = dropPointDAO.doRetrieveById(id);</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">            if (dp != null) {</span>
+<span class="fc" id="L84">                emailService.inviaAccettazioneDropPoint(dp.getEmail(), dp.getNomeAttivita());</span>
+            }
+        }
+<span class="fc" id="L87">        return aggiornato;</span>
+    }
+
+    public boolean rifiutaDropPoint(long id) {
+<span class="nc" id="L91">        return dropPointDAO.updateStato(id, StatoDropPoint.RIFIUTATO);</span>
+    }
+
+    public DropPoint trovaPerId(long id) {
+<span class="nc" id="L95">        return dropPointDAO.doRetrieveById(id);</span>
+    }
+
+    // ==========================
+    //   ALTRI METODI INVARIATI
+    // ==========================
+
+    public boolean registraRitiro(long idDropPoint, String codiceRitiro) {
+<span class="fc" id="L103">        Reclamo r = reclamoDAO.doRetrieveByCodiceAndDropPoint(codiceRitiro, idDropPoint);</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">        if (r == null) return false;</span>
+
+        // deve essere stato depositato prima
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        if (r.getDataDeposito() == null) return false;</span>
+
+        // evita doppie registrazioni
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">        if (r.getDataRitiro() != null) return false;</span>
+
+        // 1) marca ritiro
+<span class="fc" id="L113">        boolean okRitiro = reclamoDAO.marcaRitiro(r.getId());</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">        if (!okRitiro) return false;</span>
+
+        // 2) chiudi segnalazione
+<span class="fc" id="L117">        boolean okChiusa = segnalazioneDAO.updateStato(r.getIdSegnalazione(), StatoSegnalazione.CHIUSA);</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">        if (!okChiusa) return false;</span>
+
+        // 3) assegna punto al finder
+<span class="fc" id="L121">        Segnalazione s = segnalazioneDAO.doRetrieveById(r.getIdSegnalazione());</span>
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">        if (s != null) {</span>
+<span class="fc" id="L123">            Utente finder = utenteService.trovaPerId(s.getIdUtente());</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">            if (finder != null) utenteService.aggiornaPunteggioEBadge(finder, 1);</span>
+        }
+
+<span class="fc" id="L127">        return true;</span>
+    }
+
+    public boolean registraDeposito(long idDropPoint, String codiceConsegna) {
+<span class="fc" id="L131">        Reclamo r = reclamoDAO.doRetrieveByCodiceAndDropPoint(codiceConsegna, idDropPoint);</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        if (r == null) return false;</span>
+
+        // evita doppie registrazioni
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">        if (r.getDataDeposito() != null) return false;</span>
+
+<span class="fc" id="L137">        return reclamoDAO.marcaDeposito(r.getId());</span>
+    }
+
+
+    public int countDepositiAttivi(long idDropPoint) {
+<span class="nc" id="L142">        return reclamoDAO.countDepositiAttiviByDropPoint(idDropPoint);</span>
+    }
+    public int countConsegneCompletate(long idDropPoint) {
+<span class="nc" id="L145">        return reclamoDAO.countConsegneCompletateByDropPoint(idDropPoint);</span>
+    }
+<span class="nc" id="L147">    public boolean aggiornaProfilo(DropPoint dp) { return dropPointDAO.updateProfilo(dp); }</span>
+<span class="nc" id="L148">    public boolean eliminaDropPoint(long id) { return dropPointDAO.doDeleteById(id); }</span>
+<span class="nc" id="L149">    public List&lt;DropPoint&gt; findAllApprovati() { return dropPointDAO.doRetrieveAllApprovati(); }</span>
+<span class="nc" id="L150">    public List&lt;DropPoint&gt; findAllInAttesa() { return dropPointDAO.doRetrieveByStato(StatoDropPoint.IN_ATTESA); }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
