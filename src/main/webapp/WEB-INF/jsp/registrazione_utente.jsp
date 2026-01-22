@@ -9,6 +9,42 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
+
+    <!-- STILE SNACKBAR -->
+    <style>
+        #snackbar {
+            visibility: hidden;
+            min-width: 280px;
+            max-width: 90%;
+            background-color: #43a047;
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 12px 16px;
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%) translateY(20px);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 9999;
+        }
+
+        #snackbar.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #snackbar .material-icons {
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
 
@@ -119,6 +155,14 @@
     </div>
 </div>
 
+<!-- SNACKBAR (notifica di successo) -->
+<div id="snackbar">
+    <span class="material-icons">check_circle</span>
+    <span class="snackbar-text">
+        Registrazione completata! Ora puoi effettuare il login.
+    </span>
+</div>
+
 <script>
     // Toggle visibilità password
     function togglePassword() {
@@ -144,6 +188,7 @@
         const passwordRegex =
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._#-])[A-Za-z\d@$!%*?&._#-]{8,}$/;
 
+
         function validatePassword() {
             const value = passwordInput.value || "";
 
@@ -163,7 +208,6 @@
             }
         }
 
-
         passwordInput.addEventListener('input', validatePassword);
 
         form.addEventListener('submit', function (e) {
@@ -174,6 +218,33 @@
         });
     })();
 </script>
+
+<script>
+    // Mostra e nasconde automaticamente lo snackbar
+    function showSnackbar() {
+        const snackbar = document.getElementById('snackbar');
+        if (!snackbar) return;
+        snackbar.classList.add('show');
+
+        setTimeout(function () {
+            snackbar.classList.remove('show');
+        }, 4000); // 4 secondi
+    }
+</script>
+
+<%
+    // Lato servlet devi impostare request.setAttribute("registrazioneOK", true);
+    Boolean registrazioneOK = (Boolean) request.getAttribute("registrazioneOK");
+    if (registrazioneOK != null && registrazioneOK) {
+%>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        showSnackbar();
+    });
+</script>
+<%
+    }
+%>
 
 </body>
 </html>

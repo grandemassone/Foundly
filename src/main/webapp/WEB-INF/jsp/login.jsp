@@ -9,18 +9,43 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
+
+    <!-- Stile snackbar -->
+    <style>
+        #snackbar {
+            visibility: hidden;
+            min-width: 280px;
+            max-width: 90%;
+            background-color: #43a047;
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 12px 16px;
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%) translateY(20px);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 9999;
+        }
+
+        #snackbar.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #snackbar .material-icons {
+            font-size: 18px;
+        }
+    </style>
 </head>
-
-<script>
-    function togglePassword() {
-        const pwd = document.getElementById("password");
-        const icon = document.getElementById("togglePasswordIcon");
-
-        const isHidden = pwd.type === "password";
-        pwd.type = isHidden ? "text" : "password";
-        icon.textContent = isHidden ? "visibility_off" : "visibility";
-    }
-</script>
 
 <body>
 
@@ -104,6 +129,65 @@
         </div>
     </div>
 </div>
+
+<!-- Snackbar (notifica in basso) -->
+<div id="snackbar">
+    <span class="material-icons">check_circle</span>
+    <span class="snackbar-text" id="snackbarText"></span>
+</div>
+
+<!-- Script toggle password -->
+<script>
+    function togglePassword() {
+        const pwd = document.getElementById("password");
+        const icon = document.getElementById("togglePasswordIcon");
+        if (!pwd || !icon) return;
+
+        const isHidden = pwd.type === "password";
+        pwd.type = isHidden ? "text" : "password";
+        icon.textContent = isHidden ? "visibility_off" : "visibility";
+    }
+</script>
+
+<!-- Script snackbar -->
+<script>
+    function showSnackbar(message) {
+        const snackbar = document.getElementById('snackbar');
+        const textElem = document.getElementById('snackbarText');
+        if (!snackbar || !textElem) return;
+
+        textElem.textContent = message;
+        snackbar.classList.add('show');
+
+        setTimeout(function () {
+            snackbar.classList.remove('show');
+        }, 4000); // 4 secondi
+    }
+</script>
+
+<%
+    // Parametri di ritorno dai servlet di registrazione
+    String regOkParam = request.getParameter("regOk");  // registrazione utente
+    String dpOkParam  = request.getParameter("dpOk");   // registrazione Drop-Point
+
+    String snackbarMsg = null;
+
+    if ("1".equals(regOkParam)) {
+        snackbarMsg = "Registrazione completata! Ora puoi effettuare il login.";
+    } else if ("1".equals(dpOkParam)) {
+        snackbarMsg = "Richiesta Drop-Point inviata! Puoi effettuare il login, un Admin approverà o rifiuterà la tua richiesta.";
+    }
+
+    if (snackbarMsg != null) {
+%>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        showSnackbar("<%= snackbarMsg %>");
+    });
+</script>
+<%
+    }
+%>
 
 </body>
 </html>
