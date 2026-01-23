@@ -87,7 +87,7 @@ To run Foundly locally in your development environment:
 3.  **Environment Configuration**
     * The project uses environment variables to secure credentials.
     * Configure the following in your IDE or OS:
-        * `DB_PASSKEY`: Your MySQL user password.
+        * `DB_PASSKEY`: AVNS_VsbBd-gEyk_FaF7iWeY
 
 4.  **Build & Run**
     ```bash
