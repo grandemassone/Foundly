@@ -84,10 +84,15 @@ To run Foundly locally in your development environment:
 2.  **Database Setup**
     * Execute the `db/schema_v1.sql` script on your MySQL server to create the table structure.
 
-3.  **Environment Configuration**
-    * The project uses environment variables to secure credentials.
-    * Configure the following in your IDE or OS:
-        * `DB_PASSKEY`: AVNS_VsbBd-gEyk_FaF7iWeY
+3. **Environment Configuration**
+   The project uses an environment variable to store the database password:
+
+   - `DB_PASSKEY`: password of the MySQL user configured for the Foundly database.
+
+   Example (Linux/macOS):
+
+   ```bash
+   export DB_PASSKEY="your_mysql_password"
 
 4.  **Build & Run**
     ```bash
