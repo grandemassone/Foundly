@@ -81,8 +81,24 @@
                     </div>
                     <div class="input-group">
                         <label for="telefono">Telefono</label>
-                        <input type="tel" id="telefono" name="telefono" placeholder="081 1234567" required>
+                        <input
+                                type="tel"
+                                id="telefono"
+                                name="telefono"
+                                placeholder="3425089217"
+                                required
+                                inputmode="numeric"
+                                pattern="^[0-9]{10}$"
+                                minlength="10"
+                                maxlength="10"
+                                title="Inserisci un numero di telefono di 10 cifre (solo numeri)."
+                        >
+                        <div id="telefonoError"
+                             style="display:none; color:#c62828; font-size:0.8rem; margin-top:4px;">
+                            Il numero di telefono deve contenere esattamente 10 cifre (solo numeri).
+                        </div>
                     </div>
+
                 </div>
 
                 <div class="input-group">
@@ -294,16 +310,19 @@
 </script>
 
 <script>
-    // Validazione password (stessi controlli della registrazione utente)
+    // Validazione password e telefono
     (function () {
         const form = document.querySelector('.auth-card form');
         const passwordInput = document.getElementById('password');
         const passwordError = document.getElementById('passwordError');
+        const telefonoInput = document.getElementById('telefono');
+        const telefonoError = document.getElementById('telefonoError');
 
-        if (!form || !passwordInput || !passwordError) return;
+        if (!form || !passwordInput || !passwordError || !telefonoInput || !telefonoError) return;
 
         const passwordRegex =
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._#-])[A-Za-z\d@$!%*?&._#-]{8,}$/;
+        const telefonoRegex = /^[0-9]{10}$/;
 
         function validatePassword() {
             const value = passwordInput.value || "";
@@ -324,12 +343,35 @@
             }
         }
 
+        function validateTelefono() {
+            const value = (telefonoInput.value || "").trim();
+
+            if (telefonoRegex.test(value)) {
+                telefonoInput.style.borderColor = '#ccc';
+                telefonoError.style.display = 'none';
+                return true;
+            } else {
+                if (value.length > 0) {
+                    telefonoInput.style.borderColor = '#c62828';
+                    telefonoError.style.display = 'block';
+                } else {
+                    telefonoInput.style.borderColor = '#ccc';
+                    telefonoError.style.display = 'none';
+                }
+                return false;
+            }
+        }
+
         passwordInput.addEventListener('input', validatePassword);
+        telefonoInput.addEventListener('input', validateTelefono);
 
         form.addEventListener('submit', function (e) {
-            if (!validatePassword()) {
+            const passwordOk = validatePassword();
+            const telefonoOk = validateTelefono();
+
+            if (!passwordOk || !telefonoOk) {
                 e.preventDefault();
-                passwordInput.focus();
+                (passwordOk ? telefonoInput : passwordInput).focus();
             }
         });
     })();
