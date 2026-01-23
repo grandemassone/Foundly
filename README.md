@@ -100,11 +100,11 @@ To run Foundly locally in your development environment:
 
 This project was developed by the **NC05 Team** for the Bachelor's Degree in Computer Science at the **University of Salerno**.
 
-| Name | Role | Contact |
-| :--- | :--- | :--- |
-| **Salvador Davide Passarelli** | Backend & Architecture | [Email](mailto:s.passarelli2@studenti.unisa.it) |
-| **Natale Nappi** | Frontend & UI/UX | [Email](mailto:n.nappi8@studenti.unisa.it) |
-| **Salvatore Lepore** | DataBase & UI/UX| [Email](mailto:s.lepore11@studenti.unisa.it) |
+| Name | Contact |
+| :--- | :--- |
+| **Salvador Davide Passarelli** | [Email](mailto:s.passarelli2@studenti.unisa.it) |
+| **Natale Nappi** | [Email](mailto:n.nappi8@studenti.unisa.it) |
+| **Salvatore Lepore** | [Email](mailto:s.lepore11@studenti.unisa.it) |
 
 <p align="right">
   <i>Supervisor: Prof. Carmine Gravino</i>
