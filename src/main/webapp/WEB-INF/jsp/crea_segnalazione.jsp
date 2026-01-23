@@ -291,7 +291,30 @@
         }
     }
 
-    document.addEventListener("DOMContentLoaded", toggleCampi);
+    document.addEventListener("DOMContentLoaded", function () {
+        // inizializza campi oggetto/animale
+        toggleCampi();
+
+        // blocca date future
+        const dateInput = document.getElementById("data_ritrovamento");
+        const form = document.querySelector(".auth-card form");
+
+        if (dateInput) {
+            const today = new Date().toISOString().split("T")[0];
+            dateInput.setAttribute("max", today);
+
+            if (form) {
+                form.addEventListener("submit", function (e) {
+                    const value = dateInput.value;
+                    if (value && value > today) {
+                        e.preventDefault();
+                        alert("La data di ritrovamento non può essere nel futuro.");
+                        dateInput.focus();
+                    }
+                });
+            }
+        }
+    });
 </script>
 
 </body>

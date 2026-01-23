@@ -14,6 +14,16 @@ public class RegistrazioneUtenteServlet extends HttpServlet {
 
     private final UtenteService utenteService = new UtenteService();
 
+    // Pattern password: Min 8 char, 1 Maiusc, 1 Minusc, 1 Numero, 1 Speciale (@$!%*?&._#-)
+    private static final String PASSWORD_PATTERN =
+            "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&._#-])[A-Za-z\\d@$!%*?&._#-]{8,}$";
+
+    // Telefono: esattamente 10 cifre
+    private static final String TELEFONO_PATTERN = "^\\d{10}$";
+
+    // Email base (non perfetta ma meglio di niente)
+    private static final String EMAIL_PATTERN = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -25,19 +35,34 @@ public class RegistrazioneUtenteServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String nome = request.getParameter("nome");
-        String cognome = request.getParameter("cognome");
-        String username = request.getParameter("username");
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        String telefono = request.getParameter("telefono");
+        // trim per evitare spazi “furbi”
+        String nome = trimOrNull(request.getParameter("nome"));
+        String cognome = trimOrNull(request.getParameter("cognome"));
+        String username = trimOrNull(request.getParameter("username"));
+        String email = trimOrNull(request.getParameter("email"));
+        String password = request.getParameter("password"); // niente trim sulla password
+        String telefono = trimOrNull(request.getParameter("telefono"));
 
-        // Pattern password: Min 8 char, 1 Maiusc, 1 Minusc, 1 Numero, 1 Speciale (@$!%*?&._#-)
-        String passwordPattern =
-                "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&._#-])[A-Za-z\\d@$!%*?&._#-]{8,}$";
+        // Campi obbligatori
+        if (isBlank(nome) || isBlank(cognome) ||
+                isBlank(username) || isBlank(email) || isBlank(password) || isBlank(telefono)) {
 
-        // Validazione password
-        if (password == null || !password.matches(passwordPattern)) {
+            request.setAttribute("errore", "Tutti i campi sono obbligatori.");
+            request.getRequestDispatcher("/WEB-INF/jsp/registrazione_utente.jsp")
+                    .forward(request, response);
+            return;
+        }
+
+        // Lunghezze massime (scegli numeri coerenti con il DB)
+        if (nome.length() > 50 || cognome.length() > 50 || username.length() > 30 || email.length() > 100) {
+            request.setAttribute("errore", "Uno o più campi superano la lunghezza massima consentita.");
+            request.getRequestDispatcher("/WEB-INF/jsp/registrazione_utente.jsp")
+                    .forward(request, response);
+            return;
+        }
+
+        // Password
+        if (!password.matches(PASSWORD_PATTERN)) {
             request.setAttribute("errore",
                     "La password non rispetta i requisiti (usa solo @$!%*?&._#-).");
             request.getRequestDispatcher("/WEB-INF/jsp/registrazione_utente.jsp")
@@ -45,9 +70,17 @@ public class RegistrazioneUtenteServlet extends HttpServlet {
             return;
         }
 
-        // Controllo campi obbligatori base
-        if (email == null || email.isBlank() || username == null || username.isBlank()) {
-            request.setAttribute("errore", "Campi obbligatori mancanti.");
+        // Email
+        if (!email.matches(EMAIL_PATTERN)) {
+            request.setAttribute("errore", "Formato email non valido.");
+            request.getRequestDispatcher("/WEB-INF/jsp/registrazione_utente.jsp")
+                    .forward(request, response);
+            return;
+        }
+
+        // Telefono
+        if (!telefono.matches(TELEFONO_PATTERN)) {
+            request.setAttribute("errore", "Il numero di telefono deve contenere esattamente 10 cifre.");
             request.getRequestDispatcher("/WEB-INF/jsp/registrazione_utente.jsp")
                     .forward(request, response);
             return;
@@ -63,13 +96,21 @@ public class RegistrazioneUtenteServlet extends HttpServlet {
         );
 
         if (successo) {
-            // Registrazione OK → redirect alla pagina di login con flag regOk=1
             response.sendRedirect(request.getContextPath() + "/login?regOk=1");
         } else {
-            // Utente già esistente
+            // Attenzione: questo messaggio è già abbastanza “informativo”.
+            // Per maggiore sicurezza potresti usare qualcosa di più generico (tipo “Registrazione non riuscita.”)
             request.setAttribute("errore", "Email o Username già esistenti.");
             request.getRequestDispatcher("/WEB-INF/jsp/registrazione_utente.jsp")
                     .forward(request, response);
         }
+    }
+
+    private static String trimOrNull(String s) {
+        return s == null ? null : s.trim();
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.isBlank();
     }
 }
