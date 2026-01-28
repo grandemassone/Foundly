@@ -75,7 +75,16 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css?v=23">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dettaglio_segnalazione.css?v=24">
+    <style>
+        .btn-success-static {
+            background-color: #4CAF50 !important;
+            color: white !important;
+            cursor: default !important;
+            box-shadow: none !important;
+            opacity: 1 !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -164,6 +173,7 @@
             <aside class="sidebar">
 
                 <c:if test="<%= !isOwner %>">
+                    <%-- VISTA OWNER (Chi cerca l'oggetto) --%>
                     <c:choose>
                         <c:when test="${not empty mioReclamo && mioReclamo.stato == 'ACCETTATO'}">
                             <div class="winner-card">
@@ -209,11 +219,15 @@
                                     <input type="hidden" name="idReclamo" value="${mioReclamo.id}">
                                     <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
 
-                                    <% if (reclamoAccettato.isConfermaOwner()) { %>
+                                        <%-- LOGICA PULSANTE OWNER --%>
+                                    <% if (reclamoAccettato.isConfermaFinder() && reclamoAccettato.isConfermaOwner()) { %>
+                                    <button type="button" class="btn-primary btn-success-static full-width">Scambio Completato ✅</button>
+                                    <% } else if (reclamoAccettato.isConfermaOwner()) { %>
                                     <button type="button" class="btn-disabled full-width">In attesa del Finder...</button>
                                     <% } else { %>
                                     <button type="submit" class="btn-primary">Conferma Ricezione</button>
                                     <% } %>
+
                                 </form>
                                 <% } %>
                             </div>
@@ -275,6 +289,7 @@
                 </c:if>
 
                 <c:if test="<%= isOwner %>">
+                    <%-- VISTA FINDER (Proprietario Segnalazione) --%>
                     <div class="sidebar-card">
 
                         <c:if test="${param.msg == 'scambio_completato'}">
@@ -327,7 +342,7 @@
                                         </div>
 
                                         <% if (isDropPoint) { %>
-                                            <%-- Caso DropPoint: Mostra Codice + CARD DETTAGLI DROP-POINT --%>
+                                            <%-- Caso DropPoint --%>
                                         <c:if test="${not empty r.codiceConsegna}">
                                             <div class="code-ticket" style="padding:10px; margin:10px 0;">
                                                 <div style="font-size:0.7rem; color:#555; font-weight:700;">CODICE</div>
@@ -340,9 +355,6 @@
                                                     <div class="pickup-name" style="font-size:1rem;">${dropPointRitiro.nomeAttivita}</div>
                                                     <div class="pickup-address" style="font-size:0.85rem; margin-bottom:4px;">${dropPointRitiro.indirizzo}, ${dropPointRitiro.citta}</div>
                                                     <div class="pickup-details-row"><span class="material-icons" style="font-size:16px;">schedule</span> <span>${dropPointRitiro.orariApertura}</span></div>
-                                                    <c:if test="${not empty dropPointRitiro.telefono}">
-                                                        <div class="pickup-details-row"><span class="material-icons" style="font-size:16px;">call</span> <span>${dropPointRitiro.telefono}</span></div>
-                                                    </c:if>
                                                     <div style="font-size:0.8rem; color:#555; font-style:italic; margin-top:8px;">Consegna l'oggetto e comunica il codice.</div>
                                                 </div>
                                             </c:if>
@@ -361,11 +373,16 @@
                                             <input type="hidden" name="action" value="conferma_scambio">
                                             <input type="hidden" name="idReclamo" value="${r.id}">
                                             <input type="hidden" name="idSegnalazione" value="${segnalazione.id}">
-                                            <% if (reclamoAccettato.isConfermaFinder()) { %>
+
+                                                <%-- LOGICA PULSANTE FINDER --%>
+                                            <% if (reclamoAccettato.isConfermaFinder() && reclamoAccettato.isConfermaOwner()) { %>
+                                            <button type="button" class="btn-primary btn-success-static full-width">Scambio Completato ✅</button>
+                                            <% } else if (reclamoAccettato.isConfermaFinder()) { %>
                                             <button type="button" class="btn-disabled full-width">In attesa dell'Owner...</button>
                                             <% } else { %>
                                             <button type="submit" class="btn-primary full-width">Conferma Consegna</button>
                                             <% } %>
+
                                         </form>
                                         <% } %>
                                     </div>

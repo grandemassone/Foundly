@@ -29,7 +29,7 @@ public class GestioneReclamoServlet extends HttpServlet {
     private final SegnalazioneService segnalazioneService = new SegnalazioneService();
     private final EmailService emailService = new EmailService();
     private final UtenteService utenteService = new UtenteService();
-    private final DropPointService dropPointService = new DropPointService(); // Serve per recuperare nome DP
+    private final DropPointService dropPointService = new DropPointService();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -121,18 +121,18 @@ public class GestioneReclamoServlet extends HttpServlet {
                 Utente richiedente = utenteService.trovaPerId(r.getIdUtenteRichiedente());
                 Utente finder = utente;
 
-                // MAIL 1: FINDER (Ora include Codice e Nome DP se esiste)
+                // MAIL 1: FINDER
                 if (finder.getEmail() != null) {
                     emailService.inviaConfermaAccettazioneFinder(
                             finder.getEmail(),
                             s.getTitolo(),
                             richiedente.getNome() + " " + richiedente.getCognome(),
-                            codice,       // null se diretta
-                            nomeDropPoint // null se diretta
+                            codice,
+                            nomeDropPoint
                     );
                 }
 
-                // MAIL 2: OWNER (Richiedente)
+                // MAIL 2: OWNER
                 if (richiedente.getEmail() != null) {
                     emailService.inviaReclamoAccettatoOwner(
                             richiedente.getEmail(),
@@ -150,20 +150,29 @@ public class GestioneReclamoServlet extends HttpServlet {
             }
 
         } else if ("rifiuta".equals(action)) {
-            // ... (codice rifiuto invariato) ...
             long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
             long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
             segnalazioneService.rifiutaReclamo(idReclamo);
             response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=reclamo_rifiutato");
 
         } else if ("conferma_scambio".equals(action)) {
-            // ... (codice conferma scambio invariato) ...
             long idReclamo = Long.parseLong(request.getParameter("idReclamo"));
             long idSegnalazione = Long.parseLong(request.getParameter("idSegnalazione"));
             Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);
+
             boolean isFinder = (s.getIdUtente() == utente.getId());
+
+            // Logica core
             boolean finito = segnalazioneService.gestisciConfermaScambio(idReclamo, isFinder);
+
             if (finito) {
+                // FIX CRUCIALE: Se lo scambio è finito e io sono il finder, ho ricevuto +1 punto.
+                // Devo ricaricare l'utente dalla sessione per mostrare i punti aggiornati.
+                if (isFinder) {
+                    Utente utenteAggiornato = utenteService.trovaPerId(utente.getId());
+                    session.setAttribute("utente", utenteAggiornato);
+                }
+
                 response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=scambio_completato");
             } else {
                 response.sendRedirect("dettaglio-segnalazione?id=" + idSegnalazione + "&msg=conferma_registrata");
