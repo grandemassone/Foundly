@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SegnalazioneOggetto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">model.bean</a> &gt; <span class="el_source">SegnalazioneOggetto.java</span></div><h1>SegnalazioneOggetto.java</h1><pre class="source lang-java linenums">package model.bean;
+
+import model.bean.enums.CategoriaOggetto;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.TipoSegnalazione;
+
+public class SegnalazioneOggetto extends Segnalazione {
+    private CategoriaOggetto categoria;
+    private ModalitaConsegna modalitaConsegna;
+    private Long idDropPoint;
+
+    public SegnalazioneOggetto() {
+<span class="fc" id="L13">        super();</span>
+<span class="fc" id="L14">        this.setTipoSegnalazione(TipoSegnalazione.OGGETTO);</span>
+<span class="fc" id="L15">    }</span>
+
+<span class="fc" id="L17">    public CategoriaOggetto getCategoria() { return categoria; }</span>
+<span class="fc" id="L18">    public void setCategoria(CategoriaOggetto categoria) { this.categoria = categoria; }</span>
+
+<span class="fc" id="L20">    public ModalitaConsegna getModalitaConsegna() { return modalitaConsegna; }</span>
+<span class="fc" id="L21">    public void setModalitaConsegna(ModalitaConsegna modalitaConsegna) { this.modalitaConsegna = modalitaConsegna; }</span>
+
+<span class="fc" id="L23">    public Long getIdDropPoint() { return idDropPoint; }</span>
+<span class="fc" id="L24">    public void setIdDropPoint(Long idDropPoint) { this.idDropPoint = idDropPoint; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

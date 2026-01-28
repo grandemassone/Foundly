@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GestioneReclamoServlet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">GestioneReclamoServlet.java</span></div><h1>GestioneReclamoServlet.java</h1><pre class="source lang-java linenums">package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.DropPoint;
+import model.bean.Reclamo;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoSegnalazione;
+import model.dao.ReclamoDAO;
+import model.service.DropPointService;
+import model.service.EmailService;
+import model.service.SegnalazioneService;
+import model.service.UtenteService;
+
+import java.io.IOException;
+import java.util.UUID;
+
+@WebServlet(name = &quot;GestioneReclamoServlet&quot;, value = &quot;/gestione-reclamo&quot;)
+<span class="fc" id="L26">public class GestioneReclamoServlet extends HttpServlet {</span>
+
+<span class="fc" id="L28">    private final ReclamoDAO reclamoDAO = new ReclamoDAO();</span>
+<span class="fc" id="L29">    private final SegnalazioneService segnalazioneService = new SegnalazioneService();</span>
+<span class="fc" id="L30">    private final EmailService emailService = new EmailService();</span>
+<span class="fc" id="L31">    private final UtenteService utenteService = new UtenteService();</span>
+<span class="fc" id="L32">    private final DropPointService dropPointService = new DropPointService(); // Serve per recuperare nome DP</span>
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="fc" id="L36">        String action = request.getParameter(&quot;action&quot;);</span>
+<span class="fc" id="L37">        HttpSession session = request.getSession(false);</span>
+
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        Utente utente = (session != null) ? (Utente) session.getAttribute(&quot;utente&quot;) : null;</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        DropPoint dropPoint = (session != null) ? (DropPoint) session.getAttribute(&quot;dropPoint&quot;) : null;</span>
+
+<span class="fc bfc" id="L42" title="All 4 branches covered.">        if (utente == null &amp;&amp; dropPoint == null) {</span>
+<span class="fc" id="L43">            response.sendRedirect(&quot;login&quot;);</span>
+<span class="fc" id="L44">            return;</span>
+        }
+
+        // --- DROP-POINT: Conferma Ritiro ---
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (&quot;conferma_ritiro&quot;.equals(action)) {</span>
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">            if (dropPoint == null) { response.sendRedirect(&quot;login&quot;); return; }</span>
+            try {
+<span class="nc" id="L51">                long idReclamo = Long.parseLong(request.getParameter(&quot;idReclamo&quot;));</span>
+<span class="nc" id="L52">                long idSegnalazione = Long.parseLong(request.getParameter(&quot;idSegnalazione&quot;));</span>
+<span class="nc" id="L53">                String codice = request.getParameter(&quot;codiceConsegna&quot;);</span>
+
+<span class="nc" id="L55">                boolean successo = segnalazioneService.accettaReclamoEChiudiSegnalazione(idReclamo, idSegnalazione, codice);</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">                response.sendRedirect(&quot;area-drop-point?msg=&quot; + (successo ? &quot;successo_consegna&quot; : &quot;codice_errato&quot;));</span>
+<span class="fc" id="L57">            } catch (Exception e) {</span>
+<span class="fc" id="L58">                response.sendRedirect(&quot;area-drop-point?err=errore&quot;);</span>
+<span class="nc" id="L59">            }</span>
+<span class="fc" id="L60">            return;</span>
+        }
+
+        // --- UTENTI (Finder/Owner) ---
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (utente == null) { response.sendRedirect(&quot;login&quot;); return; }</span>
+
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (&quot;invia&quot;.equals(action)) {</span>
+<span class="fc" id="L67">            long idSegnalazione = Long.parseLong(request.getParameter(&quot;idSegnalazione&quot;));</span>
+<span class="fc" id="L68">            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);</span>
+
+<span class="pc bpc" id="L70" title="2 of 4 branches missed.">            if (s == null || s.getStato() != StatoSegnalazione.APERTA) {</span>
+<span class="nc" id="L71">                response.sendRedirect(&quot;dettaglio-segnalazione?id=&quot; + idSegnalazione + &quot;&amp;msg=segnalazione_chiusa&quot;);</span>
+<span class="nc" id="L72">                return;</span>
+            }
+<span class="fc bfc" id="L74" title="All 2 branches covered.">            if (reclamoDAO.doRetrieveBySegnalazioneAndUtente(idSegnalazione, utente.getId()) != null) {</span>
+<span class="fc" id="L75">                response.sendRedirect(&quot;dettaglio-segnalazione?id=&quot; + idSegnalazione + &quot;&amp;msg=reclamo_esistente&quot;);</span>
+<span class="fc" id="L76">                return;</span>
+            }
+
+<span class="fc" id="L79">            Reclamo r = new Reclamo();</span>
+<span class="fc" id="L80">            r.setIdSegnalazione(idSegnalazione);</span>
+<span class="fc" id="L81">            r.setIdUtenteRichiedente(utente.getId());</span>
+<span class="fc" id="L82">            r.setRispostaVerifica1(request.getParameter(&quot;risposta1&quot;));</span>
+<span class="fc" id="L83">            r.setRispostaVerifica2(request.getParameter(&quot;risposta2&quot;));</span>
+<span class="fc" id="L84">            boolean salvato = reclamoDAO.doSave(r);</span>
+
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">            if (salvato) {</span>
+<span class="nc" id="L87">                Utente finder = utenteService.trovaPerId(s.getIdUtente());</span>
+<span class="nc bnc" id="L88" title="All 4 branches missed.">                if (finder != null &amp;&amp; finder.getEmail() != null) {</span>
+<span class="nc" id="L89">                    emailService.inviaNotificaNuovoReclamo(finder.getEmail(), s.getTitolo(), utente.getUsername());</span>
+                }
+            }
+<span class="fc" id="L92">            response.sendRedirect(&quot;dettaglio-segnalazione?id=&quot; + idSegnalazione + &quot;&amp;msg=reclamo_inviato&quot;);</span>
+
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        } else if (&quot;accetta&quot;.equals(action)) {</span>
+<span class="fc" id="L95">            long idReclamo = Long.parseLong(request.getParameter(&quot;idReclamo&quot;));</span>
+<span class="fc" id="L96">            long idSegnalazione = Long.parseLong(request.getParameter(&quot;idSegnalazione&quot;));</span>
+<span class="fc" id="L97">            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);</span>
+
+<span class="fc" id="L99">            String codice = null;</span>
+<span class="fc" id="L100">            String nomeDropPoint = null;</span>
+<span class="fc" id="L101">            boolean isDropPoint = false;</span>
+
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">            if (s instanceof SegnalazioneOggetto) {</span>
+<span class="nc" id="L104">                SegnalazioneOggetto so = (SegnalazioneOggetto) s;</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">                if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT) {</span>
+<span class="nc" id="L106">                    isDropPoint = true;</span>
+<span class="nc" id="L107">                    codice = UUID.randomUUID().toString().substring(0, 6).toUpperCase();</span>
+
+                    // Recupero info DropPoint per la mail
+<span class="nc bnc" id="L110" title="All 2 branches missed.">                    if (so.getIdDropPoint() != null) {</span>
+<span class="nc" id="L111">                        DropPoint dp = dropPointService.trovaPerId(so.getIdDropPoint());</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">                        if (dp != null) nomeDropPoint = dp.getNomeAttivita();</span>
+                    }
+                }
+            }
+
+<span class="fc" id="L117">            boolean ok = reclamoDAO.accettaReclamo(idReclamo, codice);</span>
+
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">            if (ok) {</span>
+<span class="fc" id="L120">                Reclamo r = reclamoDAO.doRetrieveById(idReclamo);</span>
+<span class="fc" id="L121">                Utente richiedente = utenteService.trovaPerId(r.getIdUtenteRichiedente());</span>
+<span class="fc" id="L122">                Utente finder = utente;</span>
+
+                // MAIL 1: FINDER (Ora include Codice e Nome DP se esiste)
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">                if (finder.getEmail() != null) {</span>
+<span class="fc" id="L126">                    emailService.inviaConfermaAccettazioneFinder(</span>
+<span class="fc" id="L127">                            finder.getEmail(),</span>
+<span class="fc" id="L128">                            s.getTitolo(),</span>
+<span class="fc" id="L129">                            richiedente.getNome() + &quot; &quot; + richiedente.getCognome(),</span>
+                            codice,       // null se diretta
+                            nomeDropPoint // null se diretta
+                    );
+                }
+
+                // MAIL 2: OWNER (Richiedente)
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">                if (richiedente.getEmail() != null) {</span>
+<span class="fc" id="L137">                    emailService.inviaReclamoAccettatoOwner(</span>
+<span class="fc" id="L138">                            richiedente.getEmail(),</span>
+<span class="fc" id="L139">                            s.getTitolo(),</span>
+<span class="fc" id="L140">                            finder.getNome() + &quot; &quot; + finder.getCognome(),</span>
+                            codice
+                    );
+                }
+            }
+
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">            if (isDropPoint) {</span>
+<span class="nc" id="L147">                response.sendRedirect(&quot;dettaglio-segnalazione?id=&quot; + idSegnalazione + &quot;&amp;msg=attesa_ritiro&quot;);</span>
+            } else {
+<span class="fc" id="L149">                response.sendRedirect(&quot;dettaglio-segnalazione?id=&quot; + idSegnalazione + &quot;&amp;msg=scambio_avviato&quot;);</span>
+            }
+
+<span class="fc bfc" id="L152" title="All 2 branches covered.">        } else if (&quot;rifiuta&quot;.equals(action)) {</span>
+            // ... (codice rifiuto invariato) ...
+<span class="fc" id="L154">            long idReclamo = Long.parseLong(request.getParameter(&quot;idReclamo&quot;));</span>
+<span class="fc" id="L155">            long idSegnalazione = Long.parseLong(request.getParameter(&quot;idSegnalazione&quot;));</span>
+<span class="fc" id="L156">            segnalazioneService.rifiutaReclamo(idReclamo);</span>
+<span class="fc" id="L157">            response.sendRedirect(&quot;dettaglio-segnalazione?id=&quot; + idSegnalazione + &quot;&amp;msg=reclamo_rifiutato&quot;);</span>
+
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">        } else if (&quot;conferma_scambio&quot;.equals(action)) {</span>
+            // ... (codice conferma scambio invariato) ...
+<span class="fc" id="L161">            long idReclamo = Long.parseLong(request.getParameter(&quot;idReclamo&quot;));</span>
+<span class="fc" id="L162">            long idSegnalazione = Long.parseLong(request.getParameter(&quot;idSegnalazione&quot;));</span>
+<span class="fc" id="L163">            Segnalazione s = segnalazioneService.trovaPerId(idSegnalazione);</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">            boolean isFinder = (s.getIdUtente() == utente.getId());</span>
+<span class="fc" id="L165">            boolean finito = segnalazioneService.gestisciConfermaScambio(idReclamo, isFinder);</span>
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">            if (finito) {</span>
+<span class="nc" id="L167">                response.sendRedirect(&quot;dettaglio-segnalazione?id=&quot; + idSegnalazione + &quot;&amp;msg=scambio_completato&quot;);</span>
+            } else {
+<span class="fc" id="L169">                response.sendRedirect(&quot;dettaglio-segnalazione?id=&quot; + idSegnalazione + &quot;&amp;msg=conferma_registrata&quot;);</span>
+            }
+        }
+<span class="fc" id="L172">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

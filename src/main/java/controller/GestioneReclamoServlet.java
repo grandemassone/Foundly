@@ -166,7 +166,7 @@ public class GestioneReclamoServlet extends HttpServlet {
             boolean finito = segnalazioneService.gestisciConfermaScambio(idReclamo, isFinder);
 
             if (finito) {
-                // FIX CRUCIALE: Se lo scambio è finito e io sono il finder, ho ricevuto +1 punto.
+                // FIX CRUCIALE: Se  lo scambio è finito e io sono il finder, ho ricevuto +1 punto.
                 // Devo ricaricare l'utente dalla sessione per mostrare i punti aggiornati.
                 if (isFinder) {
                     Utente utenteAggiornato = utenteService.trovaPerId(utente.getId());

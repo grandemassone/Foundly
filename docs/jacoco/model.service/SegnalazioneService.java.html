@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SegnalazioneService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">model.service</a> &gt; <span class="el_source">SegnalazioneService.java</span></div><h1>SegnalazioneService.java</h1><pre class="source lang-java linenums">package model.service;
+
+import model.bean.Reclamo;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.ModalitaConsegna;
+import model.bean.enums.StatoSegnalazione;
+import model.dao.ReclamoDAO;
+import model.dao.SegnalazioneDAO;
+import model.utils.GeocodingUtils;
+
+import java.util.List;
+
+<span class="fc" id="L15">public class SegnalazioneService {</span>
+
+<span class="fc" id="L17">    private final SegnalazioneDAO segnalazioneDAO = new SegnalazioneDAO();</span>
+<span class="fc" id="L18">    private final ReclamoDAO reclamoDAO = new ReclamoDAO();</span>
+<span class="fc" id="L19">    private final UtenteService utenteService = new UtenteService(); // Per gestire i punti</span>
+
+    public boolean creaSegnalazione(Segnalazione segnalazione) {
+<span class="pc bpc" id="L22" title="2 of 4 branches missed.">        if (segnalazione.getLuogoRitrovamento() != null &amp;&amp; !segnalazione.getLuogoRitrovamento().isEmpty() &amp;&amp;</span>
+<span class="pc bpc" id="L23" title="2 of 4 branches missed.">                segnalazione.getCitta() != null &amp;&amp; !segnalazione.getCitta().isEmpty()) {</span>
+<span class="fc" id="L24">            double[] coords = GeocodingUtils.getCoordinates(</span>
+<span class="fc" id="L25">                    segnalazione.getLuogoRitrovamento(),</span>
+<span class="fc" id="L26">                    segnalazione.getCitta(),</span>
+<span class="fc" id="L27">                    segnalazione.getProvincia()</span>
+            );
+<span class="fc" id="L29">            segnalazione.setLatitudine(coords[0]);</span>
+<span class="fc" id="L30">            segnalazione.setLongitudine(coords[1]);</span>
+        }
+<span class="fc" id="L32">        return segnalazioneDAO.doSave(segnalazione);</span>
+    }
+
+    public List&lt;Segnalazione&gt; getUltimeSegnalazioni() {
+<span class="nc" id="L36">        return segnalazioneDAO.doRetrieveLatest(8);</span>
+    }
+
+    public Segnalazione trovaPerId(long id) {
+<span class="nc" id="L40">        return segnalazioneDAO.doRetrieveById(id);</span>
+    }
+
+    public List&lt;Segnalazione&gt; trovaPerUtente(long idUtente) {
+<span class="nc" id="L44">        return segnalazioneDAO.doRetrieveByUtente(idUtente);</span>
+    }
+
+    public boolean eliminaSegnalazione(long id) {
+<span class="nc" id="L48">        return segnalazioneDAO.doDelete(id);</span>
+    }
+
+    // --- LOGICA DROP-POINT (Con Codice) ---
+    public boolean accettaReclamoEChiudiSegnalazione(long idReclamo, long idSegnalazione, String codice) {
+<span class="fc" id="L53">        boolean okReclamo = reclamoDAO.accettaReclamo(idReclamo, codice);</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">        if (!okReclamo) return false;</span>
+
+        // NON chiudere qui: verrà chiusa dal DropPoint quando registra il ritiro
+<span class="fc" id="L57">        return segnalazioneDAO.updateStato(idSegnalazione, StatoSegnalazione.IN_CONSEGNA);</span>
+    }
+
+    // --- LOGICA SCAMBIO DIRETTO (Doppia Conferma) ---
+    public boolean gestisciConfermaScambio(long idReclamo, boolean isFinder) {
+        // 1. Registra la conferma singola
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        if (isFinder) {</span>
+<span class="fc" id="L64">            reclamoDAO.confermaFinder(idReclamo);</span>
+        } else {
+<span class="nc" id="L66">            reclamoDAO.confermaOwner(idReclamo);</span>
+        }
+
+        // 2. Controlla se ORA sono entrambi confermati
+<span class="fc" id="L70">        Reclamo r = reclamoDAO.doRetrieveById(idReclamo);</span>
+<span class="pc bpc" id="L71" title="3 of 6 branches missed.">        if (r != null &amp;&amp; r.isConfermaFinder() &amp;&amp; r.isConfermaOwner()) {</span>
+
+            // Entrambi hanno confermato: Chiudi e dai punti
+<span class="fc" id="L74">            segnalazioneDAO.updateStato(r.getIdSegnalazione(), StatoSegnalazione.CHIUSA);</span>
+
+<span class="fc" id="L76">            Segnalazione s = segnalazioneDAO.doRetrieveById(r.getIdSegnalazione());</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">            if (s != null) {</span>
+<span class="fc" id="L78">                Utente finder = utenteService.trovaPerId(s.getIdUtente());</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">                if (finder != null) {</span>
+<span class="fc" id="L80">                    utenteService.aggiornaPunteggioEBadge(finder, 1);</span>
+                }
+            }
+<span class="fc" id="L83">            return true; // Scambio completato</span>
+        }
+<span class="nc" id="L85">        return false; // Manca l'altro utente</span>
+    }
+
+    public boolean rifiutaReclamo(long idReclamo) {
+<span class="nc" id="L89">        return reclamoDAO.rifiutaReclamo(idReclamo);</span>
+    }
+
+    public List&lt;Segnalazione&gt; cercaSegnalazioni(String q, String tipo, String categoria) {
+<span class="nc" id="L93">        return segnalazioneDAO.doRetrieveByFiltri(q, tipo, categoria);</span>
+    }
+
+    public List&lt;Reclamo&gt; trovaReclamiFattiDaUtente(long idUtente) {
+<span class="nc" id="L97">        return reclamoDAO.doRetrieveByRichiedente(idUtente);</span>
+    }
+
+    public List&lt;Segnalazione&gt; trovaTutte() {
+<span class="nc" id="L101">        return segnalazioneDAO.doRetrieveAll(); // lo aggiungi nel DAO</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GeocodingUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">model.utils</a> &gt; <span class="el_source">GeocodingUtils.java</span></div><h1>GeocodingUtils.java</h1><pre class="source lang-java linenums">package model.utils;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+<span class="nc" id="L13">public class GeocodingUtils {</span>
+
+    // Coordinate di default (es. Roma) se l'indirizzo non viene trovato
+    private static final double DEFAULT_LAT = 41.9028;
+    private static final double DEFAULT_LON = 12.4964;
+
+    /**
+     * Restituisce un array di double {latitudine, longitudine} dato un indirizzo.
+     */
+    public static double[] getCoordinates(String indirizzo, String citta, String provincia) {
+        try {
+            // 1. Costruiamo la query per OpenStreetMap
+<span class="fc" id="L25">            String fullAddress = indirizzo + &quot;, &quot; + citta + &quot;, &quot; + provincia;</span>
+<span class="fc" id="L26">            String encodedAddress = URLEncoder.encode(fullAddress, StandardCharsets.UTF_8);</span>
+
+            // URL API Nominatim (OpenStreetMap)
+<span class="fc" id="L29">            String urlString = &quot;https://nominatim.openstreetmap.org/search?q=&quot; + encodedAddress + &quot;&amp;format=json&amp;limit=1&quot;;</span>
+
+<span class="fc" id="L31">            URL url = new URL(urlString);</span>
+<span class="fc" id="L32">            HttpURLConnection conn = (HttpURLConnection) url.openConnection();</span>
+<span class="fc" id="L33">            conn.setRequestMethod(&quot;GET&quot;);</span>
+
+            // IMPORTANTE: Nominatim richiede uno User-Agent identificativo
+<span class="fc" id="L36">            conn.setRequestProperty(&quot;User-Agent&quot;, &quot;FoundlyApp/1.0 (student.project@unisa.it)&quot;);</span>
+
+<span class="fc" id="L38">            int responseCode = conn.getResponseCode();</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">            if (responseCode == 200) {</span>
+<span class="fc" id="L40">                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));</span>
+                String inputLine;
+<span class="fc" id="L42">                StringBuilder content = new StringBuilder();</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">                while ((inputLine = in.readLine()) != null) {</span>
+<span class="fc" id="L44">                    content.append(inputLine);</span>
+                }
+<span class="fc" id="L46">                in.close();</span>
+
+                // 2. Parsiamo il JSON ricevuto
+<span class="fc" id="L49">                JSONArray jsonArray = new JSONArray(content.toString());</span>
+
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">                if (jsonArray.length() &gt; 0) {</span>
+<span class="fc" id="L52">                    JSONObject location = jsonArray.getJSONObject(0);</span>
+<span class="fc" id="L53">                    double lat = location.getDouble(&quot;lat&quot;);</span>
+<span class="fc" id="L54">                    double lon = location.getDouble(&quot;lon&quot;);</span>
+
+<span class="fc" id="L56">                    System.out.println(&quot;Geocoding Successo: &quot; + fullAddress + &quot; -&gt; &quot; + lat + &quot;, &quot; + lon);</span>
+<span class="fc" id="L57">                    return new double[]{lat, lon};</span>
+                }
+<span class="nc" id="L59">            } else {</span>
+<span class="nc" id="L60">                System.err.println(&quot;Errore API Geocoding: HTTP &quot; + responseCode);</span>
+            }
+
+<span class="fc" id="L63">        } catch (Exception e) {</span>
+<span class="fc" id="L64">            e.printStackTrace();</span>
+<span class="fc" id="L65">            System.err.println(&quot;Eccezione durante il geocoding per: &quot; + indirizzo);</span>
+<span class="nc" id="L66">        }</span>
+
+<span class="fc" id="L68">        System.out.println(&quot;Indirizzo non trovato, uso coordinate default.&quot;);</span>
+<span class="fc" id="L69">        return new double[]{DEFAULT_LAT, DEFAULT_LON};</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

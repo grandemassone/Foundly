@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AreaDropPointServlet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">AreaDropPointServlet.java</span></div><h1>AreaDropPointServlet.java</h1><pre class="source lang-java linenums">package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.DropPoint;
+import model.bean.enums.StatoDropPoint;
+import model.service.DropPointService;
+
+import java.io.IOException;
+
+@WebServlet(name = &quot;AreaDropPointServlet&quot;, value = &quot;/area-drop-point&quot;)
+<span class="fc" id="L16">public class AreaDropPointServlet extends HttpServlet {</span>
+
+<span class="fc" id="L18">    private final DropPointService dropPointService = new DropPointService();</span>
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
+
+<span class="fc" id="L24">        HttpSession session = request.getSession(false);</span>
+<span class="pc bpc" id="L25" title="1 of 2 branches missed.">        DropPoint dp = (session != null) ? (DropPoint) session.getAttribute(&quot;dropPoint&quot;) : null;</span>
+
+<span class="pc bpc" id="L27" title="1 of 2 branches missed.">        if (dp != null) {</span>
+            // ricarico dal DB per avere lo stato aggiornato
+<span class="fc" id="L29">            DropPoint fromDb = dropPointService.trovaPerId(dp.getId());</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">            if (fromDb != null) {</span>
+<span class="fc" id="L31">                dp = fromDb;</span>
+<span class="fc" id="L32">                session.setAttribute(&quot;dropPoint&quot;, dp);</span>
+            }
+        }
+
+<span class="fc" id="L36">        request.setAttribute(&quot;dropPoint&quot;, dp);</span>
+
+<span class="pc bpc" id="L38" title="1 of 4 branches missed.">        if (dp != null &amp;&amp; dp.getStato() == StatoDropPoint.APPROVATO) {</span>
+<span class="fc" id="L39">            long id = dp.getId();</span>
+<span class="fc" id="L40">            request.setAttribute(&quot;depositiAttivi&quot;,      dropPointService.countDepositiAttivi(id));</span>
+<span class="fc" id="L41">            request.setAttribute(&quot;consegneCompletate&quot;, dropPointService.countConsegneCompletate(id));</span>
+<span class="fc" id="L42">        } else {</span>
+<span class="fc" id="L43">            request.setAttribute(&quot;depositiAttivi&quot;, 0);</span>
+<span class="fc" id="L44">            request.setAttribute(&quot;consegneCompletate&quot;, 0);</span>
+<span class="fc" id="L45">            request.setAttribute(&quot;totaleOperazioni&quot;, 0);</span>
+        }
+
+<span class="fc" id="L48">        request.getRequestDispatcher(&quot;/WEB-INF/jsp/area_drop_point.jsp&quot;)</span>
+<span class="fc" id="L49">                .forward(request, response);</span>
+<span class="fc" id="L50">    }</span>
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
+
+<span class="fc" id="L56">        HttpSession session = request.getSession(false);</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        DropPoint dp = (session != null) ? (DropPoint) session.getAttribute(&quot;dropPoint&quot;) : null;</span>
+
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if (dp == null) {</span>
+<span class="fc" id="L60">            response.sendRedirect(request.getContextPath() + &quot;/login&quot;);</span>
+<span class="fc" id="L61">            return;</span>
+        }
+
+        // ricarico stato
+<span class="fc" id="L65">        dp = dropPointService.trovaPerId(dp.getId());</span>
+<span class="fc" id="L66">        session.setAttribute(&quot;dropPoint&quot;, dp);</span>
+<span class="fc" id="L67">        request.setAttribute(&quot;dropPoint&quot;, dp);</span>
+
+<span class="fc" id="L69">        String action = request.getParameter(&quot;action&quot;);</span>
+<span class="fc" id="L70">        String codice = request.getParameter(&quot;codice&quot;);</span>
+
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if (dp.getStato() != StatoDropPoint.APPROVATO) {</span>
+<span class="fc" id="L73">            request.setAttribute(&quot;erroreGenerale&quot;, &quot;Devi avere un Drop-Point approvato per effettuare operazioni.&quot;);</span>
+<span class="pc bpc" id="L74" title="3 of 6 branches missed.">        } else if (action != null &amp;&amp; codice != null &amp;&amp; !codice.isBlank()) {</span>
+
+<span class="fc bfc" id="L76" title="All 2 branches covered.">            if (&quot;deposito&quot;.equals(action)) {</span>
+<span class="fc" id="L77">                boolean ok = dropPointService.registraDeposito(dp.getId(), codice.trim());</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">                if (ok) {</span>
+<span class="fc" id="L79">                    request.setAttribute(&quot;msgDeposito&quot;, &quot;Deposito verificato.&quot;);</span>
+                } else {
+<span class="nc" id="L81">                    request.setAttribute(&quot;msgDeposito&quot;, &quot;Codice non valido o non associato a questo punto.&quot;);</span>
+                }
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">            } else if (&quot;ritiro&quot;.equals(action)) {</span>
+                // QUI AVVIENE LA MAGIA: Chiama il service aggiornato che chiude la segnalazione nel DB
+<span class="fc" id="L85">                boolean ok = dropPointService.registraRitiro(dp.getId(), codice.trim());</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">                if (ok) {</span>
+<span class="fc" id="L87">                    request.setAttribute(&quot;msgRitiro&quot;, &quot;Ritiro confermato! Segnalazione chiusa e punti assegnati.&quot;);</span>
+                } else {
+<span class="nc" id="L89">                    request.setAttribute(&quot;msgRitiro&quot;, &quot;Errore: Codice non valido o segnalazione già chiusa.&quot;);</span>
+                }
+            }
+        }
+
+<span class="fc" id="L94">        long id = dp.getId();</span>
+<span class="fc" id="L95">        request.setAttribute(&quot;depositiAttivi&quot;,      dropPointService.countDepositiAttivi(id));</span>
+<span class="fc" id="L96">        request.setAttribute(&quot;consegneCompletate&quot;, dropPointService.countConsegneCompletate(id));</span>
+
+<span class="fc" id="L98">        request.getRequestDispatcher(&quot;/WEB-INF/jsp/area_drop_point.jsp&quot;)</span>
+<span class="fc" id="L99">                .forward(request, response);</span>
+<span class="fc" id="L100">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

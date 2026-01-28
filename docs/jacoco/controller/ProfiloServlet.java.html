@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProfiloServlet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">ProfiloServlet.java</span></div><h1>ProfiloServlet.java</h1><pre class="source lang-java linenums">package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import model.bean.Utente;
+import model.service.UtenteService;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+@WebServlet(name = &quot;ProfiloServlet&quot;, value = &quot;/profilo&quot;)
+@MultipartConfig(
+        maxFileSize = 5 * 1024 * 1024,        // 5 MB
+        maxRequestSize = 10 * 1024 * 1024     // 10 MB
+)
+<span class="fc" id="L22">public class ProfiloServlet extends HttpServlet {</span>
+
+<span class="fc" id="L24">    private final UtenteService utenteService = new UtenteService();</span>
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
+
+<span class="fc" id="L30">        HttpSession session = request.getSession(false);</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        Utente utente = (session != null) ? (Utente) session.getAttribute(&quot;utente&quot;) : null;</span>
+
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if (utente == null) {</span>
+<span class="fc" id="L34">            response.sendRedirect(request.getContextPath() + &quot;/login&quot;);</span>
+<span class="fc" id="L35">            return;</span>
+        }
+
+        // mantiene il badge coerente con il punteggio
+<span class="fc" id="L39">        utenteService.aggiornaPunteggioEBadge(utente, 0);</span>
+<span class="fc" id="L40">        session.setAttribute(&quot;utente&quot;, utente);</span>
+
+<span class="fc" id="L42">        request.getRequestDispatcher(&quot;/WEB-INF/jsp/profilo.jsp&quot;)</span>
+<span class="fc" id="L43">                .forward(request, response);</span>
+<span class="fc" id="L44">    }</span>
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
+
+<span class="fc" id="L50">        request.setCharacterEncoding(&quot;UTF-8&quot;);</span>
+
+<span class="fc" id="L52">        HttpSession session = request.getSession(false);</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        Utente utente = (session != null) ? (Utente) session.getAttribute(&quot;utente&quot;) : null;</span>
+
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        if (utente == null) {</span>
+<span class="fc" id="L56">            response.sendRedirect(request.getContextPath() + &quot;/login&quot;);</span>
+<span class="fc" id="L57">            return;</span>
+        }
+
+<span class="fc" id="L60">        String action = request.getParameter(&quot;action&quot;);</span>
+
+        // ==========================
+        // DELETE ACCOUNT
+        // ==========================
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (&quot;delete_account&quot;.equals(action)) {</span>
+<span class="fc" id="L66">            boolean deleted = utenteService.cancellaUtente(utente.getId());</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">            if (deleted) {</span>
+<span class="fc" id="L68">                session.invalidate();</span>
+<span class="fc" id="L69">                response.sendRedirect(request.getContextPath() + &quot;/login?deleted=1&quot;);</span>
+            } else {
+<span class="fc" id="L71">                response.sendRedirect(request.getContextPath() + &quot;/profilo?error=delete_failed&quot;);</span>
+            }
+<span class="fc" id="L73">            return;</span>
+        }
+
+        // ==========================
+        // UPDATE PROFILE
+        // ==========================
+        // (consigliato: controlla action update_profile, ma puoi anche farne a meno)
+        // if (!&quot;update_profile&quot;.equals(action)) { response.sendRedirect(...); return; }
+
+        // campi testo (non sovrascrivere con null)
+<span class="fc" id="L83">        String username = request.getParameter(&quot;username&quot;);</span>
+<span class="fc" id="L84">        String nome     = request.getParameter(&quot;nome&quot;);</span>
+<span class="fc" id="L85">        String cognome  = request.getParameter(&quot;cognome&quot;);</span>
+
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (username != null) utente.setUsername(username.trim());</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        if (nome != null)     utente.setNome(nome.trim());</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        if (cognome != null)  utente.setCognome(cognome.trim());</span>
+
+        // flag rimozione immagine
+<span class="fc" id="L92">        boolean removeAvatar = &quot;true&quot;.equalsIgnoreCase(request.getParameter(&quot;removeAvatar&quot;));</span>
+
+        // upload immagine profilo (campo &quot;avatar&quot;)
+<span class="fc" id="L95">        Part avatarPart = null;</span>
+        try {
+<span class="fc" id="L97">            avatarPart = request.getPart(&quot;avatar&quot;);</span>
+<span class="nc" id="L98">        } catch (IllegalStateException | ServletException e) {</span>
+<span class="nc" id="L99">            avatarPart = null;</span>
+<span class="fc" id="L100">        }</span>
+
+<span class="pc bpc" id="L102" title="1 of 4 branches missed.">        boolean hasNewUpload = (avatarPart != null &amp;&amp; avatarPart.getSize() &gt; 0);</span>
+
+<span class="fc bfc" id="L104" title="All 2 branches covered.">        if (hasNewUpload) {</span>
+<span class="fc" id="L105">            try (InputStream is = avatarPart.getInputStream()) {</span>
+<span class="fc" id="L106">                byte[] bytes = is.readAllBytes();</span>
+<span class="fc" id="L107">                utente.setImmagineProfilo(bytes);</span>
+<span class="fc" id="L108">                utente.setImmagineProfiloContentType(avatarPart.getContentType());</span>
+            }
+<span class="fc" id="L110">            removeAvatar = false;</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">        } else if (removeAvatar) {</span>
+<span class="fc" id="L112">            utente.setImmagineProfilo(null);</span>
+<span class="fc" id="L113">            utente.setImmagineProfiloContentType(null);</span>
+        }
+
+<span class="fc" id="L116">        boolean ok = utenteService.aggiornaProfilo(utente);</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">        if (!ok) {</span>
+<span class="fc" id="L118">            response.sendRedirect(request.getContextPath() + &quot;/profilo?error=update_failed&quot;);</span>
+<span class="fc" id="L119">            return;</span>
+        }
+
+<span class="fc" id="L122">        session.setAttribute(&quot;utente&quot;, utente);</span>
+<span class="fc" id="L123">        response.sendRedirect(request.getContextPath() + &quot;/profilo?success=1&quot;);</span>
+<span class="fc" id="L124">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

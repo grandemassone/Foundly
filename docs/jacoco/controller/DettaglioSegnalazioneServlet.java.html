@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DettaglioSegnalazioneServlet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">DettaglioSegnalazioneServlet.java</span></div><h1>DettaglioSegnalazioneServlet.java</h1><pre class="source lang-java linenums">package controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.bean.DropPoint;
+import model.bean.Reclamo;
+import model.bean.Segnalazione;
+import model.bean.SegnalazioneOggetto;
+import model.bean.Utente;
+import model.bean.enums.ModalitaConsegna;
+import model.dao.ReclamoDAO;
+import model.dao.UtenteDAO;
+import model.service.DropPointService;
+import model.service.SegnalazioneService;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@WebServlet(name = &quot;DettaglioSegnalazioneServlet&quot;, value = &quot;/dettaglio-segnalazione&quot;)
+<span class="fc" id="L26">public class DettaglioSegnalazioneServlet extends HttpServlet {</span>
+
+<span class="fc" id="L28">    private final SegnalazioneService segnalazioneService = new SegnalazioneService();</span>
+<span class="fc" id="L29">    private final ReclamoDAO reclamoDAO = new ReclamoDAO();</span>
+<span class="fc" id="L30">    private final UtenteDAO utenteDAO = new UtenteDAO();</span>
+<span class="fc" id="L31">    private final DropPointService dropPointService = new DropPointService();</span>
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="fc" id="L35">        String idStr = request.getParameter(&quot;id&quot;);</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        if (idStr == null) {</span>
+<span class="fc" id="L37">            response.sendRedirect(&quot;index&quot;);</span>
+<span class="fc" id="L38">            return;</span>
+        }
+
+<span class="fc" id="L41">        long id = Long.parseLong(idStr);</span>
+<span class="fc" id="L42">        Segnalazione s = segnalazioneService.trovaPerId(id);</span>
+
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (s == null) {</span>
+<span class="fc" id="L45">            response.sendRedirect(&quot;index&quot;);</span>
+<span class="fc" id="L46">            return;</span>
+        }
+
+        // --- Recupero Drop-Point per la consegna (se applicabile) ---
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (s instanceof SegnalazioneOggetto) {</span>
+<span class="fc" id="L51">            SegnalazioneOggetto so = (SegnalazioneOggetto) s;</span>
+<span class="pc bpc" id="L52" title="1 of 4 branches missed.">            if (so.getModalitaConsegna() == ModalitaConsegna.DROP_POINT &amp;&amp; so.getIdDropPoint() != null) {</span>
+<span class="fc" id="L53">                DropPoint dp = dropPointService.trovaPerId(so.getIdDropPoint());</span>
+<span class="fc" id="L54">                request.setAttribute(&quot;dropPointRitiro&quot;, dp);</span>
+            }
+        }
+
+<span class="fc" id="L58">        HttpSession session = request.getSession(false);</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">        Utente utente = (session != null) ? (Utente) session.getAttribute(&quot;utente&quot;) : null;</span>
+
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">        if (utente != null) {</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">            if (utente.getId() == s.getIdUtente()) {</span>
+                // CASO PROPRIETARIO (Finder)
+<span class="fc" id="L64">                List&lt;Reclamo&gt; reclami = reclamoDAO.doRetrieveBySegnalazione(s.getId());</span>
+<span class="fc" id="L65">                request.setAttribute(&quot;reclamiRicevuti&quot;, reclami);</span>
+
+                // --- NUOVO: Mappa per associare ID Utente -&gt; Oggetto Utente (Richiedente) ---
+                // Serve per mostrare i dati di chi ha fatto reclamo al Finder
+<span class="fc" id="L69">                Map&lt;Long, Utente&gt; mappaRichiedenti = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">                for (Reclamo r : reclami) {</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">                    if (!mappaRichiedenti.containsKey(r.getIdUtenteRichiedente())) {</span>
+<span class="fc" id="L72">                        Utente richiedente = utenteDAO.doRetrieveById(r.getIdUtenteRichiedente());</span>
+<span class="fc" id="L73">                        mappaRichiedenti.put(r.getIdUtenteRichiedente(), richiedente);</span>
+                    }
+<span class="fc" id="L75">                }</span>
+<span class="fc" id="L76">                request.setAttribute(&quot;mappaRichiedenti&quot;, mappaRichiedenti);</span>
+                // ----------------------------------------------------------------------------
+
+<span class="fc" id="L79">            } else {</span>
+                // CASO UTENTE CHE CERCA (Owner)
+<span class="fc" id="L81">                Reclamo mioReclamo = reclamoDAO.doRetrieveBySegnalazioneAndUtente(s.getId(), utente.getId());</span>
+<span class="fc" id="L82">                request.setAttribute(&quot;mioReclamo&quot;, mioReclamo);</span>
+            }
+        }
+
+        // Recupero info del proprietario (Finder) per mostrarle all'Owner in caso di vittoria
+<span class="fc" id="L87">        Utente proprietario = utenteDAO.doRetrieveById(s.getIdUtente());</span>
+<span class="fc" id="L88">        request.setAttribute(&quot;proprietarioSegnalazione&quot;, proprietario);</span>
+
+<span class="fc" id="L90">        request.setAttribute(&quot;segnalazione&quot;, s);</span>
+<span class="fc" id="L91">        request.getRequestDispatcher(&quot;/WEB-INF/jsp/dettaglio_segnalazione.jsp&quot;).forward(request, response);</span>
+<span class="fc" id="L92">    }</span>
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+<span class="fc" id="L96">        String action = request.getParameter(&quot;action&quot;);</span>
+<span class="fc" id="L97">        String idStr = request.getParameter(&quot;idSegnalazione&quot;);</span>
+
+<span class="pc bpc" id="L99" title="2 of 4 branches missed.">        if (&quot;delete&quot;.equals(action) &amp;&amp; idStr != null) {</span>
+<span class="fc" id="L100">            long id = Long.parseLong(idStr);</span>
+<span class="fc" id="L101">            HttpSession session = request.getSession(false);</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">            Utente utente = (session != null) ? (Utente) session.getAttribute(&quot;utente&quot;) : null;</span>
+<span class="fc" id="L103">            Segnalazione s = segnalazioneService.trovaPerId(id);</span>
+
+<span class="pc bpc" id="L105" title="3 of 6 branches missed.">            if (utente != null &amp;&amp; s != null &amp;&amp; s.getIdUtente() == utente.getId()) {</span>
+<span class="fc" id="L106">                segnalazioneService.eliminaSegnalazione(id);</span>
+            }
+<span class="fc" id="L108">            response.sendRedirect(&quot;le-mie-segnalazioni&quot;);</span>
+        }
+<span class="fc" id="L110">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

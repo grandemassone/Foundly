@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UtenteService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Foundly</a> &gt; <a href="index.source.html" class="el_package">model.service</a> &gt; <span class="el_source">UtenteService.java</span></div><h1>UtenteService.java</h1><pre class="source lang-java linenums">package model.service;
+
+import model.bean.Utente;
+import model.bean.enums.Ruolo;
+import model.dao.UtenteDAO;
+import model.utils.PasswordUtils;
+
+import java.util.List;
+
+<span class="fc" id="L10">public class UtenteService {</span>
+
+<span class="fc" id="L12">    private final UtenteDAO utenteDAO = new UtenteDAO();</span>
+
+    /**
+     * Registrazione di un nuovo utente &quot;cittadino&quot;.
+     */
+    public boolean registraUtente(String nome,
+                                  String cognome,
+                                  String username,
+                                  String email,
+                                  String password,
+                                  String telefono) {
+
+<span class="fc" id="L24">        System.out.println(&quot;DEBUG: Inizio registrazione per &quot; + email);</span>
+
+        // 1. Controllo Email
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if (utenteDAO.doRetrieveByEmail(email) != null) {</span>
+<span class="fc" id="L28">            System.out.println(&quot;DEBUG: Email già presente.&quot;);</span>
+<span class="fc" id="L29">            return false;</span>
+        }
+
+        // 2. Controllo Username
+<span class="pc bpc" id="L33" title="1 of 2 branches missed.">        if (utenteDAO.doRetrieveByUsername(username) != null) {</span>
+<span class="nc" id="L34">            System.out.println(&quot;DEBUG: Username già presente.&quot;);</span>
+<span class="nc" id="L35">            return false;</span>
+        }
+
+<span class="fc" id="L38">        System.out.println(&quot;DEBUG: Email e Username liberi. Procedo...&quot;);</span>
+
+<span class="fc" id="L40">        Utente nuovoUtente = new Utente();</span>
+<span class="fc" id="L41">        nuovoUtente.setNome(nome);</span>
+<span class="fc" id="L42">        nuovoUtente.setCognome(cognome);</span>
+<span class="fc" id="L43">        nuovoUtente.setUsername(username);</span>
+<span class="fc" id="L44">        nuovoUtente.setEmail(email);</span>
+<span class="fc" id="L45">        nuovoUtente.setTelefono(telefono);</span>
+
+        // Hash della password
+<span class="fc" id="L48">        String passwordHash = PasswordUtils.hashPassword(password);</span>
+<span class="fc" id="L49">        nuovoUtente.setPasswordHash(passwordHash);</span>
+
+        // Impostazioni di default
+<span class="fc" id="L52">        nuovoUtente.setRuolo(Ruolo.UTENTE_BASE);</span>
+<span class="fc" id="L53">        nuovoUtente.setPunteggio(0);</span>
+<span class="fc" id="L54">        nuovoUtente.setBadge(&quot;OCCHIO_DI_FALCO&quot;);</span>
+<span class="fc" id="L55">        nuovoUtente.setImmagineProfilo(null);</span>
+
+<span class="fc" id="L57">        boolean salvato = utenteDAO.doSave(nuovoUtente);</span>
+<span class="fc" id="L58">        System.out.println(&quot;DEBUG: Risultato salvataggio DAO: &quot; + salvato);</span>
+
+<span class="fc" id="L60">        return salvato;</span>
+    }
+    public List&lt;Utente&gt; getClassificaUtenti() {
+<span class="nc" id="L63">        return utenteDAO.doRetrieveAllByPunteggio();</span>
+    }
+    //commento fico
+
+    /**
+     * Login utente &quot;cittadino&quot; con email + password.
+     */
+    public Utente login(String email, String password) {
+        // 1. Recupera l'utente dal DB
+<span class="fc" id="L72">        Utente utente = utenteDAO.doRetrieveByEmail(email);</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        if (utente == null) {</span>
+<span class="nc" id="L74">            return null; // Utente non trovato</span>
+        }
+
+        // 2. Verifica la password (hash vs password in chiaro)
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        if (PasswordUtils.checkPassword(password, utente.getPasswordHash())) {</span>
+<span class="fc" id="L79">            return utente; // Login successo</span>
+        }
+
+<span class="fc" id="L82">        return null; // Password errata</span>
+    }
+
+    /**
+     * Comodo per il recupero password:
+     * restituisce l'utente associato a una certa email,
+     * oppure null se non esiste.
+     */
+    public Utente trovaPerEmail(String email) {
+<span class="nc" id="L91">        return utenteDAO.doRetrieveByEmail(email);</span>
+    }
+
+    /**
+     * Usato nel flusso di recupero password:
+     * - trova l'utente tramite email
+     * - calcola il nuovo hash
+     * - aggiorna la password nel DB
+     *
+     * @return true se l'aggiornamento va a buon fine, false altrimenti
+     */
+    public boolean resetPasswordByEmail(String email, String nuovaPassword) {
+<span class="nc" id="L103">        Utente utente = utenteDAO.doRetrieveByEmail(email);</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">        if (utente == null) {</span>
+<span class="nc" id="L105">            return false; // nessun utente con questa email</span>
+        }
+
+        // Applica gli stessi criteri di sicurezza che usi in registrazione (già validati a monte)
+<span class="nc" id="L109">        String nuovoHash = PasswordUtils.hashPassword(nuovaPassword);</span>
+<span class="nc" id="L110">        utente.setPasswordHash(nuovoHash);</span>
+
+<span class="nc" id="L112">        return utenteDAO.updatePasswordByEmail(email, nuovoHash);</span>
+    }
+
+    /* =========================================================
+       METODI PER GESTIONE PROFILO
+       ========================================================= */
+
+    /**
+     * Aggiorna i dati base del profilo (username, nome, cognome).
+     * Si aspetta un Utente già caricato (es. da sessione) con id valorizzato.
+     *
+     * @param utente utente da aggiornare
+     * @return true se l'update su DB va a buon fine, false altrimenti
+     */
+    public boolean aggiornaProfilo(Utente utente) {
+        // id è un long primitivo: uso un controllo &gt; 0 invece di null
+<span class="nc bnc" id="L128" title="All 4 branches missed.">        if (utente == null || utente.getId() &lt;= 0) {</span>
+<span class="nc" id="L129">            return false;</span>
+        }
+
+        // Controllo eventuale duplicato di username
+<span class="nc" id="L133">        Utente esistente = utenteDAO.doRetrieveByUsername(utente.getUsername());</span>
+<span class="nc bnc" id="L134" title="All 4 branches missed.">        if (esistente != null &amp;&amp; esistente.getId() != utente.getId()) {</span>
+            // c'è già un altro utente con questo username
+<span class="nc" id="L136">            return false;</span>
+        }
+
+<span class="nc" id="L139">        return utenteDAO.updateProfilo(utente);</span>
+    }
+
+
+    /**
+     * (Opzionale) Recupera utente per id, utile se in futuro
+     * ti serve ricaricare i dati dal DB.
+     */
+    public Utente trovaPerId(long id) {
+<span class="nc" id="L148">        return utenteDAO.doRetrieveById(id);</span>
+    }
+    /* ==========================
+   LOGICA BADGE/PUNTEGGIO
+   ========================== */
+
+    /**
+     * Ritorna il nome del badge (stringa ENUM) in base al punteggio.
+     * 0-2 punti  -&gt; OCCHIO_DI_FALCO
+     * 3-4 punti  -&gt; DETECTIVE
+     * &gt;=5 punti  -&gt; SHERLOCK_HOLMES
+     */
+    // in UtenteService
+
+    /**
+     * 0-2 punti  -&gt; OCCHIO_DI_FALCO
+     * 3-4 punti  -&gt; DETECTIVE
+     * &gt;=5 punti  -&gt; SHERLOCK_HOLMES
+     */
+    private String calcolaBadgePerPunteggio(int punti) {
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">        if (punti &gt;= 150) {</span>
+<span class="nc" id="L169">            return &quot;SHERLOCK_HOLMES&quot;;</span>
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">        } else if (punti &gt;= 100) {</span>
+<span class="fc" id="L171">            return &quot;DETECTIVE&quot;;</span>
+        } else {
+<span class="nc" id="L173">            return &quot;OCCHIO_DI_FALCO&quot;;</span>
+        }
+    }
+
+    public boolean aggiornaPunteggioEBadge(Utente utente, int deltaPunti) {
+<span class="pc bpc" id="L178" title="2 of 4 branches missed.">        if (utente == null || utente.getId() &lt;= 0) {</span>
+<span class="nc" id="L179">            return false;</span>
+        }
+
+<span class="fc" id="L182">        int nuovoPunteggio = utente.getPunteggio() + deltaPunti;</span>
+<span class="pc bpc" id="L183" title="1 of 2 branches missed.">        if (nuovoPunteggio &lt; 0) {</span>
+<span class="nc" id="L184">            nuovoPunteggio = 0;</span>
+        }
+
+<span class="fc" id="L187">        String nuovoBadge = calcolaBadgePerPunteggio(nuovoPunteggio);</span>
+
+<span class="fc" id="L189">        utente.setPunteggio(nuovoPunteggio);</span>
+<span class="fc" id="L190">        utente.setBadge(nuovoBadge);</span>
+
+<span class="fc" id="L192">        return utenteDAO.updatePunteggioEBadge(utente);</span>
+    }
+    // =========================================================
+    // METODI AREA ADMIN
+    // =========================================================
+
+    /** Tutti gli utenti, usato in Area Admin. */
+    public java.util.List&lt;Utente&gt; trovaTutti() {
+<span class="nc" id="L200">        return utenteDAO.doRetrieveAll();</span>
+    }
+
+    /** Ban = cancellazione account. */
+    public boolean cancellaUtente(long id) {
+<span class="nc" id="L205">        return utenteDAO.deleteById(id);</span>
+    }
+
+    public List&lt;String&gt; getEmailAdmins() {
+<span class="fc" id="L209">        return utenteDAO.doRetrieveAll().stream()</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">                .filter(u -&gt; u.getRuolo() == model.bean.enums.Ruolo.ADMIN)</span>
+<span class="fc" id="L211">                .map(Utente::getEmail)</span>
+<span class="fc" id="L212">                .toList();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

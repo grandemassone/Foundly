@@ -49,7 +49,7 @@
         }
     }
 
-    // --- CONTROPARTE ---
+    // -- CONTROPARTE --
     Utente controparte = null;
     String etichettaControparte = "Utente";
 
